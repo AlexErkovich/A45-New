@@ -17,3 +17,6 @@ secrets*.json
 .aws/
 .vercel
 .env*
+
+/integration.js
+!.env.example

@@ -8,6 +8,7 @@ const filterState={category:'',subcategory:'',year:'',type:''};
 const expanded=new Set();
 let route={};
 let treeRouteKey=null;
+let remoteRootCategories=null;
 let archiveScrollTop=0;
 let mobileMenuOpen=false;
 let backgroundScrollTop=0;
@@ -17,7 +18,7 @@ function childrenOf(id=null){return categories.filter(c=>c.parentId===id).sort((
 function categoryPath(id){const path=[];for(let c=categoryById.get(id);c;c=categoryById.get(c.parentId))path.unshift(c);return path}
 function isWithin(id,parentId){return categoryPath(id).some(c=>c.id===parentId)}
 function belongsTo(project,categoryId=''){return !categoryId||project.categoryIds.some(id=>isWithin(id,categoryId))}
-function parseRoute(){const [path,query='']=location.hash.slice(2).split('?');let [page='home',id='',sub='']=path.split('/');const params=new URLSearchParams(query);if(page==='category'){id=legacyRoots[id]||id;if(sub)id=childrenOf(id).find(c=>c.title===decodeURIComponent(sub))?.id||id}let category=params.get('category');category=legacyRoots[category]||category;const legacySub=params.get('subcategory');if(legacySub)category=childrenOf(category).find(c=>c.title===legacySub)?.id||category;return {page:page||'home',id,category,tab:params.get('tab')||'overview'}}
+function parseRoute(){if(!location.hash&&location.pathname==='/admin')return {page:'admin',id:'',category:null,tab:'overview'};const [path,query='']=location.hash.slice(2).split('?');let [page='home',id='',sub='']=path.split('/');const params=new URLSearchParams(query);if(page==='category'){id=legacyRoots[id]||id;if(sub)id=childrenOf(id).find(c=>c.title===decodeURIComponent(sub))?.id||id}let category=params.get('category');category=legacyRoots[category]||category;const legacySub=params.get('subcategory');if(legacySub)category=childrenOf(category).find(c=>c.title===legacySub)?.id||category;return {page:page||'home',id,category,tab:params.get('tab')||'overview'}}
 function findProject(id){return projects.find(p=>p.id===id||p.slug===id)}
 function projectContext(project){return categoryById.get(route.category)&&belongsTo(project,route.category)?categoryById.get(route.category):categoryById.get(project.categoryIds[0])}
 function projectHref(project){return '#/project/'+project.id+(route.page==='category'?'?'+new URLSearchParams({category:route.id}):'')}
@@ -43,8 +44,9 @@ function setMobileMenu(open){
  else{document.body.style.top='';page.scrollTop=backgroundScrollTop;$('#archive-toggle')?.focus({preventScroll:true})}
 }
 function render(){route=parseRoute();const internal=['category','project','year','projects'].includes(route.page);const project=findProject(route.id);const cat=route.page==='project'&&project?projectContext(project):categoryById.get(route.id);const nextTreeRouteKey=JSON.stringify([route.page,route.id,route.category]);if(nextTreeRouteKey!==treeRouteKey){if(cat)categoryPath(cat.id).forEach(c=>expanded.add(c.id));if(route.page==='project')project?.categoryIds.forEach(id=>categoryPath(id).forEach(c=>expanded.add(c.id)));treeRouteKey=nextTreeRouteKey;}$('#layout').classList.toggle('internal',internal);if(internal)tree();$('#main').classList.toggle('home',route.page==='home');$('#main').classList.toggle('listing',['category','projects','year'].includes(route.page));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===route.page));let html='';const archiveButton=internal?'<button class="archive-toggle" id="archive-toggle" aria-expanded="false" aria-controls="archive">☰ Дерево архива</button>':'';
-if(route.page==='about'){html=`<div class="about"><div class="eyebrow">ОБ АРХИВЕ</div><h1>Творчество —<br>способ смотреть на мир.</h1><p>A45 — персональная творческая библиотека. Здесь собираются фотографии, тексты, визуальные исследования и проекты на пересечении искусства и технологий.</p><p>Это пространство для поиска, экспериментов и сохранения того, что хочется помнить.</p><p>Пока архив наполнен демонстрационными материалами. Постепенно здесь появятся настоящие работы и истории их создания.</p><a class="back-link" href="#/">К направлениям творчества ↗</a></div>`}
-else if(route.page==='home'){html=`<div class="card-grid" aria-label="Направления творчества">${childrenOf().map(c=>card(c,true)).join('')}</div>`}
+if(route.page==='admin'){html='<section class="admin-page"><h1>Администрирование</h1><p>Загрузка…</p></section>'}
+else if(route.page==='about'){html=`<div class="about"><div class="eyebrow">ОБ АРХИВЕ</div><h1>Творчество —<br>способ смотреть на мир.</h1><p>A45 — персональная творческая библиотека. Здесь собираются фотографии, тексты, визуальные исследования и проекты на пересечении искусства и технологий.</p><p>Это пространство для поиска, экспериментов и сохранения того, что хочется помнить.</p><p>Пока архив наполнен демонстрационными материалами. Постепенно здесь появятся настоящие работы и истории их создания.</p><a class="back-link" href="#/">К направлениям творчества ↗</a></div>`}
+else if(route.page==='home'){html=`<div class="card-grid" aria-label="Направления творчества">${(remoteRootCategories??childrenOf()).map(c=>card(c,true)).join('')}</div>`}
 else if(route.page==='project'&&project){html=ProjectPage.render(project,cat,route.tab)}
 else if(['projects','category','year'].includes(route.page)&& (route.page!=='category'||cat)){
 let items=projects.filter(matches);
@@ -55,7 +57,7 @@ const filtered=Object.values(filterState).some(Boolean);
 html=`<div class="crumbs">${cat?breadcrumbs(cat):'<a href="#/">Главная</a> / '+esc(title)}</div><div class="section-heading"><h1>${esc(title)}</h1><button id="open-filter" aria-haspopup="dialog" aria-controls="filters">Фильтр${filtered?' · '+Object.values(filterState).filter(Boolean).length:''}</button></div>${filtered?'<div class="active-note">Фильтры применены · <button id="clear-all">Сбросить</button></div>':''}${items.length?`<div class="card-grid">${items.map(i=>card(i)).join('')}</div>`:'<div class="empty">По выбранным условиям ничего не найдено. Попробуйте сбросить фильтры.</div>'}`}
 
 else{html='<h1>Страница не найдена</h1><a href="#/">← На главную</a>'}
-$('#main').innerHTML=archiveButton+html;if(internal)$('#archive-toggle').setAttribute('aria-expanded',String($('#archive').classList.contains('open')));document.title=(route.page==='home'?'Направления творчества':project&&route.page==='project'?project.title:cat?.title||'Творческий архив')+' — A45';}
+$('#main').innerHTML=archiveButton+html;if(route.page==='admin'){if(window.A45Cloud)window.A45Cloud.mountAdmin();else $('#main').innerHTML='<section class="admin-page"><h1>Администрирование</h1><p>Выполните npm run build, чтобы подготовить интеграцию Supabase.</p></section>'}else window.A45Cloud?.releaseImage();if(internal)$('#archive-toggle').setAttribute('aria-expanded',String($('#archive').classList.contains('open')));document.title=(route.page==='home'?'Направления творчества':project&&route.page==='project'?project.title:cat?.title||'Творческий архив')+' — A45';}
 function options(name,values,selected){const select=$(`[name="${name}"]`);select.innerHTML='<option value="">Все</option>'+values.map(v=>{const [id,label]=Array.isArray(v)?v:[v,v];return `<option value="${esc(id)}">${esc(label)}</option>`}).join('');select.value=selected}
 function subOptions(){const root=$('[name="category"]').value;const descendants=categories.filter(c=>c.parentId!==null&&(!root||isWithin(c.id,root)));options('subcategory',descendants.map(c=>[c.id,categoryPath(c.id).slice(root?1:0).map(n=>n.title).join(' / ')]),filterState.subcategory)}
 function openFilters(){options('category',childrenOf().map(c=>[c.id,c.title]),filterState.category);subOptions();options('year',[2026,2025,2024],filterState.year);options('type',['Статья','Фотография','Видео','Проект','Исследование'],filterState.type);$('#filters').showModal()}
@@ -71,3 +73,13 @@ mobileViewport.addEventListener('change',e=>{if(!e.matches)setMobileMenu(false)}
 function handleRouteChange(){const next=parseRoute();const previousProject=route.page==='project'?findProject(route.id):null;const nextProject=next.page==='project'?findProject(next.id):null;if(previousProject&&previousProject===nextProject&&route.category===next.category){route=next;ProjectPage.update(nextProject,next.tab);return}setMobileMenu(false);render();document.scrollingElement.scrollTop=0}
 if(typeof history!=='undefined'&&'scrollRestoration' in history)history.scrollRestoration='manual';
 window.addEventListener('hashchange',handleRouteChange);render();
+
+// Cloud metadata overlays the existing stable category IDs; routing/tree structure stays local.
+window.A45Cloud?.start((rows,coverUrl)=>{
+ const byId=new Map(rows.map(c=>[c.id,c]));
+ remoteRootCategories=childrenOf().filter(c=>byId.has(c.id)).map(c=>{
+  const remote=byId.get(c.id);
+  return {...c,title:remote.title,description:remote.description,image:remote.cover_image_path?coverUrl(remote.cover_image_path):c.image};
+ });
+ if(route.page==='home'){const top=document.scrollingElement.scrollTop;render();document.scrollingElement.scrollTop=top}
+});

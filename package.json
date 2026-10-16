@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "description": "A45 — персональная творческая библиотека",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "test": "node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/project-page.cjs",
+    "test": "node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/project-page.cjs && node tests/cloud.mjs && node tests/database.mjs",
     "build": "npm test && node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "esbuild": "0.28.2"
   }
 }

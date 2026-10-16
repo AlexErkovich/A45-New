@@ -1,10 +1,13 @@
 import { cp, mkdir, rm, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
+import { build } from 'esbuild';
+import { existsSync } from 'node:fs';
+import { publicSupabaseConfig } from '../src/build-config.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = resolve(root, 'dist');
 // Publish only these frontend assets; never copy the whole checkout or dotfiles.
-const publicFiles = ['index.html', 'styles.css', 'app.js', 'project-page.js', 'data/projects.js', 'assets'];
+const publicFiles = ['index.html', 'styles.css', 'app.js', 'project-page.js', 'admin.css', 'data/projects.js', 'assets'];
 for (const file of publicFiles) await stat(resolve(root, file));
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -13,4 +16,9 @@ for (const file of publicFiles) {
   await mkdir(resolve(destination, '..'), { recursive: true });
   await cp(resolve(root, file), destination, { recursive: true, dereference: false });
 }
-console.log('Production frontend ready in dist/');
+if (existsSync(resolve(root, '.env.local'))) process.loadEnvFile(resolve(root, '.env.local'));
+const config = publicSupabaseConfig(process.env);
+await build({ entryPoints: [resolve(root, 'src/cloud-entry.js')], bundle: true, platform: 'browser', format: 'iife', target: ['es2022'], minify: true, outfile: resolve(output, 'integration.js'), define: { __A45_SUPABASE_CONFIG__: JSON.stringify(config) } });
+// Retain source-directory preview compatibility; this generated file is ignored by Git.
+await cp(resolve(output, 'integration.js'), resolve(root, 'integration.js'));
+console.log('Production frontend ready in dist/. Supabase: ' + (config ? 'configured' : 'disabled (local fallback)'));
