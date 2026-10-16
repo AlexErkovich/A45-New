@@ -15,3 +15,5 @@ secrets*.json
 .codex/
 .agents/
 .aws/
+.vercel
+.env*
