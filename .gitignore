@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.vercel/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+.npmrc
+.DS_Store
+*.log
+.codex/
+.agents/
+.aws/

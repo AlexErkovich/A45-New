@@ -1,0 +1,11 @@
+{
+  "name": "a45-new",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A45 — персональная творческая библиотека",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/project-page.cjs",
+    "build": "npm test && node scripts/build.mjs"
+  }
+}
