@@ -20,3 +20,5 @@ secrets*.json
 
 /integration.js
 !.env.example
+
+/supabase/backups/

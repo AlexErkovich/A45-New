@@ -7,14 +7,16 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/project-page.cjs && node tests/cloud.mjs && node tests/database.mjs",
-    "build": "npm test && node scripts/build.mjs"
+    "test": "node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/project-page.cjs && node tests/cloud.mjs && node tests/database.mjs && node tests/editor-state.mjs && node tests/visual-editor.mjs && node tests/projects-db.mjs && node tests/project-editor.mjs && node tests/create-project-button.mjs",
+    "build": "npm test && node scripts/build.mjs && node tests/bundle.mjs",
+    "preview": "node scripts/preview.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.118.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.10",
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "happy-dom": "21.0.3"
   }
 }

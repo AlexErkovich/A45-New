@@ -1,6 +1,26 @@
+-- Run the COMPLETE file as one SQL Editor query, using the postgres role.
+-- Successful re-runs are no-ops; unrelated existing objects are never overwritten.
 begin;
+select pg_advisory_xact_lock(1045, 1);
 create schema if not exists private;
-revoke all on schema private from public, anon, authenticated;
+create table if not exists private.a45_schema_migrations (
+ version text primary key,
+ applied_at timestamptz not null default now()
+);
+alter table private.a45_schema_migrations enable row level security;
+revoke all on private.a45_schema_migrations from public, anon, authenticated;
+
+do $a45_migration$
+begin
+ if exists (select 1 from private.a45_schema_migrations where version = '001_categories') then
+  raise notice 'A45 migration 001 already applied; no objects or data changed.';
+  return;
+ end if;
+ if to_regclass('public.categories') is not null
+    or to_regclass('private.site_admin') is not null
+    or exists (select 1 from storage.buckets where id = 'category-covers') then
+  raise exception 'A45 objects already exist without migration marker. Stop and review existing schema; nothing will be overwritten.';
+ end if;
 
 -- Only a trusted SQL operator can assign the single administrator.
 create table private.site_admin (
@@ -102,7 +122,7 @@ language sql stable security definer set search_path = '' as $$
  and exists (select 1 from public.categories where id = split_part(object_name, '/', 1));
 $$;
 revoke all on function public.valid_category_cover_path(text) from public;
-grant execute on function public.valid_category_cover_path(text) to authenticated;
+grant execute on function public.valid_category_cover_path(text) to anon, authenticated;
 create policy covers_admin_select on storage.objects for select to authenticated
  using (bucket_id = 'category-covers' and public.is_a45_admin());
 create policy covers_admin_insert on storage.objects for insert to authenticated
@@ -113,4 +133,24 @@ create policy covers_admin_update on storage.objects for update to authenticated
 create policy covers_admin_delete on storage.objects for delete to authenticated
  using (bucket_id = 'category-covers' and public.is_a45_admin()
  and not exists (select 1 from public.categories where cover_image_path = name));
+
+-- Restrictive policies prevent broader policies of other apps from granting access
+-- to this bucket. For other buckets these predicates are always true.
+create policy covers_guard_select on storage.objects as restrictive for select to anon, authenticated
+ using (bucket_id <> 'category-covers' or public.is_a45_admin());
+create policy covers_guard_insert on storage.objects as restrictive for insert to anon, authenticated
+ with check (bucket_id <> 'category-covers' or
+ (public.is_a45_admin() and public.valid_category_cover_path(name)));
+create policy covers_guard_update on storage.objects as restrictive for update to anon, authenticated
+ using (bucket_id <> 'category-covers' or public.is_a45_admin())
+ with check (bucket_id <> 'category-covers' or
+ (public.is_a45_admin() and public.valid_category_cover_path(name)));
+create policy covers_guard_delete on storage.objects as restrictive for delete to anon, authenticated
+ using (bucket_id <> 'category-covers' or
+ (public.is_a45_admin() and not exists
+ (select 1 from public.categories where cover_image_path = name)));
+
+insert into private.a45_schema_migrations(version) values ('001_categories');
+end;
+$a45_migration$;
 commit;

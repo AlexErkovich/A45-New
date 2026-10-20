@@ -8,6 +8,22 @@
     {
       "source": "/admin",
       "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/project/new",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/project/drafts",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/project/edit/:id",
+      "destination": "/index.html"
     }
   ]
 }
