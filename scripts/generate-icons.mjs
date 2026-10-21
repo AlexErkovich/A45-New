@@ -1,0 +1,12 @@
+import {createElement} from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import {Pencil, Plus, X, Check, Upload, FolderUp, Menu, ArrowLeft, ArrowUpRight, LoaderCircle, CircleAlert, TriangleAlert, CircleCheck, Info, Trash2} from 'lucide-react';
+import {writeFile} from 'node:fs/promises';
+const components={pencil:Pencil,plus:Plus,x:X,check:Check,upload:Upload,folderUp:FolderUp,menu:Menu,arrowLeft:ArrowLeft,arrowUpRight:ArrowUpRight,loader:LoaderCircle,alertCircle:CircleAlert,triangleAlert:TriangleAlert,checkCircle:CircleCheck,info:Info,trash:Trash2};
+const icons=Object.fromEntries(Object.entries(components).map(([name,component])=>[name,renderToStaticMarkup(createElement(component,{size:18,strokeWidth:1.75,'aria-hidden':true,focusable:false,className:'ui-icon ui-icon-'+name}))]));
+// Official Lucide React components are rendered during the build; no CDN/runtime dependency.
+const runtime=`\n(()=>{const names={'✎':'pencil','＋':'plus','✕':'x','×':'x','☰':'menu','←':'arrowLeft','↗':'arrowUpRight','✓':'check'};
+function decorate(root){if(root.nodeType!==1)return;const targets=[...(root.matches('button,a')?[root]:[]),...root.querySelectorAll('button,a')];for(const target of targets){for(const node of [...target.childNodes,...[...target.querySelectorAll('span[aria-hidden="true"]')].flatMap(span=>[...span.childNodes])]){if(node.nodeType!==3||!/[✎＋✕×☰←↗✓]/.test(node.textContent))continue;const fragment=document.createDocumentFragment();for(const part of node.textContent.split(/([✎＋✕×☰←↗✓])/)){if(names[part]){const template=document.createElement('template');template.innerHTML=window.A45Icons[names[part]];fragment.append(template.content)}else fragment.append(document.createTextNode(part))}node.replaceWith(fragment)}}}
+const observer=new MutationObserver(records=>{for(const record of records){if(record.type==='characterData'){const parent=record.target.parentElement?.closest('button,a');if(parent)decorate(parent)}else for(const node of record.addedNodes){if(node.nodeType===1)decorate(node);else if(node.nodeType===3&&node.parentElement?.matches('button,a'))decorate(node.parentElement)}}});
+decorate(document.body);observer.observe(document.body,{childList:true,subtree:true,characterData:true});})();\n`;
+await writeFile(new URL('../icons.js',import.meta.url),'// Generated from lucide-react by scripts/generate-icons.mjs.\nwindow.A45Icons='+JSON.stringify(icons)+';'+runtime);

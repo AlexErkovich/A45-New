@@ -7,7 +7,8 @@ import { publicSupabaseConfig } from '../src/build-config.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = resolve(root, 'dist');
 // Publish only these frontend assets; never copy the whole checkout or dotfiles.
-const publicFiles = ['index.html', 'styles.css', 'app.js', 'project-page.js', 'admin.css', 'data/projects.js', 'assets'];
+await import('./generate-icons.mjs');
+const publicFiles = ['index.html', 'styles.css', 'app.js', 'home-page.js', 'icons.js', 'feedback.js', 'project-page.js', 'admin.css', 'data/projects.js', 'assets'];
 for (const file of publicFiles) await stat(resolve(root, file));
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
