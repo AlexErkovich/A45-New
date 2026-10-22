@@ -163,7 +163,7 @@ dialog .panel-head{position:sticky;top:-32px;z-index:4;background:var(--paper);p
 /* Menu geometry matches the reference; collapsed blocks have no hidden-row space. */
 .archive-page .internal #archive{height:auto;max-height:calc(100dvh - 40px)}
 .archive-page .category-tree{display:grid;gap:12px}
-.menu-block{margin:0;background:#fff;border-radius:13px;padding:16px;cursor:pointer}
+.menu-block{margin:0;background:#fff;border-radius:13px;padding:16px;cursor:pointer;transition:background .15s,box-shadow .15s}
 .menu-block-heading{margin:0;font-size:19px;line-height:1.5;font-weight:400;letter-spacing:0}
 .menu-block-title{display:block;width:100%;padding:6px 0;margin:0;border:0;border-radius:0;text-align:left;font:inherit;background:transparent;color:#171717}
 .menu-block-title:hover,.menu-block-title:active{background:transparent;color:#171717}
@@ -180,3 +180,7 @@ html{scrollbar-gutter:stable}
 @media(max-width:767px){#home-actions,#section-actions{gap:8px}#home-actions button,#section-actions button,#section-actions a{height:40px;padding:10px;font-size:11px;gap:6px}}
 
 .menu-block-items:empty{display:none}
+
+@media(hover:hover){.menu-block:hover{background:#f3f3f3;box-shadow:inset 0 0 0 1px #d7d7d7}}
+.menu-block:has(.menu-block-title:focus-visible){background:#f3f3f3;box-shadow:inset 0 0 0 1px #d7d7d7}
+@media(prefers-reduced-motion:reduce){.menu-block{transition:none}}
