@@ -184,3 +184,10 @@ html{scrollbar-gutter:stable}
 @media(hover:hover){.menu-block:hover{background:#fafafa;box-shadow:none}}
 .menu-block:has(.menu-block-title:focus-visible){background:#fafafa;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.menu-block{transition:none}}
+
+/* Rounded archive folders: a small paper tab and a soft, measured reveal. */
+.menu-block{position:relative;border-radius:17px;transition:background .2s,box-shadow .3s}
+.menu-block::before{content:"";position:absolute;top:-5px;left:20px;width:46px;height:8px;border-radius:9px 9px 0 0;background:inherit;pointer-events:none}
+.menu-block[data-open=true]{box-shadow:0 5px 18px #00000004}
+.menu-block-items{overflow:hidden;overflow:clip}
+@media(prefers-reduced-motion:reduce){.menu-block{transition:none}}

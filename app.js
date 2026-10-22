@@ -47,14 +47,47 @@ function navigationBlocks(){
 function treeNodes(){return navigationBlocks().map(block=>{
  const open=expanded.has(block.id);
  const active=route.page==='project'?projectContext(findProject(route.id)||{categoryIds:[]})?.id:route.id;
- return `<section class="menu-block" data-menu-block="${block.id}" data-menu-category="${block.categoryId}"><h2 class="menu-block-heading"><button type="button" class="menu-block-title" data-category="${block.id}" aria-controls="branch-${block.id}" aria-expanded="${open}">${esc(block.title)}</button></h2><div id="branch-${block.id}" class="menu-block-items" ${open&&block.items.length?'':'hidden inert'}>${block.items.map(([id,title])=>`<a class="menu-item" data-category="${id}" href="#/category/${id}" ${active===id?'aria-current="page"':''}>${esc(title)}</a>`).join('')}</div></section>`;
+ return `<section class="menu-block" data-menu-block="${block.id}" data-menu-category="${block.categoryId}" data-open="${open&&block.items.length>0}"><h2 class="menu-block-heading"><button type="button" class="menu-block-title" data-category="${block.id}" aria-controls="branch-${block.id}" aria-expanded="${open}">${esc(block.title)}</button></h2><div id="branch-${block.id}" class="menu-block-items" ${open&&block.items.length?'':'hidden inert'}>${block.items.map(([id,title])=>`<a class="menu-item" data-category="${id}" href="#/category/${id}" ${active===id?'aria-current="page"':''}>${esc(title)}</a>`).join('')}</div></section>`;
  }).join('')}
-function tree(){const archive=$('#archive');archive.innerHTML='<button type="button" id="close-archive" class="archive-close">Закрыть меню</button><nav class="category-tree" aria-label="Категории">'+treeNodes()+'</nav>';archive.scrollTop=archiveScrollTop}
+function tree(){
+ const archive=$('#archive'),signature=JSON.stringify(navigationBlocks());
+ // Keep the menu DOM during route changes so disclosure can finish and focus stays put.
+ if(archive.a45MenuSignature!==signature){
+  archive.innerHTML='<button type="button" id="close-archive" class="archive-close">Закрыть меню</button><nav class="category-tree" aria-label="Категории">'+treeNodes()+'</nav>';
+  archive.a45MenuSignature=signature;
+ }
+ const active=route.page==='project'?projectContext(findProject(route.id)||{categoryIds:[]})?.id:route.id;
+ document.querySelectorAll('#archive .menu-item').forEach(link=>{if(link.dataset.category===active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});
+ archive.scrollTop=archiveScrollTop;
+}
 function toggleBranch(id,force){
  const open=force??!expanded.has(id);
  if(open)expanded.add(id);else expanded.delete(id);
  const branch=$('#branch-'+id);
- if(branch){const archive=$('#archive'),top=archive.scrollTop;branch.hidden=!open;branch.inert=!open;$(`[data-category="${id}"]`).setAttribute('aria-expanded',String(open));archive.scrollTop=top}
+ if(!branch)return;
+ const archive=$('#archive'),top=archive.scrollTop,block=branch.closest?.('[data-menu-block]');
+ const hasItems=!!branch.children?.length;
+ block?.setAttribute('data-open',String(open&&hasItems));
+ $(`[data-category="${id}"]`).setAttribute('aria-expanded',String(open));
+ branch.inert=!open;
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!hasItems||typeof branch.animate!=='function'||reduced){branch.hidden=!open||!hasItems;archive.scrollTop=top;return}
+ const fromHeight=branch.hidden?0:branch.getBoundingClientRect().height;
+ const fromOpacity=branch.hidden?0:getComputedStyle(branch).opacity;
+ const fromMargin=branch.hidden?'0px':getComputedStyle(branch).marginTop;
+ branch.a45Animation?.cancel();
+ branch.hidden=false;
+ const animation=branch.animate([
+  {height:fromHeight+'px',opacity:fromOpacity,marginTop:fromMargin},
+  {height:(open?branch.scrollHeight:0)+'px',opacity:open?1:0,marginTop:open?'12px':'0px'}
+ ],{duration:open?380:280,easing:'cubic-bezier(.22,1,.36,1)',fill:'both'});
+ branch.a45Animation=animation;
+ animation.onfinish=()=>{branch.hidden=!open;animation.cancel();branch.a45Animation=null};
+ if(open)branch.querySelectorAll('.menu-item').forEach((item,index)=>{
+  item.a45Animation?.cancel();
+  item.a45Animation=item.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,delay:Math.min(index,6)*28,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+ });
+ archive.scrollTop=top;
 }
 
 function setMobileMenu(open){
