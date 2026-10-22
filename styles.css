@@ -181,6 +181,6 @@ html{scrollbar-gutter:stable}
 
 .menu-block-items:empty{display:none}
 
-@media(hover:hover){.menu-block:hover{background:#f3f3f3;box-shadow:inset 0 0 0 1px #d7d7d7}}
-.menu-block:has(.menu-block-title:focus-visible){background:#f3f3f3;box-shadow:inset 0 0 0 1px #d7d7d7}
+@media(hover:hover){.menu-block:hover{background:#fafafa;box-shadow:none}}
+.menu-block:has(.menu-block-title:focus-visible){background:#fafafa;box-shadow:none}
 @media(prefers-reduced-motion:reduce){.menu-block{transition:none}}
