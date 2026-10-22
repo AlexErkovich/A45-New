@@ -64,5 +64,16 @@ assert.equal(JSON.parse(win.localStorage.getItem('a45-home-drafts'))[id].deleted
 win.document.querySelector('.feedback-popover:not(.feedback-leaving) [data-feedback-action=undo-delete]').click();
 assert.equal(home.sections(null).length,10);assert.equal(home.isDeleted(id),false);
 assert.ok(win.archiveData.categories.some(c=>c.id===id));
+// Server-saved covers beat persisted browser drafts both in data and DOM decoration.
+const coverWindow=new Window({url:'http://localhost/'});
+coverWindow.document.body.innerHTML='<header class="header"><nav id="navigation"></nav></header><main class="home"><a class="card" data-category-card="photography"><img src="assets/old.jpg"><div class="card-body"><h2>Фотография</h2><p>Описание</p></div></a></main>';
+coverWindow.localStorage.setItem('a45-home-drafts',JSON.stringify({photography:{title:'Фотография',description:'Описание',image:'assets/old.jpg'}}));
+for(const file of ['data/projects.js','home-page.js'])coverWindow.eval(readFileSync(new URL('../'+file,import.meta.url),'utf8'));
+const serverCover='https://example.org/new-server-cover.webp';
+coverWindow.A45Home.sections([{id:'photography',image:serverCover,cover_image_path:'photography/new.webp'}]);
+assert.equal(coverWindow.A45Home.sections(null).find(c=>c.id==='photography').image,serverCover);
+coverWindow.A45Home.afterRender();
+assert.equal(coverWindow.document.querySelector('.card img').getAttribute('src'),serverCover);
+await coverWindow.happyDOM.close();
 await win.happyDOM.close();
 console.log('PASS: preserved cloud cover, required fields/cover, full-page drop, invalid file, loading/disabled save, preview, persistence, long descriptions, cancel/Escape/continue/discard and edit mode.');

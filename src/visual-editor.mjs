@@ -9,7 +9,7 @@ export function createVisualEditor({client,service,refresh}){
  function controls(){let el=document.querySelector('#visual-controls');if(!el){el=document.createElement('div');el.id='visual-controls';document.body.append(el)}return el}
  function renderControls(){queueMicrotask(()=>window.dispatchEvent(new Event('a45-visual-state')));const s=editor.state;if(!started)return;const el=controls();if(!s.authorized&&!editor.dirty){el.hidden=true;return}el.hidden=false;
   el.className='visual-controls';el.setAttribute('aria-label','Управление редактированием');
-  if(!s.editing&&!editor.dirty){el.innerHTML='<button type="button" data-visual="enter">Редактировать</button><button type="button" data-visual="signout">Выйти</button>';if(s.message){const message=document.createElement('p');message.className='visual-message'+(s.error?' error':'');message.setAttribute('role','status');message.textContent=s.message;el.append(message)}return}
+  if(!s.editing&&!editor.dirty){el.remove();return}
   el.innerHTML=`<strong>A45</strong><span>${s.preview?'Предпросмотр':'Режим редактирования'}</span><span class="visual-dirty" aria-live="polite">${s.saving?'Сохранение…':editor.dirty?'Не сохранено: '+s.drafts.size:'Изменений нет'}</span>${!s.authorized?`<a href="/#/login?return=${encodeURIComponent(location.hash||'#/')}" data-visual-login>Войти снова</a>`:''}<button type="button" data-visual="preview" ${s.saving?'disabled':''}>${s.preview?'Редактировать':'Предпросмотр'}</button><button type="button" data-visual="save" ${!s.authorized||!editor.dirty||s.saving?'disabled':''}>Сохранить</button><button type="button" data-visual="finish" ${s.saving?'disabled':''}>Завершить</button><button type="button" data-visual="signout" ${s.saving?'disabled':''}>Выйти</button>${s.message?'<p class="visual-message" role="status"></p>':''}`;
   const message=el.querySelector('.visual-message');if(message){message.textContent=s.message;message.classList.toggle('error',s.error)}
  }
@@ -75,5 +75,5 @@ export function createVisualEditor({client,service,refresh}){
   document.addEventListener('keydown',event=>{if(event.target.matches?.('[data-edit-field="title"]')&&event.key==='Enter'){event.preventDefault();event.target.blur()}if(event.target.matches?.('[data-category-card] img')&&editable()&&['Enter',' '].includes(event.key)){event.preventDefault();openCrop(event.target.closest('[data-category-card]').dataset.categoryCard)}});
   window.addEventListener('beforeunload',event=>{if(needsWarning()){event.preventDefault();event.returnValue=''}});renderControls();
  }
- return {subscribe(listener){listeners.add(listener);return ()=>listeners.delete(listener)},state:editor.state,get dirty(){return editor.dirty},get editing(){return editor.state.editing},hydrate:rows=>editor.hydrate(rows),start,checkAuth,afterRender,beforeRouteChange,mountLogin,save,editor};
+ return {subscribe(listener){listeners.add(listener);return ()=>listeners.delete(listener)},state:editor.state,enter:()=>handleAction('enter'),get dirty(){return editor.dirty},get editing(){return editor.state.editing},hydrate:rows=>editor.hydrate(rows),start,checkAuth,afterRender,beforeRouteChange,mountLogin,save,editor};
 }
