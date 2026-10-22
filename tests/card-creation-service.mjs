@@ -8,8 +8,8 @@ const service={
  async isAdmin(){return admin},async listAdmin(){return [...rows.values()]},coverUrl:p=>'https://example.org/'+p,
  client:{
   async rpc(name,args){
-   if(name==='create_a45_category'){const d=args.doc;if(!rows.has(d.id))rows.set(d.id,{id:d.id,parent_id:d.parentId,title:d.title,description:d.description,cover_image_path:d.coverPath||null,is_published:!d.coverPath,slug:d.id,sort_order:99});return {data:rows.get(d.id)}}
-   const row=rows.get(args.category_id);assert(stored.has(row.cover_image_path));row.is_published=true;return {data:row};
+   if(name==='create_a45_category'){const d=args.doc;if(!rows.has(d.id))rows.set(d.id,{id:d.id,parent_id:d.parentId,title:d.title,description:d.description,cover_image_path:d.coverPath||null,is_published:!d.coverPath,slug:d.id,sort_order:99});return {data:[rows.get(d.id)]}}
+   const row=rows.get(args.category_id);assert(stored.has(row.cover_image_path));row.is_published=true;return {data:[row]};
   },
   storage:{from(){return {
    async upload(path,file){if(failUpload)return {error:{message:'Offline'}};stored.set(path,file);return {}},

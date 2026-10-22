@@ -2,7 +2,7 @@ import {newProject,publicProject,uid} from './project-model.mjs';
 import {prepareImage} from './image-optimizer.mjs';
 export function createCardCreation({categoryService,projectService,refreshCategories,refreshProjects,prepare=prepareImage}){
  const jobs=new Map();
- async function rpc(name,args){const {data,error}=await categoryService.client.rpc(name,args);if(error)throw Error(error.message||'Не удалось сохранить раздел.');return data}
+ async function rpc(name,args){const {data,error}=await categoryService.client.rpc(name,args);if(error)throw Error(error.message||'Не удалось сохранить раздел.');return Array.isArray(data)?data[0]:data}
  async function ensureCategory(id,known){if(known.has(id))return;const c=window.archiveData.categories.find(c=>c.id===id);if(!c)throw Error('Раздел не найден. Обновите страницу.');if(c.parentId)await ensureCategory(c.parentId,known);await rpc('create_a45_category',{doc:{id:c.id,parentId:c.parentId,title:c.title,description:c.description||''}});known.add(id)}
  async function create(input,progress=()=>{}){
   if(!categoryService||!await categoryService.isAdmin())throw Error('Для сохранения на сайте войдите администратором. Введённые данные остаются в окне.');
