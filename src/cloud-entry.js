@@ -1,3 +1,4 @@
+import { createCardCreation } from './card-creation.mjs';
 import { createProjectService } from './project-service.mjs';
 import { createProjectEditor } from './project-editor.mjs';
 import { richText,escape as projectEscape,safeUrl } from './project-model.mjs';
@@ -12,6 +13,7 @@ const service=client?createCategoryService(client):null;
 const visual=createVisualEditor({client,service,refresh:async()=>{lastData='';await refresh()}});
 const projectService=client?createProjectService(client,service):null;
 const projectEditor=createProjectEditor({service:projectService,categoryService:service,visual,refresh:refreshProjects});
+const cardCreation=createCardCreation({categoryService:service,projectService,refreshCategories:async()=>{lastData='';await refresh()},refreshProjects});
 let projectRefreshing=false;
 async function refreshProjects(){if(!projectService||projectRefreshing)return;projectRefreshing=true;try{const projects=await projectService.publicList();window.dispatchEvent(new CustomEvent('a45-projects',{detail:projects}))}catch(error){window.dispatchEvent(new CustomEvent('a45-project-error',{detail:error.message}))}finally{projectRefreshing=false}}
 let refreshCallback,refreshing=false,lastData='',adminGeneration=0,previewUrl=null,lastSelectedId=null,adminNotice='';
@@ -60,4 +62,4 @@ async function mountAdmin(){
   if(adminNotice){message(root,adminNotice);adminNotice=''}
  }
 }
-window.A45Cloud={largeImage:path=>projectService.largeUrl(path),configured:!!config,mountAdmin,visual,projectEditor,richText,projectEscape,safeUrl,releaseImage,start(callback){refreshCallback=callback;projectEditor.start();visual.start();refresh();refreshProjects();if(service){setInterval(()=>{refresh();refreshProjects()},60000);window.addEventListener('focus',()=>{refresh();refreshProjects()});document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});client.auth.onAuthStateChange(event=>{setTimeout(()=>{visual.checkAuth();if(event==='SIGNED_OUT'){projectEditor.lock();projectService.clearMedia();refreshProjects()}},0);if(event==='SIGNED_OUT'&&isAdminRoute())setTimeout(mountAdmin,0)})}}};
+window.A45Cloud={createCard:cardCreation.create,largeImage:path=>projectService.largeUrl(path),configured:!!config,mountAdmin,visual,projectEditor,richText,projectEscape,safeUrl,releaseImage,start(callback){refreshCallback=callback;projectEditor.start();visual.start();refresh();refreshProjects();if(service){setInterval(()=>{refresh();refreshProjects()},60000);window.addEventListener('focus',()=>{refresh();refreshProjects()});document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});client.auth.onAuthStateChange(event=>{setTimeout(()=>{visual.checkAuth();if(event==='SIGNED_OUT'){projectEditor.lock();projectService.clearMedia();refreshProjects()}},0);if(event==='SIGNED_OUT'&&isAdminRoute())setTimeout(mountAdmin,0)})}}};

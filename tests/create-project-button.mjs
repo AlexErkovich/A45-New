@@ -20,23 +20,19 @@ async function boot(url){
  return {window,visual,projectEditor,navigate};
 }
 let app=await boot('http://127.0.0.1:3001/#/category/technical');
-assert(!document.querySelector('[data-create-project]'),'visitor');
-admin=true;await app.visual.checkAuth();assert(!document.querySelector('[data-create-project]'),'admin outside edit mode');
-document.querySelector('#section-edit').click();await until(()=>document.querySelector('[data-create-project]'));
+assert(document.querySelector('#section-add'),'shared add action exists for visitors');
+assert.equal(document.querySelector('#section-add').dataset.createKind,'subcategory');
+assert(!document.querySelector('[data-create-project]'),'obsolete direct editor link is absent');
+admin=true;await app.visual.checkAuth();
 for(const cat of window.archiveData.categories){
- app.navigate('/#/category/'+cat.id);const button=document.querySelector('[data-create-project]');
- assert(button,cat.id);assert.equal(document.querySelectorAll('[data-create-project]').length,1);
- assert.equal(button.previousElementSibling.tagName,'H1');assert.equal(button.nextElementSibling.id,'open-filter');
- const href=new URL(button.href);assert.equal(href.pathname,'/project/new');assert.equal(href.searchParams.get('category'),cat.id);
- button.click();await until(()=>!!document.querySelector('#project-edit-form'));assert.equal(app.projectEditor.doc.primaryCategoryId,cat.id);assert.deepEqual(app.projectEditor.doc.categoryIds,[cat.id]);
+ app.navigate('/#/category/'+cat.id);
+ const button=document.querySelector('#section-add');
+ assert.equal(button.dataset.parentCategory,cat.id);
+ assert.equal(button.dataset.createKind,cat.parentId===null?'subcategory':'project');
+ assert(!document.querySelector('[data-create-project]'));
+ // Existing editor deep links retain their exact category context for later editing.
+ app.navigate('/project/new?'+new URLSearchParams({category:cat.id}));
+ await until(()=>!!document.querySelector('#project-edit-form'));
+ assert.equal(app.projectEditor.doc.primaryCategoryId,cat.id);assert.deepEqual(app.projectEditor.doc.categoryIds,[cat.id]);
 }
-app.navigate('/#/category/0/'+encodeURIComponent('Макросъёмка'));
-assert.equal(new URL(document.querySelector('[data-create-project]').href).searchParams.get('category'),'macro');
-app.visual.editor.preview();assert(!document.querySelector('[data-create-project]'));app.visual.editor.preview();assert(document.querySelector('[data-create-project]'));
-app.visual.editor.exit();assert(!document.querySelector('[data-create-project]'));
-// Simulate a refreshed deep page: verified Auth alone never enables editing automatically.
-await app.window.happyDOM.close();app=await boot('http://127.0.0.1:3001/#/category/beetles');await until(()=>app.visual.state.authorized);
-assert(!document.querySelector('[data-create-project]'));document.querySelector('#section-edit').click();await until(()=>document.querySelector('[data-create-project]'));
-assert.equal(new URL(document.querySelector('[data-create-project]').href).searchParams.get('category'),'beetles');
-app.visual.editor.authorize(false);assert(!document.querySelector('[data-create-project]'),'immediate removal on lost role');
-await app.window.happyDOM.close();console.log('PASS: actual app + editor state, all 45 categories, exact subsection ID, button order/visibility, click into existing editor, legacy links, refreshed deep page, preview/exit/auth loss. Auth is mocked; no cloud writes.');
+await app.window.happyDOM.close();console.log('PASS: shared contextual add button replaces legacy creation link; existing editor deep links preserve every category ID.');

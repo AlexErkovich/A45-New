@@ -30,5 +30,5 @@ export function createProjectService(client,categoryService){
 
  async function publicList(){return Promise.all((await list()).map(async d=>publicProject(d,await publicUrls(d))))}
  function clearMedia(){for(const url of urls.values())URL.revokeObjectURL(url);urls.clear()}
- return {list,get,save,mediaUrls,largeUrl,publicList,clearMedia};
+ return {list,get,save,mediaUrls,publicUrls,largeUrl,publicList,clearMedia};
 }

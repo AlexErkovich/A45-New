@@ -14,14 +14,14 @@ win.dispatchEvent(new win.HashChangeEvent('hashchange'));
 assert(win.document.body.classList.contains('archive-page'));
 assert.equal($('#home-actions').hidden,true);
 assert.equal($('#section-actions').hidden,false);
-assert.equal($('.section-add').getAttribute('href'),'/project/new?category=macro');
+assert.equal($('.section-add').dataset.parentCategory,'macro');
 assert($('#archive [aria-current="page"]').textContent.includes('Макросъемка'));
 assert([...win.document.querySelectorAll('.menu-block-items')].every(branch=>branch.hidden));
 $('#archive [data-category="photography"]').click();
 assert.equal($('#branch-photography').hidden,false);
 $('#archive [data-category="photography"]').click();
 assert.equal(win.location.hash,'#/category/photography');
-assert.equal($('.section-add').getAttribute('href'),'/project/new?category=photography');
+assert.equal($('.section-add').dataset.parentCategory,'photography');
 assert($('#main .card').getAttribute('href').includes('category=photography'));
 assert.equal($('#branch-photography').inert,true);
 assert.equal($('#branch-photography').hidden,true);
@@ -31,7 +31,7 @@ assert.equal(win.location.hash,'#/category/photography');
 $('#archive [data-category="video"]').click();
 assert.equal(win.location.hash,'#/category/video');
 assert.equal($('#branch-video').hidden,false);
-assert.equal($('.section-add').getAttribute('href'),'/project/new?category=video');
+assert.equal($('.section-add').dataset.parentCategory,'video');
 $('#archive [data-category="video"]').click();
 assert.equal($('#branch-video').hidden,true);
 const blocks=[...win.document.querySelectorAll('.menu-block')];
@@ -43,7 +43,7 @@ for(const section of win.A45Home.sections(null))assert($('#archive [data-menu-ca
 for(const link of win.document.querySelectorAll('.menu-item')){
  const hash=link.getAttribute('href');win.location.hash=hash;win.dispatchEvent(new win.HashChangeEvent('hashchange'));
  assert.equal($('#archive .menu-item[aria-current="page"]').getAttribute('href'),hash);
- assert.equal($('.section-add').getAttribute('href'),'/project/new?category='+hash.split('/').at(-1));
+ assert.equal($('.section-add').dataset.parentCategory,hash.split('/').at(-1));
  assert(!$('#main').textContent.includes('Страница не найдена'));
 }
 win.location.hash='#/category/macro';win.dispatchEvent(new win.HashChangeEvent('hashchange'));

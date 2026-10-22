@@ -186,3 +186,7 @@ html{scrollbar-gutter:stable}
 @media(prefers-reduced-motion:reduce){.menu-block{transition:none}}
 
 .menu-block-items{overflow:hidden;overflow:clip}
+
+.home-creation-context{margin:4px 0 12px;color:#888;font-size:12px}
+
+@media(max-height:740px){.home-dropzone{min-height:240px}}
