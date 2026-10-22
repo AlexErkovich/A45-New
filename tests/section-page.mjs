@@ -37,7 +37,7 @@ const blocks=[...win.document.querySelectorAll('.menu-block')];
 assert.deepEqual(blocks.slice(0,4).map(b=>b.querySelector('h2').textContent),['Фотография','Видео','Техническое творчество','Педагогика']);
 assert.deepEqual([...win.document.querySelectorAll('.menu-item')].slice(0,12).map(a=>a.textContent),['Предметная фотография','Репортажная','Макросъемка','Студийная','Пленочные проекты','Свадебная съемка','Монтаж','Репортаж','Ардуино','Кинооператорское оборудование','Методические разработки','Проекты']);
 assert(!$('#archive').textContent.includes('Все проекты'));
-for(const section of win.A45Home.sections(null))assert($('#archive [data-menu-block="'+section.id+'"]'),section.title);
+for(const section of win.A45Home.sections(null))assert($('#archive [data-menu-category="'+section.id+'"]'),section.title);
 
 for(const link of win.document.querySelectorAll('.menu-item')){
  const hash=link.getAttribute('href');win.location.hash=hash;win.dispatchEvent(new win.HashChangeEvent('hashchange'));
@@ -47,6 +47,14 @@ for(const link of win.document.querySelectorAll('.menu-item')){
 }
 win.location.hash='#/category/macro';win.dispatchEvent(new win.HashChangeEvent('hashchange'));
 assert($('#main .card').getAttribute('href').includes('category=macro'));
+const homeSections=win.A45Home.sections;
+win.A45Home.sections=()=>homeSections(null).filter(c=>c.id!=='pedagogy').concat({id:'replacement-pedagogy',title:'Педагогика',parentId:null});
+win.archiveData.categories.push({id:'replacement-pedagogy',title:'Педагогика',parentId:null,slug:'replacement-pedagogy',description:'',sortOrder:99});
+win.dispatchEvent(new win.Event('a45-home-change'));
+assert.equal([...win.document.querySelectorAll('.menu-block-title')].filter(b=>b.textContent==='Педагогика').length,1);
+$('#archive [data-menu-block="pedagogy"]').click();
+assert.equal(win.location.hash,'#/category/replacement-pedagogy');
+win.A45Home.sections=homeSections;
 win.location.hash='#/';win.dispatchEvent(new win.HashChangeEvent('hashchange'));
 assert.equal($('#section-actions').hidden,true);
 assert.equal($('#home-actions').hidden,false);
