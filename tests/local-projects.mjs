@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import {withLocalProjects} from '../src/local-projects.mjs';
+const context={window:{}};vm.createContext(context);vm.runInContext(await readFile(new URL('../data/projects.js',import.meta.url),'utf8'),context);globalThis.window=context.window;
+let stored='{}',cloudCalls=0;const storage={getItem:()=>stored,setItem(k,v){stored=v}};
+const service=withLocalProjects({async get(){cloudCalls++;throw Error('protected')}},storage);
+const doc=await service.get('automatic-greenhouse');assert.equal(doc.tabs[0].title,'Идея');assert(doc.tabs[0].blocks.some(b=>b.content.text?.includes('Концепция')));
+doc.title='Теплица — новое название';await service.save(doc,new Map(),'published');assert.equal(window.archiveData.projects.find(p=>p.id===doc.id).title,doc.title);assert.equal(cloudCalls,0);assert.equal(window.archiveData.projects.find(p=>p.id===doc.id).cloud,false);
+const reloaded=withLocalProjects(null,storage);assert.equal((await reloaded.get(doc.id)).title,doc.title);assert((await reloaded.get(doc.id)).tabs[0].blocks.some(b=>b.content.text?.includes('Зачем?')));
+await assert.rejects(()=>service.get('cloud-id'),/protected/);assert.equal(cloudCalls,1);
+const failed=withLocalProjects(null,{getItem:()=>stored,setItem(){throw Error('Quota')}});doc.title='Unsaved';await assert.rejects(()=>failed.save(doc,new Map(),'published'),/Quota/);assert.notEqual(window.archiveData.projects.find(p=>p.id===doc.id).title,'Unsaved');
+console.log('PASS: local project edit, full content, persistence, failed save and protected cloud routing.');
+
+const protectedDoc={...structuredClone(doc),id:'protected-cloud',title:'Правки исходного проекта',localOnly:undefined,media:[]};
+window.archiveData.projects.push({id:protectedDoc.id,slug:'protected-cloud',cloud:true,categoryIds:['technical']});
+const guarded=withLocalProjects({async get(){return structuredClone(protectedDoc)},async save(){throw Error('Existing materials cannot be replaced through creation')}},storage);
+await guarded.save(protectedDoc,new Map(),'published');assert.equal(protectedDoc.localOnly,true);assert(guarded.isLocal(protectedDoc.id));assert.equal(window.archiveData.projects.find(p=>p.id===protectedDoc.id).title,protectedDoc.title);
+const restored=withLocalProjects(null,storage);assert.equal((await restored.get(protectedDoc.id)).title,protectedDoc.title);
+const offlineDoc={...protectedDoc,id:'offline-cloud'};const offline=withLocalProjects({async save(){throw Error('Нет сети')}},storage);await assert.rejects(offline.save(offlineDoc,new Map(),'published'),/Нет сети/);assert(!offline.isLocal(offlineDoc.id));
+console.log('PASS: protected existing edits persist locally without server permission changes; network errors stay failures.');

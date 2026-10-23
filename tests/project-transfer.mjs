@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {newProject,uid} from '../src/project-model.mjs';
+import {createProjectTransfer,makeBackup,restoreBackup,currentPlacement} from '../src/project-transfer.mjs';
+const memory=new Map(),storage={getItem:key=>memory.get(key)||null,setItem:(key,value)=>memory.set(key,value)};
+const doc=newProject('wildlife');doc.id='legacy-local';doc.title='Мой проект';doc.status='published';const mediaId=uid();doc.media=[{id:mediaId,kind:'image',name:'photo.jpg',localUrl:'data:image/jpeg;base64,/9j/',path:'local',size:3,mimeType:'image/jpeg'}];doc.coverMediaId=mediaId;doc.tabs[0].blocks=[{id:uid(),type:'IMAGE',content:{mediaId}}];
+let stored=null,uploaded=0,denied=false;
+const projectService={async get(id){if(stored&&stored.id===id)return structuredClone(stored);throw {code:'PGRST116'}},async save(candidate,pending){uploaded=[...pending.values()].reduce((n,entry)=>n+entry.files.length,0);candidate.revision++;candidate.slug='p-'+candidate.id;stored=structuredClone(candidate);pending.clear()},async publicUrls(){return {[mediaId]:'https://example.test/photo.webp'}}};
+const categoryService={async isAdmin(){return !denied},async listAdmin(){return [{id:'macro'}]}};
+const transfer=createProjectTransfer({projectService,categoryService,storage,fetchFile:async()=>new Blob(['original'],{type:'image/jpeg'}),prepare:async()=>({width:100,height:80,thumbnail:new Blob(['thumbnail']),content:new Blob(['content']),large:new Blob(['large'])})});
+const record={doc,pending:[]};denied=true;await assert.rejects(transfer(record,{categoryId:'macro'}),/администратором/);assert.equal(stored,null);denied=false;
+const result=await transfer(record,{categoryId:'macro'});assert.notEqual(result.doc.id,'legacy-local');assert.equal(uploaded,4);assert.equal(stored.primaryCategoryId,'macro');assert(!stored.media[0].localUrl);assert(stored.media[0].variants.large);assert.equal(JSON.parse(memory.get('a45-transfer-receipts'))['legacy-local'].id,result.doc.id);assert.equal(doc.id,'legacy-local','local original is untouched');
+await assert.rejects(transfer({doc:stored},{categoryId:'macro',expectedRevision:0}),/изменился/);
+assert.equal(currentPlacement('wildlife',[{id:'macro'}],[{id:'wildlife',parentId:'macro'},{id:'macro',parentId:'photography'}]),'macro');
+memory.set('a45-creation-key','never-export');memory.set('sb-test-auth-token','never-export');memory.set('a45-project-drafts',JSON.stringify({[doc.id]:{doc}}));
+const recoveryRows=[{id:'recovery',doc,pending:[[mediaId,{files:[{path:'image',file:new File(['abc'],'original.jpg',{type:'image/jpeg'})}]}]]}];
+const recovery={async list(){return recoveryRows},async get(){return null},async put(record){this.record=record}};
+const backup=await makeBackup(storage,recovery);assert(!JSON.stringify(backup).includes('never-export'));const restoredMemory=new Map(),other={getItem:k=>restoredMemory.get(k)||null,setItem:(k,v)=>restoredMemory.set(k,v)};await restoreBackup(backup,other,recovery);assert.equal(await recovery.record.pending[0][1].files[0].file.text(),'abc');assert(restoredMemory.get('a45-project-drafts'));
+console.log('PASS: admin-only transfer, 4 image variants, UUID mapping, revision conflicts, no local deletion, portable original-file backup without credentials.');

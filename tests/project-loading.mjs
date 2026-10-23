@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {createProjectService} from '../src/project-service.mjs';
+let release;
+const pending=new Promise(resolve=>release=resolve);
+const row={id:'film-project',slug:'fed',title:'ФЭД',description:'',year:2026,primary_category_id:'film-photo',status:'published',project_categories:[{category_id:'film-photo'}],project_tabs:[],project_blocks:[],project_media:[{id:'photo',kind:'image',path:'photo.webp'}]};
+const client={from(){return {select(){return this},eq(){return this},async order(){return {data:[row]}}}},storage:{from(){return {async createSignedUrl(){await pending;return {data:{signedUrl:'https://example.test/photo.webp'}}}}}}};
+const service=createProjectService(client,{});
+let metadata;
+const result=service.publicList(projects=>metadata=projects);
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(metadata[0].title,'ФЭД');
+assert.deepEqual(metadata[0].categoryIds,['film-photo']);
+release();
+assert.equal((await result)[0].id,'film-project');
+console.log('PASS: film project metadata appears before slow photo URLs resolve.');

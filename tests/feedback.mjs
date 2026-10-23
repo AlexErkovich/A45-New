@@ -27,5 +27,18 @@ assert.equal(source.hasAttribute('data-feedback-source'),true);assert.ok(current
 api.clearWithin(win.document.querySelector('form'));assert.equal(field.hasAttribute('data-feedback-tone'),false);
 const dialog=win.document.createElement('dialog');win.document.body.append(dialog);dialog.innerHTML='<input required>';dialog.showModal();const modalField=dialog.querySelector('input');api.show(modalField,{tone:'error',message:'Заполните поле.'});assert.equal(current().parentElement,dialog);
 win.document.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));assert.equal(current(),null);assert.equal(dialog.open,true);
+// Arrow stays aimed at the field when the bubble flips and clamps.
+Object.defineProperty(win,'innerWidth',{value:800,configurable:true});Object.defineProperty(win,'innerHeight',{value:600,configurable:true});
+for(const [rect,side] of [
+ [{left:100,right:200,top:100,bottom:140,width:100,height:40},'right'],
+ [{left:650,right:750,top:100,bottom:140,width:100,height:40},'left'],
+ [{left:100,right:700,top:100,bottom:140,width:600,height:40},'bottom'],
+ [{left:100,right:700,top:550,bottom:590,width:600,height:40},'top']
+]){
+ field.getBoundingClientRect=()=>rect;
+ const bubble=api.show(field,{message:'Проверка '+side});bubble.getBoundingClientRect=()=>({width:200,height:100});api.reposition();await new Promise(resolve=>win.setTimeout(resolve,25));
+ assert.equal(bubble.dataset.side,side);assert(Number.parseFloat(bubble.style.left)>=14);assert(Number.parseFloat(bubble.style.top)>=14);
+ assert(bubble.style.getPropertyValue('--feedback-arrow-x'));assert(bubble.style.getPropertyValue('--feedback-arrow-y'));api.dismiss();
+}
 await win.happyDOM.close();
 console.log('PASS: shared anchored feedback, status/ARIA, dismiss without losing validation, correction, save/discard, migrated admin errors, modal host and Escape.');

@@ -8,7 +8,7 @@ win.archiveData={categories:[{id:'technical',parentId:null,title:'Проекты
 win.A45Archive={preview(project,target){target.textContent=project.title}};
 let feedback,fail=true;
 win.A45Feedback={show(anchor,options){feedback=options}};
-const editor=createProjectEditor({service:{async save(doc){if(fail)throw Error('Нет сети');doc.revision++;return doc}},categoryService:{async isAdmin(){return true}},visual:{state:{authorized:true}},refresh:async()=>{}});
+const editor=createProjectEditor({service:{async save(doc){if(fail)throw Error('Нет сети');doc.revision++;return doc}},categoryService:{async isAdmin(){return true}},refresh:async()=>{}});
 await editor.mount();
 function title(value){const field=document.querySelector('[name=title]');field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}))}
 title('Изменения');history.replaceState(null,'','/#/about');

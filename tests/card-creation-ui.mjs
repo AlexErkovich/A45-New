@@ -1,30 +1,32 @@
+import * as sharedUI from '../src/ui/components.mjs';
 import {Window} from 'happy-dom';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 const win=new Window({url:'http://localhost/#/category/photography'});
+win.A45UI=sharedUI;
 win.matchMedia=()=>({matches:false,addEventListener(){}});
 win.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
 win.eval('window.Image=class {async decode(){}}');
 const calls=[];let fail=false;
-win.A45Cloud={visual:{editing:false,state:{authorized:true},afterRender(){},beforeRouteChange(){return true}},projectEditor:{decorate(){},beforeRouteChange(){return true}},releaseImage(){},start(){},async createCard(input){calls.push(input);if(fail)throw Error('Нет соединения');if(input.kind==='subcategory')return {category:{id:input.id,parentId:input.parentId,title:input.title,description:input.description,image:'https://example.org/sub.jpg',slug:input.id,sortOrder:99,custom:true}};return {project:{...win.archiveData.projects[0],id:input.id,slug:'p-'+input.id,title:input.title,description:input.description,categoryIds:[input.parentId],image:'https://example.org/project.jpg',cloud:true}}}};
+win.A45Cloud={projectEditor:{beforeRouteChange(){return true}},releaseImage(){},start(){},async createCard(input){calls.push(input);if(fail)throw Error('Нет соединения');if(input.kind==='subcategory')return {category:{id:input.id,parentId:input.parentId,title:input.title,description:input.description,image:'https://example.org/sub.jpg',slug:input.id,sortOrder:99,custom:true}};return {project:{...win.archiveData.projects[0],id:input.id,slug:'p-'+input.id,title:input.title,description:input.description,categoryIds:[input.parentId],image:'https://example.org/project.jpg',cloud:true}}}};
 win.eval(['data/projects.js','project-page.js','feedback.js','home-page.js','app.js'].map(f=>readFileSync(new URL('../'+f,import.meta.url),'utf8')).join('\n;\n'));
 const $=s=>win.document.querySelector(s);
 const until=async f=>{for(let i=0;i<100;i++){if(f())return;await new Promise(r=>setTimeout(r,5))}assert.fail('Timed out')};
 $('.section-add').click();
 const dialog=$('#home-section-dialog'),form=dialog.querySelector('form');
-assert(dialog.open);assert.equal(form.elements.title.placeholder,'Новый подраздел');assert.match($('.home-creation-context').textContent,/Фотография/);
+assert(dialog.open);assert.match(dialog.querySelector('.home-drop-empty').textContent,/Перенесите сюда файл/);assert.equal(dialog.querySelector('.home-dropzone').getAttribute('aria-invalid'),null);assert.equal(form.elements.title.placeholder,'Новый подраздел');assert.match($('.home-creation-context').textContent,/Фотография/);
 function input(name,value){form.elements[name].value=value;form.elements[name].dispatchEvent(new win.Event('input',{bubbles:true}))}
 const png=new win.File([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=','base64')],'cover.png',{type:'image/png'});
 async function fill(title){input('title',title);input('description','Описание '+title);const event=new win.Event('drop',{bubbles:true,cancelable:true});Object.defineProperty(event,'dataTransfer',{value:{types:['Files'],files:[png]}});dialog.dispatchEvent(event);await win.happyDOM.whenAsyncComplete()}
 const submit=()=>form.dispatchEvent(new win.Event('submit',{bubbles:true,cancelable:true}));
-await fill('Туристические');fail=true;submit();await until(()=>!form.querySelector('[type=submit]').disabled);assert(dialog.open);assert.equal(form.elements.title.value,'Туристические');assert.match(dialog.textContent,/Нет соединения/);
+await fill('Туристические');fail=true;submit();await until(()=>!form.querySelector('[type=submit]').disabled);assert(dialog.open);assert.equal(form.elements.title.value,'Туристические');assert.match(dialog.textContent,/Нет соединения/);assert.equal(dialog.querySelector('.home-dropzone').getAttribute('aria-invalid'),null);assert.equal(form.querySelector('[type=submit]').getAttribute('aria-invalid'),'true');
 fail=false;submit();await until(()=>!dialog.open&&win.location.hash.includes('section-'));
 const subsection=calls.at(-1);assert.equal(subsection.parentId,'photography');assert.equal(subsection.kind,'subcategory');
 assert.equal(win.archiveData.categories.find(c=>c.id===subsection.id).parentId,'photography');
 assert(!win.A45Home.sections(null).some(c=>c.id===subsection.id));
 await until(()=>$('.section-add')?.dataset.parentCategory===subsection.id);
 $('.section-add').click();assert.equal(form.elements.title.placeholder,'Новый проект');assert.match($('.home-creation-context').textContent,/Туристические/);
-await fill('Поездка');submit();await until(()=>!dialog.open&&win.location.hash.startsWith('#/project/'));
+input('title','Поездка');assert.equal(form.querySelector('[type=submit]').disabled,false);assert.equal(form.elements.description.value,'');submit();await until(()=>!dialog.open&&win.location.hash.startsWith('#/project/'));
 const project=calls.at(-1);assert.equal(project.kind,'project');assert.equal(project.parentId,subsection.id);
 await until(()=>!!$('.project-page'));
 assert(win.location.hash.includes('category='+subsection.id));assert.equal($('#section-edit').dataset.editProject,project.id);assert(!$('#project-edit-form'));
@@ -35,8 +37,8 @@ assert($('#main').textContent.includes('Поездка'),'project aggregates int
 // Simulate a fresh visit using only server data, with no browser-local section draft.
 const savedProject=win.archiveData.projects.find(p=>p.id===project.id);
 const fresh=new Window({url:'http://localhost/#/project/'+savedProject.slug+'?category='+subsection.id});
-fresh.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
-fresh.A45Cloud={visual:{editing:false,state:{authorized:true},afterRender(){},beforeRouteChange(){return true}},projectEditor:{decorate(){},beforeRouteChange(){return true}},releaseImage(){},start(callback){fresh.queueMicrotask(()=>{callback([{id:subsection.id,parent_id:'photography',title:subsection.title,description:subsection.description,slug:subsection.id,sort_order:99,cover_image_path:'saved/cover.png'}],()=> 'https://example.org/saved.png');fresh.dispatchEvent(new fresh.CustomEvent('a45-projects',{detail:[savedProject]}))})}};
+fresh.A45UI=sharedUI;fresh.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
+fresh.A45Cloud={projectEditor:{beforeRouteChange(){return true}},releaseImage(){},start(callback){fresh.queueMicrotask(()=>{callback([{id:subsection.id,parent_id:'photography',title:subsection.title,description:subsection.description,slug:subsection.id,sort_order:99,cover_image_path:'saved/cover.png'}],()=> 'https://example.org/saved.png');fresh.dispatchEvent(new fresh.CustomEvent('a45-projects',{detail:[savedProject]}))})}};
 fresh.eval(['data/projects.js','project-page.js','feedback.js','home-page.js','app.js'].map(f=>readFileSync(new URL('../'+f,import.meta.url),'utf8')).join('\n;\n'));
 await until(()=>fresh.document.querySelector('.project-title h1')?.textContent==='Поездка');
 assert.equal(fresh.document.querySelector('#section-edit').dataset.editProject,project.id);
@@ -46,5 +48,13 @@ fresh.location.hash='#/category/photography';fresh.dispatchEvent(new fresh.HashC
 assert(fresh.document.querySelector('[data-category-card="'+subsection.id+'"]'));
 assert(fresh.document.querySelector('#archive [data-category="'+subsection.id+'"]'));
 await fresh.happyDOM.close();
+// Editing a selected project card changes metadata in a modal and stays in its list.
+win.location.hash='#/category/'+subsection.id;win.dispatchEvent(new win.HashChangeEvent('hashchange'));
+let cardSaveFails=true,cardSaveCalls=0;const beforeTabs=JSON.stringify(savedProject.tabs);
+win.A45Cloud.saveProjectCard=async input=>{cardSaveCalls++;if(cardSaveFails)throw Error('Ошибка сохранения карточки');return {project:{...savedProject,title:input.title,description:input.description,image:input.image}}};
+$('#section-edit').click();$('#main [data-project-card="'+savedProject.id+'"]').click();
+assert(dialog.open);assert.equal(win.location.hash,'#/category/'+subsection.id);assert.equal(form.elements.title.value,savedProject.title);assert.equal(form.elements.description.value,savedProject.description);
+form.elements.title.value='Новая карточка';form.elements.title.dispatchEvent(new win.Event('input',{bubbles:true}));submit();await until(()=>!form.querySelector('[type=submit]').disabled);assert(dialog.open);assert.equal(form.elements.title.value,'Новая карточка');assert(dialog.textContent.includes('Ошибка сохранения карточки'));
+cardSaveFails=false;submit();await until(()=>!dialog.open);assert.equal(cardSaveCalls,2);assert.equal(win.location.hash,'#/category/'+subsection.id);assert($('#main').textContent.includes('Новая карточка'));assert.equal(JSON.stringify(win.archiveData.projects.find(p=>p.id===savedProject.id).tabs),beforeTabs);assert(win.document.body.classList.contains('listing-editing'));
 await win.happyDOM.close();
 console.log('PASS: shared card modal, root/subsection type, parent binding, upload, failed save retention, create then view, later edit, parent cards and menu.');

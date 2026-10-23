@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {Window} from 'happy-dom';
-import {createVisualEditor} from '../src/visual-editor.mjs';
 import {createProjectEditor} from '../src/project-editor.mjs';
 const source=await Promise.all(['index.html','data/projects.js','project-page.js','app.js'].map(f=>readFile(new URL('../'+f,import.meta.url),'utf8')));
 let admin=false;
@@ -12,18 +11,17 @@ async function boot(url){
  Object.defineProperty(document,'scrollingElement',{value:document.documentElement});window.confirm=()=>true;
  document.write(source[0].replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'').replace(/<link\b[^>]*>/g,''));window.eval(source[1]);
  const categoryService={async isAdmin(){return admin},async listAdmin(){return window.archiveData.categories.map(c=>({...c,parent_id:c.parentId}))},coverUrl(){return ''}};
- const visual=createVisualEditor({client:{auth:{async signOut(){admin=false;return {}}}},service:categoryService,refresh:async()=>{}});
- const projectEditor=createProjectEditor({service:{},categoryService,visual,refresh:async()=>{}});
- window.A45Cloud={visual,projectEditor,releaseImage(){},start(){projectEditor.start();visual.start()}};
+ const projectEditor=createProjectEditor({service:{},categoryService,refresh:async()=>{}});
+ window.A45Cloud={projectEditor,releaseImage(){},start(){projectEditor.start()}};
  window.eval(source.slice(2).join('\n;\n'));
  const navigate=path=>{history.pushState(null,'',path);window.dispatchEvent(new Event('hashchange'))};
- return {window,visual,projectEditor,navigate};
+ return {window,projectEditor,navigate};
 }
 let app=await boot('http://127.0.0.1:3001/#/category/technical');
 assert(document.querySelector('#section-add'),'shared add action exists for visitors');
 assert.equal(document.querySelector('#section-add').dataset.createKind,'subcategory');
 assert(!document.querySelector('[data-create-project]'),'obsolete direct editor link is absent');
-admin=true;await app.visual.checkAuth();
+admin=true;
 for(const cat of window.archiveData.categories){
  app.navigate('/#/category/'+cat.id);
  const button=document.querySelector('#section-add');

@@ -13,7 +13,7 @@ const server=createServer(async(req,res)=>{
   const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
   if(['/admin/','/login/'].includes(path)){res.writeHead(302,{Location:path.slice(0,-1)});res.end();return}
   if(path.split('/').some(segment=>segment.startsWith('.'))){res.writeHead(404);res.end();return}
-  const file=resolve(root,'.'+((['/', '/admin', '/login'].includes(path)||/^\/project\/(new|drafts|edit\/[^/]+)$/.test(path))?'/index.html':path));
+  const file=resolve(root,'.'+((['/', '/admin', '/login','/transfer'].includes(path)||/^\/project\/(new|drafts|edit\/[^/]+)$/.test(path))?'/index.html':path));
   if(!file.startsWith(resolve(root)+sep)){res.writeHead(404);res.end();return}
   const info=await stat(file);if(!info.isFile()){res.writeHead(404);res.end();return}
   res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream','Content-Length':info.size,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});

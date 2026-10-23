@@ -1,0 +1,2 @@
+// One mapping for publication tabs and the editor.
+export function tabIconName(tab){const title=(tab.title||'').toLocaleLowerCase('ru');if(/идея|концепц|обзор/.test(title)||['overview','idea'].includes(tab.key||tab.id))return 'idea';if(/фото|photo/.test(title)||tab.kind==='photos')return 'photo';if(/процесс|создани|разработ|этап/.test(title))return 'workflow';if(/документ|документац|docs/.test(title))return 'document';return 'file'}

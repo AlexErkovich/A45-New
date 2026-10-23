@@ -1,0 +1,25 @@
+import {Window} from 'happy-dom';
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const win=new Window({url:'https://example.org/'}),media={matches:false,addEventListener(name,callback){this.change=callback}};
+win.matchMedia=()=>media;
+let observer;win.IntersectionObserver=class {constructor(callback){this.callback=callback;this.nodes=new Set();observer=this}observe(node){this.nodes.add(node)}unobserve(node){this.nodes.delete(node)}disconnect(){this.nodes.clear()}};
+const source=readFileSync(new URL('../card-motion.js',import.meta.url),'utf8');win.eval(source);
+win.document.body.innerHTML='<main></main>';const root=win.document.querySelector('main'),motion=win.A45Cards;
+const card=(id,title=id)=>`<a class="card" href="#/project/${id}"><img src="assets/${id}.png"><div class="card-body"><h2>${title}</h2><p>Описание</p></div></a>`;
+const grid=items=>`<div class="card-grid">${items.join('')}</div>`;
+motion.render(root,grid([card('a'),card('b')]),'/');const first=root.querySelector('.card'),image=first.querySelector('img'),originalGrid=root.querySelector('.card-grid');
+assert(first.classList.contains('card-reveal-pending'));observer.callback([{target:first,isIntersecting:true}]);assert(first.classList.contains('card-reveal-enter'));assert(!first.classList.contains('card-reveal-pending'));
+const end=new win.Event('animationend');Object.defineProperty(end,'animationName',{value:'a45-card-reveal'});first.dispatchEvent(end);
+let layoutFrames;first.getBoundingClientRect=()=>({left:0,top:first.querySelector('h2').textContent==='a'?100:180,bottom:300});first.animate=frames=>{layoutFrames=frames;return {cancel(){},finished:Promise.resolve()}};
+motion.render(root,grid([card('a','Обновлённый заголовок'),card('b'),card('c')]),'/');
+assert.equal(layoutFrames[0].translate,'0px -80px');
+assert.equal(root.querySelector('.card-grid'),originalGrid);assert.equal(root.querySelector('.card'),first);assert.equal(first.querySelector('img'),image);assert.equal(first.querySelector('h2').textContent,'Обновлённый заголовок');assert(!first.classList.contains('card-reveal-pending'));assert(!first.classList.contains('card-reveal-enter'),'a cloud refresh does not replay completed appearances');
+const [second,third]=[...root.querySelectorAll('.card')].slice(1);assert(observer.nodes.has(third));observer.callback([{target:second,isIntersecting:true},{target:third,isIntersecting:true}]);assert.equal(third.style.getPropertyValue('--card-reveal-delay'),'55ms');
+motion.render(root,grid([card('d')]),'/next');const fresh=root.querySelector('.card');assert(fresh.classList.contains('card-reveal-pending'));media.matches=true;media.change();assert(!fresh.classList.contains('card-reveal-pending'));assert(!fresh.classList.contains('card-reveal-enter'));
+// A slow previous image request must never replace a newer image.
+const loads=[];win.Image=class {decode(){return new Promise(resolve=>loads.push(resolve))}};Object.defineProperty(fresh.querySelector('img'),'complete',{value:true});Object.defineProperty(fresh.querySelector('img'),'naturalWidth',{value:100});const photo=fresh.querySelector('img');
+motion.image(photo,'assets/older.png');motion.image(photo,'assets/newer.png');loads[0]();await new Promise(resolve=>setImmediate(resolve));assert.equal(photo.getAttribute('src'),'assets/d.png');loads[1]();await new Promise(resolve=>setImmediate(resolve));assert.equal(photo.getAttribute('src'),'assets/newer.png');
+motion.image(photo,'assets/obsolete.png');motion.image(photo,'assets/newer.png');loads[2]();await new Promise(resolve=>setImmediate(resolve));assert.equal(photo.getAttribute('src'),'assets/newer.png');
+await win.happyDOM.close();
+console.log('PASS: viewport reveals, stagger, cloud refresh DOM/image reuse, no repeated appearances, reduced motion and stale image race handling.');

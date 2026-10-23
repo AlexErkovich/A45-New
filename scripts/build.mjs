@@ -8,7 +8,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const output = resolve(root, 'dist');
 // Publish only these frontend assets; never copy the whole checkout or dotfiles.
 await import('./generate-icons.mjs');
-const publicFiles = ['index.html', 'styles.css', 'app.js', 'home-page.js', 'icons.js', 'feedback.js', 'project-page.js', 'admin.css', 'data/projects.js', 'assets'];
+const publicFiles = ['index.html', 'styles.css', 'ui.css', 'app.js', 'card-motion.js', 'home-page.js', 'icons.js', 'feedback.js', 'project-page.js', 'admin.css', 'data/projects.js', 'assets'];
 for (const file of publicFiles) await stat(resolve(root, file));
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -25,3 +25,6 @@ await cp(resolve(output, 'integration.js'), resolve(root, 'integration.js'));
 console.log('Production frontend ready in dist/. Supabase: ' + (config ? 'configured' : 'disabled (local fallback)'));
 
 await build({entryPoints:[resolve(root,'src/image-worker.mjs')],bundle:true,platform:'browser',format:'iife',target:['es2022'],minify:true,outfile:resolve(output,'image-worker.js')});
+
+const {buildSharePages}=await import("./share-pages.mjs");
+await buildSharePages(root,output);

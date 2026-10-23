@@ -1,0 +1,17 @@
+import {escape as e} from '../project-model.mjs';
+import {icons} from './icons.mjs';
+export function categoryPicker(){return `<div class="ui-category-picker" hidden><input type="hidden" name="moveCategory"><button type="button" class="ui-category-trigger" aria-expanded="false">${icons.folderUp}<span></span>${icons.chevronRight}</button></div>`}
+export function bindCategoryPicker(container,{categories,value,onChange=()=>{}}){
+ const input=container.querySelector('input'),trigger=container.querySelector('button');let menu;
+ const byId=new Map(categories.map(c=>[c.id,c]));
+ function path(id){const parts=[],seen=new Set();for(let c=byId.get(id);c&&!seen.has(c.id);c=byId.get(c.parentId)){parts.unshift(c.title);seen.add(c.id)}return parts.join(' / ')}
+ function select(id){input.value=id;trigger.querySelector('span').textContent='Перенести в раздел · '+path(id);close();onChange(id)}
+ function close(){menu?.remove();menu=null;trigger.setAttribute('aria-expanded','false')}
+ function open(){if(menu){close();return}menu=document.createElement('div');menu.className='ui-category-menu';menu.setAttribute('popover','auto');menu.innerHTML='<div class="ui-category-menu-heading">Перенести в раздел</div><input class="ui-category-search" type="search" aria-label="Найти раздел" placeholder="Найти раздел…"><div class="ui-category-options"></div>';container.append(menu);
+ function draw(query=''){const target=menu.querySelector('.ui-category-options'),sorted=[...categories].sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0)),visited=new Set();
+ function branch(parent,depth){return sorted.filter(c=>c.parentId===parent&&!visited.has(c.id)).map(c=>{visited.add(c.id);const children=sorted.filter(x=>x.parentId===c.id);const matches=!query||path(c.id).toLocaleLowerCase('ru').includes(query);const row=`<button type="button" data-category-choice="${e(c.id)}" class="ui-category-option ${depth?'':'ui-category-root'}" style="--category-depth:${Math.min(depth,6)}" aria-pressed="${c.id===input.value}"><span>${e(c.title)}</span>${c.id===input.value?icons.check:''}</button>`;return (matches?row:'')+branch(c.id,depth+1)}).join('')}
+ target.innerHTML=branch(null,0)||'<p class="ui-category-empty">Разделы не найдены</p>';target.querySelectorAll('button').forEach(b=>b.onclick=()=>select(b.dataset.categoryChoice));}
+ draw();menu.querySelector('input').oninput=event=>draw(event.target.value.trim().toLocaleLowerCase('ru'));menu.showPopover?.();trigger.setAttribute('aria-expanded','true');const r=trigger.getBoundingClientRect(),height=Math.min(380,window.innerHeight-24);menu.style.width=Math.min(360,window.innerWidth-24)+'px';menu.style.maxHeight=height+'px';menu.style.left=Math.max(12,Math.min(r.left,window.innerWidth-372))+'px';menu.style.top=Math.max(12,Math.min(r.bottom+8,window.innerHeight-height-12))+'px';menu.querySelector('input').focus();menu.addEventListener('toggle',event=>{if(event.newState==='closed')close()});menu.onkeydown=event=>{if(event.key==='Escape'){close();trigger.focus()}if(event.key==='ArrowDown'||event.key==='ArrowUp'){const buttons=[...menu.querySelectorAll('.ui-category-option')];if(!buttons.length)return;event.preventDefault();const i=buttons.indexOf(document.activeElement);buttons[(i+(event.key==='ArrowDown'?1:buttons.length-1)+buttons.length)%buttons.length].focus()}};
+ }
+ container.a45PickerCleanup?.();container.a45PickerCleanup=close;input.value=value||'';trigger.querySelector('span').textContent='Перенести в раздел · '+path(value);trigger.onclick=open;return {close};
+}
