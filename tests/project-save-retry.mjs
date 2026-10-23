@@ -15,7 +15,9 @@ const client={
  }}}
 };
 
+const events=[];const progress=(text,event)=>{if(event)events.push(event)};
 const service=createProjectService(client,{async isAdmin(){return true}});
-await assert.rejects(service.save(doc,pending,'published'),/two.txt/);assert.equal(pending.size,2,'successful staged files remain in pending snapshot until final commit');
-fail=false;await service.save(doc,pending,'published');assert.equal(pending.size,0);assert.equal(stored.media.length,2);assert.equal(uploads.size,2);
+await assert.rejects(service.save(doc,pending,'published',progress),/two.txt/);assert.equal(pending.size,2,'successful staged files remain in pending snapshot until final commit');
+assert(events.some(e=>e.mediaId===b&&e.state==='error'));assert(!events.some(e=>e.state==='done'),'no green checks until final commit');events.length=0;
+fail=false;await service.save(doc,pending,'published',progress);assert.equal(pending.size,0);assert.equal(stored.media.length,2);assert.equal(uploads.size,2);assert.deepEqual(events.filter(e=>e.state==='done').map(e=>e.mediaId),[a,b]);
 console.log('PASS: partial file failure and retry retain all media through the final atomic commit.');

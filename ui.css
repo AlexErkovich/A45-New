@@ -44,7 +44,7 @@
 .ui-upload-name{flex:1;min-width:0;overflow-wrap:anywhere;color:#444}
 .ui-upload-result{display:flex;align-items:center;justify-content:center;width:24px;flex:0 0 24px;color:#65a077}
 .ui-upload-result[aria-label="Загрузка фотографии"]{color:#ed5938}
-.ui-upload-result[aria-label="Загрузка фотографии"]>.ui-icon{animation:ui-upload-spin .8s linear infinite}
+.ui-upload-result[data-loading="true"]>.ui-icon{animation:ui-upload-spin .8s linear infinite}
 .ui-upload-row.error .ui-upload-result{color:#cf4731}
 .ui-upload-error{max-width:35%;font-size:12px}
 .ui-upload-list .ui-upload-row .ui-icon-button{width:30px;height:30px;padding:6px}
@@ -92,3 +92,7 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 .ui-category-picker[hidden]{display:none}.ui-category-picker{margin:4px 0 16px}.ui-category-trigger{display:inline-flex;align-items:center;gap:9px;max-width:100%;border:0;background:#f8f8f7;color:#666;border-radius:9px;padding:10px 12px;font:500 12px/1.4 Inter,Arial,sans-serif;text-align:left;cursor:pointer}.ui-category-trigger:hover{background:#eeeeeb;color:#222}.ui-category-trigger>.ui-icon{width:16px;height:16px;flex:none}.ui-category-trigger>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ui-category-trigger>.ui-icon:last-child{transform:rotate(90deg);margin-left:8px}
 .ui-category-menu{position:fixed;inset:auto;margin:0;box-sizing:border-box;padding:10px;border:1px solid #ededeb;border-radius:14px;background:white;box-shadow:0 10px 36px #00000012;color:#222;overflow:auto;font-family:Inter,Arial,sans-serif}.ui-category-menu-heading{font-size:12px;font-weight:650;padding:6px 8px 12px}.ui-category-menu .ui-category-search{box-sizing:border-box;width:100%;margin:0 0 8px;padding:10px 12px;border:1px solid #eee;border-radius:9px;background:#fafafa;font:400 12px Inter,Arial,sans-serif}.ui-category-options{display:flex;flex-direction:column;gap:2px}.ui-category-option{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px;width:100%;border:0;border-radius:8px;background:white;color:#555;text-align:left;padding:9px 10px 9px calc(12px + var(--category-depth)*14px);font:400 12px/1.4 Inter,Arial,sans-serif;cursor:pointer}.ui-category-option.ui-category-root{font-weight:650;color:#222;margin-top:6px}.ui-category-option:hover,.ui-category-option:focus-visible{background:#f2f2ef;outline:none}.ui-category-option[aria-pressed=true]{background:#fff2ec;color:#e85837}.ui-category-option>.ui-icon{width:15px;height:15px;flex:none}.ui-category-empty{padding:12px;color:#888;font-size:12px}
 .ui-category-menu .ui-category-search:focus{outline:2px solid #ed5938;outline-offset:1px;border-color:transparent}
+
+.ui-upload-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.ui-upload-status{font-size:11px;line-height:1.4;color:#888}.ui-upload-result[data-loading="true"]{color:#ed5938}.canvas-save[aria-busy="true"]>.ui-icon{animation:ui-upload-spin .8s linear infinite}@media(prefers-reduced-motion:reduce){.ui-upload-result[data-loading="true"]>.ui-icon,.canvas-save[aria-busy="true"]>.ui-icon{animation:none}}
+
+.ui-upload-row.error{flex-wrap:wrap}.ui-upload-row.error .ui-upload-error{flex-basis:100%;max-width:100%;font-size:11px;line-height:1.5}
