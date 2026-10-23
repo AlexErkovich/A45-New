@@ -96,3 +96,16 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 .ui-upload-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.ui-upload-status{font-size:11px;line-height:1.4;color:#888}.ui-upload-result[data-loading="true"]{color:#ed5938}.canvas-save[aria-busy="true"]>.ui-icon{animation:ui-upload-spin .8s linear infinite}@media(prefers-reduced-motion:reduce){.ui-upload-result[data-loading="true"]>.ui-icon,.canvas-save[aria-busy="true"]>.ui-icon{animation:none}}
 
 .ui-upload-row.error{flex-wrap:wrap}.ui-upload-row.error .ui-upload-error{flex-basis:100%;max-width:100%;font-size:11px;line-height:1.5}
+
+/* Long photo descriptions stay within the image stage and use numbered pages. */
+.photo-details-paged .photo-details-sidebar{contain:size;min-height:0;gap:0}
+.photo-details-paged .photo-detail-fields{flex:1;min-height:0}
+.photo-details-paged .photo-title-label{flex:none}
+.photo-details-paged .photo-description-label{flex:1;min-height:0}
+.photo-caption-body{flex:1;min-height:0;overflow:hidden}
+.photo-caption-pages{display:flex;flex-wrap:wrap;gap:6px;min-height:32px;flex:none;margin-top:8px}
+.photo-caption-pages button{width:32px;height:32px;padding:0;border:0;border-radius:8px;background:transparent;color:#727272;font:500 12px Inter,Arial,sans-serif;cursor:pointer}
+.photo-caption-pages button:hover{background:#f5f5f5;color:#222}
+.photo-caption-pages button[aria-current=page]{background:#fff0eb;color:#f25532}
+.photo-caption-pages button:focus-visible{outline:2px solid #ed5938;outline-offset:2px}
+@media(max-width:600px){.photo-details-paged .photo-details-sidebar{contain:none;height:330px;max-height:55dvh}}

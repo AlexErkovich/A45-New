@@ -1,5 +1,16 @@
 import {icon,iconButton} from './components.mjs';
 import {escape as e} from '../project-model.mjs';
+// Keep every character, splitting at word boundaries whenever the available space allows.
+export function paginateCaption(text,fits){
+ const chars=Array.from(text||''),pages=[];let start=0;
+ while(start<chars.length){let low=1,high=chars.length-start,best=1;
+  while(low<=high){const mid=Math.floor((low+high)/2);if(fits(chars.slice(start,start+mid).join(''))){best=mid;low=mid+1}else high=mid-1}
+  let end=start+best;
+  if(end<chars.length){for(let i=end;i>start+best*.55;i--)if(/\s/u.test(chars[i-1])){end=i;break}}
+  pages.push(chars.slice(start,end).join(''));start=end;
+ }
+ return pages.length?pages:[''];
+}
 export function openPhotoDialog({root,doc,tab,urls,id,onChange,onDelete,onClose}){
  const ids=[...new Set(tab.blocks.flatMap(b=>b.type==='IMAGE'?[b.content.mediaId]:b.type==='GALLERY'?(b.content.items||[]).map(i=>i.mediaId):[]).filter(id=>doc.media.some(m=>m.id===id)))];
  const items=ids.map(id=>{const m=doc.media.find(m=>m.id===id);return {id,src:urls[id]||m.localUrl||m.path,alt:m.alt||m.name,title:m.alt||m.name||'',date:m.createdAt,caption:m.caption||tab.blocks.flatMap(b=>b.type==='IMAGE'?[b.content]:b.content.items||[]).find(i=>i.mediaId===id)?.caption||''}});
@@ -7,10 +18,10 @@ export function openPhotoDialog({root,doc,tab,urls,id,onChange,onDelete,onClose}
 }
 export function openPhotoCarousel({root=document.body,items,id,editable=false,isCover=()=>false,onCaption=()=>{},onCover=()=>{},onTitle=()=>{},onDelete,onClose=()=>{},projectDescription='',loadLarge}){
  let index=items.findIndex(item=>item.id===id);if(index<0)return;
- document.querySelector('.photo-details-dialog')?.remove();
- const dialog=document.createElement('dialog');dialog.className='photo-details-dialog';dialog.setAttribute('aria-label','Фотография проекта');root.append(dialog);let request=0,scrollFrame=0;
+ const previous=document.querySelector('.photo-details-dialog');previous?.dispatchEvent(new document.defaultView.Event('photo-dispose'));previous?.remove();
+ const dialog=document.createElement('dialog');dialog.className='photo-details-dialog'+(editable?'':' photo-details-paged');dialog.setAttribute('aria-label','Фотография проекта');root.append(dialog);let request=0,scrollFrame=0,captionObserver;
  function stopScroll(){if(scrollFrame)cancelAnimationFrame(scrollFrame);scrollFrame=0}
- function draw(){stopScroll();const media=items[index],token=++request;dialog.innerHTML=`${iconButton({name:'x',label:'Закрыть фотографию',attributes:'data-photo-close',className:'photo-details-close ui-action-icon'})}<div class="photo-details-stage">${iconButton({name:'chevronLeft',label:'Предыдущая фотография',attributes:'data-photo-prev',className:'photo-carousel-prev'})}<div class="photo-details-image"><img src="${e(media.src||'')}" alt="${e(media.alt||media.title||'Фотография')}"></div>${iconButton({name:'chevronRight',label:'Следующая фотография',attributes:'data-photo-next',className:'photo-carousel-next'})}<nav class="photo-thumbnails" aria-label="Фотографии">${thumbnailIndices().map(i=>`<button type="button" data-photo-thumbnail="${i}" aria-label="Фотография ${i+1}" aria-current="${i===index?'true':'false'}"><img src="${e(items[i].src||'')}" alt="${e(items[i].title||items[i].alt||'Фотография')}"></button>`).join('')}</nav></div><aside class="photo-details-sidebar"><div class="photo-detail-fields"><div class="photo-title-label"><h2>Название фотографии</h2>${editable?`<input data-photo-title aria-label="Название фотографии" maxlength="500" placeholder="Название фотографии" value="${e(media.title||'')}">`:`<p class="photo-details-name">${e(media.title||media.alt||'')}</p>`}</div><div class="photo-description-label"><h2>Описание</h2>${editable?`<textarea aria-label="Описание фотографии" data-photo-description rows="6" maxlength="4000" placeholder="Добавьте описание…">${e(media.caption||'')}</textarea>`:`<p class="photo-details-caption">${e(media.caption||'')}</p>`}</div></div><div class="photo-detail-actions">${editable?`<label class="photo-cover-toggle"><span>Сделать обложкой</span><input type="checkbox" role="switch" aria-label="Сделать обложкой проекта" data-photo-cover ${isCover(media.id)?'checked':''}><span class="photo-switch-track" aria-hidden="true"></span></label>${onDelete?`<button type="button" class="photo-delete" data-photo-delete>Удалить ${icon('trash')}</button>`:''}`:''}</div></aside>`;
+ function draw(){stopScroll();captionObserver?.disconnect();const media=items[index],token=++request;dialog.innerHTML=`${iconButton({name:'x',label:'Закрыть фотографию',attributes:'data-photo-close',className:'photo-details-close ui-action-icon'})}<div class="photo-details-stage">${iconButton({name:'chevronLeft',label:'Предыдущая фотография',attributes:'data-photo-prev',className:'photo-carousel-prev'})}<div class="photo-details-image"><img src="${e(media.src||'')}" alt="${e(media.alt||media.title||'Фотография')}"></div>${iconButton({name:'chevronRight',label:'Следующая фотография',attributes:'data-photo-next',className:'photo-carousel-next'})}<nav class="photo-thumbnails" aria-label="Фотографии">${thumbnailIndices().map(i=>`<button type="button" data-photo-thumbnail="${i}" aria-label="Фотография ${i+1}" aria-current="${i===index?'true':'false'}"><img src="${e(items[i].src||'')}" alt="${e(items[i].title||items[i].alt||'Фотография')}"></button>`).join('')}</nav></div><aside class="photo-details-sidebar"><div class="photo-detail-fields"><div class="photo-title-label"><h2>Название фотографии</h2>${editable?`<input data-photo-title aria-label="Название фотографии" maxlength="500" placeholder="Название фотографии" value="${e(media.title||'')}">`:`<p class="photo-details-name">${e(media.title||media.alt||'')}</p>`}</div><div class="photo-description-label"><h2>Описание</h2>${editable?`<textarea aria-label="Описание фотографии" data-photo-description rows="6" maxlength="4000" placeholder="Добавьте описание…">${e(media.caption||'')}</textarea>`:`<div class="photo-caption-body"><p class="photo-details-caption">${e(media.caption||'')}</p></div><nav class="photo-caption-pages" aria-label="Страницы описания"></nav>`}</div></div><div class="photo-detail-actions">${editable?`<label class="photo-cover-toggle"><span>Сделать обложкой</span><input type="checkbox" role="switch" aria-label="Сделать обложкой проекта" data-photo-cover ${isCover(media.id)?'checked':''}><span class="photo-switch-track" aria-hidden="true"></span></label>${onDelete?`<button type="button" class="photo-delete" data-photo-delete>Удалить ${icon('trash')}</button>`:''}`:''}</div></aside>`;
  dialog.querySelectorAll('[data-photo-thumbnail]').forEach(button=>button.onclick=()=>{index=Number(button.dataset.photoThumbnail);draw()});
  const strip=dialog.querySelector('.photo-thumbnails');
  const active=strip.querySelector('[aria-current=true]');if(active&&strip.scrollWidth>strip.clientWidth)strip.scrollLeft=Math.max(0,active.offsetLeft-strip.offsetLeft-(strip.clientWidth-active.offsetWidth)/2);
@@ -19,11 +30,20 @@ export function openPhotoCarousel({root=document.body,items,id,editable=false,is
  strip.addEventListener('wheel',event=>{if(strip.scrollWidth<=strip.clientWidth)return;event.preventDefault();strip.scrollLeft+=event.deltaX||event.deltaY},{passive:false});
  dialog.querySelector('[data-photo-close]').onclick=()=>dialog.close();dialog.querySelector('[data-photo-prev]').onclick=()=>step(-1);dialog.querySelector('[data-photo-next]').onclick=()=>step(1);
  if(editable){dialog.querySelector('[data-photo-title]').oninput=event=>{media.title=event.target.value;onTitle(media.id,media.title)};if(onDelete)dialog.querySelector('[data-photo-delete]').onclick=()=>{onDelete(media.id);items.splice(index,1);if(!items.length){dialog.close();return}index=Math.min(index,items.length-1);draw()};dialog.querySelector('[data-photo-description]').oninput=event=>{media.caption=event.target.value;onCaption(media.id,media.caption)};dialog.querySelector('[data-photo-cover]').onchange=event=>onCover(media.id,event.target.checked)}
+ if(!editable){
+  const body=dialog.querySelector('.photo-caption-body'),caption=body.firstElementChild,nav=dialog.querySelector('.photo-caption-pages');let page=0,pages=[''];
+  function showPage(){caption.textContent=pages[page];nav.innerHTML=pages.length>1?pages.map((_,i)=>`<button type="button" data-caption-page="${i}" aria-label="Страница описания ${i+1}" ${i===page?'aria-current="page"':''}>${i+1}</button>`).join(''):'';nav.querySelectorAll('button').forEach(button=>button.onclick=()=>{page=Number(button.dataset.captionPage);showPage();nav.querySelector(`[data-caption-page="${page}"]`)?.focus()})}
+  function layout(){if(!dialog.isConnected||!body.clientHeight)return;pages=paginateCaption(media.caption||'',text=>{caption.textContent=text;return caption.scrollHeight<=body.clientHeight});page=Math.min(page,pages.length-1);showPage()}
+  const view=document.defaultView;
+  if(view?.ResizeObserver){captionObserver=new view.ResizeObserver(layout);captionObserver.observe(body)}
+  if(dialog.open)layout();else dialog.addEventListener('photo-layout',layout,{once:true});
+ }
  if(loadLarge&&media.largePath)Promise.resolve(loadLarge(media.largePath)).then(url=>{if(dialog.open&&token===request)dialog.querySelector('.photo-details-image img').src=url}).catch(()=>{});
  }
  function thumbnailIndices(){return items.map((_,i)=>i)}
  function step(delta){index=(index+delta+items.length)%items.length;draw()}
- dialog.addEventListener('keydown',event=>{if(event.target.matches('textarea,input'))return;if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();step(event.key==='ArrowLeft'?-1:1)}});
+ dialog.addEventListener('keydown',event=>{if(event.target.matches('textarea,input')||event.target.closest('.photo-caption-pages'))return;if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();step(event.key==='ArrowLeft'?-1:1)}});
  dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close()}});
- dialog.addEventListener('close',()=>{stopScroll();dialog.remove();onClose()});draw();dialog.showModal();return dialog;
+ dialog.addEventListener('photo-dispose',()=>{stopScroll();captionObserver?.disconnect()});
+ dialog.addEventListener('close',()=>{stopScroll();captionObserver?.disconnect();dialog.remove();onClose()});draw();dialog.showModal();dialog.dispatchEvent(new document.defaultView.Event('photo-layout'));return dialog;
 }
