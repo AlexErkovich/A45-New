@@ -31,6 +31,7 @@ await until(()=>window.document.querySelector('#admin-login-form')||window.docum
 assert.equal(window.document.title,'Вход администратора — A45');
 window.history.pushState(null,'','/admin');window.dispatchEvent(new window.Event('hashchange'));
 await until(()=>window.document.querySelector('#admin-login-form')||window.document.querySelector('#main').textContent.includes('Supabase пока не настроен'));
+if(window.A45Cloud.configured){const original=window.archiveData.projects.find(p=>p.id==='automatic-greenhouse');const migrated={...structuredClone(original),id:'b14018ae-3906-4a60-a70b-7cc5490c8412',slug:'p-b14018ae-3906-4a60-a70b-7cc5490c8412',title:'Теплица с сервера',cloud:true};window.dispatchEvent(new window.CustomEvent('a45-projects',{detail:[migrated]}));assert(!window.archiveData.projects.some(p=>p.id==='automatic-greenhouse'),'migrated seed must not duplicate the server project');window.history.pushState(null,'','/#/project/automatic-greenhouse?category=eco');window.dispatchEvent(new window.Event('hashchange'));assert.equal(window.document.querySelector('.project-title h1').textContent,'Теплица с сервера','old project link resolves to the server version')}
 assert.deepEqual(errors,[]);await window.happyDOM.close();
 console.log('PASS: built app boots with official Supabase SDK, public category loading/local fallback, ten navigation-aligned cards, /login, legacy /admin, private /project/new and cloud project deep tab; no DOM runtime errors. HTTP is mocked.');
 

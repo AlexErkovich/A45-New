@@ -1,4 +1,5 @@
 window.archiveData = {
+  "projectAliases": {"automatic-greenhouse": "b14018ae-3906-4a60-a70b-7cc5490c8412"},
   "categories": [
     {
       "id": "photography",
