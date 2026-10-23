@@ -7,7 +7,7 @@ export function createProjectService(client,categoryService){
  const urls=new Map();
  const check=async()=>{if(!await categoryService.isAdmin(true))throw Error('Нужны права администратора.')};
  async function list(admin=false){if(admin)await check();let q=client.from('projects').select(select);if(!admin)q=q.eq('status','published');const {data,error}=await q.order('created_at',{ascending:false});if(error)throw Error('Проекты не загружены. Проверьте подключение и применена ли миграция 003_projects.sql.');return data.map(fromRow)}
- async function get(id){await check();const {data,error}=await client.from('projects').select(select).eq('id',id).single();if(error)throw error;return fromRow(data)}
+ async function get(id){await check();if(!/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(id)){const doc=(await list(true)).find(d=>d.slug===id||d.sourceId===id);if(doc)return doc;throw Object.assign(Error('Проект не найден на сервере.'),{code:'PGRST116'})}const {data,error}=await client.from('projects').select(select).eq('id',id).single();if(error)throw error;return fromRow(data)}
  async function commit(doc){const {data,error}=await client.rpc('save_a45_project',{doc,expected_revision:doc.revision});if(error)throw Error(error.message||'Не удалось сохранить проект.');doc.revision=data.revision;doc.slug=data.slug;return data}
  async function save(doc,pending,status,progress=()=>{}){await check();const candidate=validateProject({...doc,status});
   // Register staged media under a draft or the PREVIOUS published snapshot, before upload.

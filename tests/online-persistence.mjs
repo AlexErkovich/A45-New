@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {newProject,uid,publicProject} from '../src/project-model.mjs';
+import {serializeCanvas,hydrateCanvas} from '../src/canvas-model.mjs';
+import {createProjectTransfer} from '../src/project-transfer.mjs';
+import {removeProject} from '../src/project-removal.mjs';
+const entry=await readFile(new URL('../src/cloud-entry.js',import.meta.url),'utf8');
+assert(!entry.includes('withLocalProjects'));assert(!entry.includes('creationClient'));assert(entry.includes('const editableProjects=projectService'));
+const doc=newProject('technical');doc.id='legacy-crane';doc.title='Кран';doc.status='published';doc.tabs[0].blocks=[{id:uid(),type:'LEGACY',content:{type:'text',content:{quote:'Авторский текст'}}}];
+const serialized=serializeCanvas({...doc,sourceId:'legacy-crane'});assert(serialized.tabs[0].blocks.every(b=>b.type!=='LEGACY'));assert.equal(publicProject(serialized).tabs[0].content[0].content.quote,'Авторский текст');assert.equal(hydrateCanvas(serialized).sourceId,'legacy-crane');
+let server,uploaded=0;const storage={getItem:()=>null,setItem(){throw new DOMException('full','QuotaExceededError')}};
+const projects={async list(){return []},async get(){return server},async save(d,p){server=structuredClone({...d,revision:d.revision+1,slug:'p-'+d.id});Object.assign(d,server);uploaded+=p.size},async publicUrls(){return {}}};
+const category={async isAdmin(){return true},async listAdmin(){return [{id:'technical'}]}};
+const move=createProjectTransfer({projectService:projects,categoryService:category,storage});const result=await move({doc},{categoryId:'technical'});assert.equal(result.doc.title,'Кран');assert.equal(result.doc.sourceId,'legacy-crane');assert.equal(uploaded,0,'text-only transfer commits remotely even when localStorage is full');
+const cloud=structuredClone(result.doc),missing=uid();cloud.media.push({id:missing,name:'missing.jpg',kind:'image'});cloud.coverMediaId=missing;cloud.tabs[0].blocks.push({id:uid(),type:'IMAGE',content:{mediaId:missing}});cloud.tabs[0].blocks.push({id:uid(),type:'GALLERY',content:{items:[{mediaId:missing}]}});
+const previous=server;projects.get=async()=>server;await move({doc:cloud},{categoryId:'technical',expectedRevision:previous.revision,skipMissingNames:['missing.jpg']});assert.equal(server.media.length,0);assert.equal(server.coverMediaId,null);assert(!server.tabs[0].blocks.some(b=>b.content.mediaId===missing));assert.equal(server.tabs[0].blocks.find(b=>b.type==='GALLERY').content.items.length,0);
+await assert.rejects(removeProject({id:'id',onlineOnly:true,service:{async get(){throw Error('belongs to another browser')}},storage,projects:[]}),/belongs/);
+console.log('PASS: online runtime has no local project adapter; legacy content/source IDs survive cloud migration; local quota cannot fail verified remote commits; only approved missing media are skipped; cloud deletion never hides locally.');
