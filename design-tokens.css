@@ -152,6 +152,16 @@
   --font-heading:"Space Grotesk",Inter,sans-serif;
 
   /* Shared component sizes */
+  --icon-sm:16px;
+  --icon-md:18px;
+  --icon-lg:20px;
+  --icon-stroke:1.75;
+  --icon-stroke-soft:1.5;
+  --icon-stroke-thin:1;
+  --icon-stroke-light:1.25;
+  --ui-control-glyph:var(--icon-md);
+  --ui-button-icon-size:var(--icon-sm);
+  --ui-button-gap:8px;
   --menu-width:230px;
   --menu-item-gap:10px;
   --menu-row-radius:8px;
@@ -159,8 +169,10 @@
   --menu-radius:10px;
   --menu-row-height:36px;
   --menu-row-padding:9px 10px;
-  --menu-icon-size:16px;
+  --menu-icon-size:var(--icon-sm);
   --dialog-sm-width:340px;
+  --dialog-sm-padding:22px;
+  --dialog-sm-radius:14px;
   --dialog-form-width:440px;
   --dialog-form-padding:28px;
   --dialog-form-radius:16px;
@@ -192,7 +204,7 @@
   --ui-hover:var(--palette-neutral-22);
   --ui-accent:var(--color-accent);
   --ui-action-size:40px;
-  --ui-action-glyph:20px;
+  --ui-action-glyph:var(--icon-lg);
   --ui-action-hover:var(--color-page);
   --ui-button-height:40px;
   --ui-button-radius:8px;
