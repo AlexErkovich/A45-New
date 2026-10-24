@@ -20,7 +20,7 @@ $('[data-photo-next]').click();assert.equal($('textarea').value,'Описани�
 $('[data-photo-prev]').click();$('[data-photo-cover]').checked=false;$('[data-photo-cover]').dispatchEvent(new win.Event('change'));assert.equal(doc.coverMediaId,null);assert.equal(doc.coverOriginalId,null);
 assert.equal(changes,4);$('[data-photo-close]').click();assert(!dialog.open);
 const viewer=openPhotoCarousel({items:[{id:'one',src:'one.jpg',caption:'Первое'},{id:'two',src:'two.jpg',caption:'Второе'}],id:'one'});
-assert(viewer.querySelector('.document-actions a[download]'));assert.equal(viewer.querySelector('textarea'),null);assert.equal(viewer.querySelector('[data-photo-cover]'),null);
+assert.equal(viewer.querySelector('.document-actions a[download]'),null);assert.equal(viewer.querySelector('textarea'),null);assert.equal(viewer.querySelector('[data-photo-cover]'),null);
 viewer.querySelector('[data-photo-thumbnail="1"]').click();assert.equal(viewer.querySelector('.photo-details-caption').textContent,'Второе');assert.equal(viewer.querySelector('img').getAttribute('src'),'two.jpg');viewer.close();
 // Simulate a narrow description column and a resize without depending on fonts.
 let resize;
