@@ -1,7 +1,8 @@
+import {hydrateCanvas,serializeCanvas} from '../src/canvas-model.mjs';
 import {PGlite} from '@electric-sql/pglite';
 import {readFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {newProject,newTab,uid,normalize} from '../src/project-model.mjs';
+import {newProject,newTab,uid,normalize,fromRow,publicProject} from '../src/project-model.mjs';
 const db=new PGlite();
 await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;
 create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
@@ -69,4 +70,14 @@ const legacyPath=d.id+'/'+image;await as('authenticated',admin);await db.query("
 assert.equal((await db.query('select public.a45_media_access($1,true) allowed',[legacyPath+'/wrong.webp'])).rows[0].allowed,false);
 await as('anon');assert.equal((await db.query("select * from storage.objects where name=$1",[legacyPath+'/content.webp'])).rows.length,0);await assert.rejects(db.query("insert into storage.objects(bucket_id,name) values('project-media',$1)",[legacyPath+'/large.webp']));await as('authenticated',other);await assert.rejects(db.query("insert into storage.objects(bucket_id,name) values('project-media',$1)",[legacyPath+'/large.webp']));await db.exec('reset role');
 console.log('PASS: migration 006, admin-only deterministic staged variants, hidden unregistered derivatives, denied outsider uploads.');
+// Reproduce deleting the original overview, editing Idea, saving and loading real SQL rows.
+await as('authenticated',admin);
+const helmet=newProject('technical');helmet.title='Overview deletion regression';helmet.status='published';
+const idea=newTab('Идея');idea.blocks=[{id:uid(),type:'TEXT',content:{text:'First saved paragraph'}},{id:uid(),type:'TEXT',content:{text:'Second saved paragraph'}}];helmet.tabs.push(idea,newTab('Документация'));
+let helmetSave=serializeCanvas(helmet);await save(helmetSave);helmet.revision=helmetSave.revision;
+helmet.tabs.shift();helmet.tabs[0].blocks[1].content.text='Updated description survives refresh';helmetSave=serializeCanvas(helmet);await save(helmetSave);
+async function reloadHelmet(){const row=(await db.query('select * from public.projects where id=$1',[helmet.id])).rows[0];for(const name of ['project_tabs','project_blocks','project_media','project_categories'])row[name]=(await db.query('select * from public.'+name+' where project_id=$1',[helmet.id])).rows;return fromRow(row)}
+let reloaded=await reloadHelmet();assert.equal(reloaded.tabs.length,2);assert.equal(reloaded.tabs[0].title,'Идея');assert.equal(reloaded.tabs[0].blocks.filter(b=>!b.content.editorMeta).length,2);assert.ok(JSON.stringify(publicProject(reloaded)).includes('Updated description survives refresh'));
+const edited=hydrateCanvas(reloaded);edited.tabs[0].blocks[0].content.text='Second save after reload';await save(serializeCanvas(edited));reloaded=await reloadHelmet();assert.ok(JSON.stringify(reloaded).includes('Second save after reload'));assert.ok(JSON.stringify(reloaded).includes('Updated description survives refresh'));assert.equal(reloaded.tabs.length,2);
+console.log('PASS: deleting original overview preserves Idea, all paragraphs and remaining tabs through SQL save/reload/save.');
 await db.close();console.log('PASS: project SQL atomic saves, multi-category/draft/publish/unpublish, immutable slug, conflict rejection, private draft/staged media, RLS, denied outsider writes, repeat migration and untouched 45 categories.');

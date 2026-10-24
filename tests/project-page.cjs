@@ -32,3 +32,10 @@ console.log('PASS: all project/tab routes, 8 crane tabs, URL/history events, unc
 const publication=render('#/project/camera-crane?category=technical');assert(publication.includes('class="project-actions"'));assert(publication.includes('data-copy-project-link'));assert(publication.includes('href="#/category/technical"'));assert(!publication.includes('class="back-link"'));assert(run('ProjectPage.content("divider")').includes('<hr'));
 
 assert(render("#/category/eco").includes("Автоматическая теплица"));const greenhouse=render("#/project/automatic-greenhouse?category=eco");assert(greenhouse.includes("Концепция"));assert(greenhouse.includes("Зачем?"));assert(greenhouse.includes('href="#/category/eco"'));
+
+// Removing the original overview must not create a phantom description-only tab after reload.
+const cloudTabs=run("ProjectTabs.list({cloud:true,description:'Card summary',tabs:[{id:'t-idea',title:'Идея',sortOrder:0,type:'mixed',content:[{type:'richtext',content:{text:'Full saved idea'}}]},{id:'t-history',title:'История',sortOrder:1,type:'mixed',content:[]}]})");
+assert.deepEqual(Array.from(cloudTabs,t=>t.id),['t-idea','t-history']);
+assert.equal(cloudTabs[0].title,'Идея');
+assert.equal(cloudTabs[0].content[0].content.text,'Full saved idea');
+console.log('PASS: cloud projects preserve real tabs/content without phantom overview after deleting original overview.');
