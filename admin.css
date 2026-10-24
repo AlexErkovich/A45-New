@@ -43,33 +43,35 @@ body:has(.auth-shell) #layout{display:block;max-width:1000px;width:calc(100% - 4
 .canvas-editor [data-feedback-source]{margin:0!important}
 .account-action{border:0;background:transparent;font:inherit;padding:10px 0}
 
-/* Keep editable content and its controls inside a consistent canvas gutter. */
-.canvas-editor .project-title{gap:16px}
-.canvas-editor .canvas-title{box-sizing:border-box;padding:10px 12px;border-radius:8px}
+/* One internal control column; no editor control extends outside its row. */
+.canvas-editor{--canvas-gutter:72px;--canvas-inset:12px}
+.canvas-editor .project-title{gap:16px;padding-left:var(--canvas-gutter)}
+.canvas-editor .canvas-title{box-sizing:border-box;padding:10px var(--canvas-inset);border-radius:8px}
 .canvas-editor .canvas-title:focus{outline-offset:0}
-.canvas-editor .canvas-tabs{margin:0 0 28px;padding:12px;gap:12px;box-shadow:none;border:0}
-.canvas-editor .canvas-tabs>.canvas-tools{position:static;transform:none;padding:0;gap:4px;flex:none}
+.canvas-editor .canvas-tabs{margin:0 0 28px;padding:12px 12px 12px calc(var(--canvas-gutter) + 2px);gap:12px;box-shadow:none;border:0}
+.canvas-editor .canvas-tabs>.canvas-tools{position:absolute;left:var(--canvas-inset);right:auto;top:15px;transform:none;padding:0;gap:4px}
 .canvas-editor .canvas-tabs:focus-within:not(:hover){background:transparent}
-.canvas-editor .canvas-tab>button:hover{background:#ededed}
-.canvas-editor .canvas-block{padding:12px;border-radius:8px}
-.canvas-editor .canvas-block>.canvas-tools{left:-60px;right:auto;top:12px;padding:0;gap:4px}
+.canvas-editor .canvas-tab>button:hover{background:#ededed;color:#222}
+.canvas-editor .canvas-block{padding:12px 12px 12px calc(var(--canvas-gutter) + var(--canvas-inset));border-radius:8px}
+.canvas-editor .canvas-block>.canvas-tools{left:var(--canvas-inset);right:auto;top:12px;padding:0;gap:4px}
 .canvas-editor .canvas-block>.canvas-tools button{width:26px;height:28px}
 .canvas-editor .canvas-text:focus{outline-offset:4px}
 .canvas-editor .canvas-insert{padding:12px}
+.canvas-editor .canvas-insert>.canvas-empty-add{margin:0;width:26px;height:28px}
+.canvas-editor .canvas-blocks~.ui-dropzone,.canvas-editor .canvas-blocks~.ui-upload-list{margin-left:calc(var(--canvas-gutter) + var(--canvas-inset))}
 @media(min-width:768px){
- .project-canvas-open #layout .canvas-editor .project-page{padding-left:80px;padding-right:40px}
- .project-canvas-open #layout .canvas-editor .project-header{margin-left:-80px;padding-left:80px}
+ .project-canvas-open #layout .canvas-editor .project-page{padding-left:40px;padding-right:40px}
+ .project-canvas-open #layout .canvas-editor .project-header{margin-left:-40px;padding-left:40px}
 }
 @media(max-width:767px){
+ .canvas-editor{--canvas-gutter:60px;--canvas-inset:8px}
  .project-canvas-open #layout .canvas-editor .project-page{padding-left:20px;padding-right:20px}
  .project-canvas-open #layout .canvas-editor .project-header{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}
- .canvas-editor .canvas-block{padding-top:48px}
- .canvas-editor .canvas-block>.canvas-tools{left:12px;top:10px}
- .canvas-editor .canvas-tabs{padding:12px;gap:8px}
+ .canvas-editor .canvas-tabs{gap:8px;padding-left:var(--canvas-gutter)}
  .canvas-editor .canvas-title{font-size:26px}
+ .canvas-editor .canvas-insert{padding-left:var(--canvas-inset)}
 }
 @media(max-width:479px){.canvas-editor .project-title{flex-wrap:wrap;gap:12px}.canvas-editor .canvas-title{flex:1 0 100%}.canvas-editor .canvas-page-menu{margin-left:auto}}
 .canvas-editor .canvas-tab>button[aria-selected=true]{color:#999}
 .canvas-editor .canvas-tab>button[aria-selected=true]>.ui-icon{color:#b8b8b8}
-.canvas-editor .canvas-tab>button:hover{color:#222}
 .canvas-editor .canvas-tab>button:hover>.ui-icon{color:#777}
