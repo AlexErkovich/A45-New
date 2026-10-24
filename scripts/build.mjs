@@ -25,6 +25,3 @@ await cp(resolve(output, 'integration.js'), resolve(root, 'integration.js'));
 console.log('Production frontend ready in dist/. Supabase: ' + (config ? 'configured' : 'disabled (local fallback)'));
 
 await build({entryPoints:[resolve(root,'src/image-worker.mjs')],bundle:true,platform:'browser',format:'iife',target:['es2022'],minify:true,outfile:resolve(output,'image-worker.js')});
-
-const {buildSharePages}=await import("./share-pages.mjs");
-await buildSharePages(root,output);

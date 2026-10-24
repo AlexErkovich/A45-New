@@ -1,0 +1,1 @@
+export async function sameFileContent(left,right){if(!left||!right||left.size!==right.size)return false;const [a,b]=await Promise.all([left.arrayBuffer(),right.arrayBuffer()]);const x=new Uint8Array(a),y=new Uint8Array(b);return x.length===y.length&&x.every((value,i)=>value===y[i])}

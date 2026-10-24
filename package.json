@@ -2,12 +2,12 @@
   "name": "a45-new",
   "version": "1.0.0",
   "private": true,
-  "description": "A45 \u2014 \u043f\u0435\u0440\u0441\u043e\u043d\u0430\u043b\u044c\u043d\u0430\u044f \u0442\u0432\u043e\u0440\u0447\u0435\u0441\u043a\u0430\u044f \u0431\u0438\u0431\u043b\u0438\u043e\u0442\u0435\u043a\u0430",
+  "description": "A45 — персональная творческая библиотека",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --check feedback.js && node tests/feedback.mjs && node tests/feedback-navigation.mjs && node tests/session-navigation.mjs && node --check home-page.js && node tests/home-page.mjs && node tests/card-motion.mjs && node tests/card-creation-ui.mjs && node tests/card-creation-service.mjs && node tests/category-covers.mjs && node tests/project-loading.mjs && node tests/temporary-creation-db.mjs && node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/section-page.mjs && node tests/project-page.cjs && node tests/cloud.mjs && node tests/database.mjs && node tests/category-creation-db.mjs && node tests/projects-db.mjs && node tests/project-editor.mjs && node tests/editor-transition.mjs && node tests/photo-dialog.mjs && node tests/project-card.mjs && node tests/project-removal.mjs && node tests/ui-dropzones.mjs && node tests/create-project-button.mjs && node tests/upload-progress.mjs && node tests/project-save-retry.mjs && node tests/project-transfer.mjs && node tests/online-persistence.mjs && node tests/navigation-catalog-db.mjs",
+    "test": "node tests/audit-editor.mjs && node tests/audit-media.mjs && node tests/audit-share.mjs && node tests/audit-runtime.mjs && node --check feedback.js && node tests/feedback.mjs && node tests/feedback-navigation.mjs && node tests/session-navigation.mjs && node --check home-page.js && node tests/home-page.mjs && node tests/card-motion.mjs && node tests/card-creation-ui.mjs && node tests/card-creation-service.mjs && node tests/category-covers.mjs && node tests/project-loading.mjs && node tests/temporary-creation-db.mjs && node --check app.js && node --check project-page.js && node --check data/projects.js && node tests/archive.cjs && node tests/section-page.mjs && node tests/project-page.cjs && node tests/cloud.mjs && node tests/database.mjs && node tests/category-creation-db.mjs && node tests/projects-db.mjs && node tests/project-editor.mjs && node tests/editor-transition.mjs && node tests/photo-dialog.mjs && node tests/project-card.mjs && node tests/project-removal.mjs && node tests/ui-dropzones.mjs && node tests/create-project-button.mjs && node tests/upload-progress.mjs && node tests/project-save-retry.mjs && node tests/project-transfer.mjs && node tests/online-persistence.mjs && node tests/navigation-catalog-db.mjs",
     "build": "npm test && node scripts/build.mjs && node tests/bundle.mjs",
     "preview": "node scripts/preview.mjs"
   },

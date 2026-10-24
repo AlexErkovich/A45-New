@@ -136,3 +136,19 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
  .photo-details-paged .photo-details-image,.photo-details-paged .photo-details-image>img{border-radius:20px}
  .photo-details-paged .photo-carousel-prev{left:-34px}.photo-details-paged .photo-carousel-next{right:-34px}
 }
+
+/* One modal heading keeps the title and close action available while content scrolls. */
+.ui-dialog-header{position:sticky;top:-28px;z-index:8;display:flex;align-items:center;justify-content:space-between;gap:16px;margin:-28px -28px 20px;padding:24px 28px 14px;background:#fff}
+.ui-dialog-header h2{min-width:0;margin:0;font-family:"Space Grotesk",Inter,sans-serif}
+.ui-dialog-header .ui-action-icon{flex:none}
+.photo-details-dialog:not(.photo-details-paged){height:min(780px,calc(100dvh - 32px));max-height:calc(100dvh - 32px);overflow:hidden;padding-top:64px;padding-bottom:28px}
+.photo-details-dialog:not(.photo-details-paged)[open]{grid-template-rows:minmax(0,1fr)}
+.photo-details-dialog:not(.photo-details-paged) .photo-details-stage{min-height:0}
+.photo-details-dialog:not(.photo-details-paged) .photo-details-image{flex:1;min-height:0;aspect-ratio:auto}
+.photo-details-dialog:not(.photo-details-paged) .photo-details-sidebar{min-height:0;overflow:auto;padding:2px}
+.photo-details-dialog:not(.photo-details-paged) .photo-title-label{position:sticky;top:0;z-index:2;padding-bottom:8px;background:#fff}
+.photo-details-dialog:not(.photo-details-paged) .photo-details-close{top:16px;right:20px}
+.photo-details-paged .photo-details-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden;max-height:5.1em}
+.photo-name-full{display:block;align-self:flex-start;border:0;background:transparent;color:#777;font:400 11px Inter,sans-serif;padding:2px 0;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:767px){.canvas-modal .ui-dialog-header{top:-22px;margin:-22px -22px 18px;padding:18px 22px 12px}}
+@media(max-width:600px){.photo-details-dialog:not(.photo-details-paged){padding:48px 40px 20px}.photo-details-dialog:not(.photo-details-paged)[open]{grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:16px}}

@@ -1,16 +1,20 @@
 // Local static preview only: serves dist, with the same /admin mapping as Vercel.
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
+import {existsSync} from 'node:fs';
+import {createShareHandler} from '../src/server/share.mjs';
 import { stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root=fileURLToPath(new URL('../dist/',import.meta.url));
 const port=Number(process.env.A45_PREVIEW_PORT||3001);
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.mp4':'video/mp4','.zip':'application/zip','.txt':'text/plain; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'};
+if(existsSync('.env.local'))process.loadEnvFile('.env.local');
+const share=createShareHandler();
 const server=createServer(async(req,res)=>{
  try{
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return}
-  const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
+  const requestUrl=new URL(req.url,'http://localhost'),path=decodeURIComponent(requestUrl.pathname);if(path==='/api/share'||path.startsWith('/share/')){if(path.startsWith('/share/'))requestUrl.searchParams.set('project',path.slice(7));req.url='/api/share?'+requestUrl.searchParams;await share(req,res);return}if(path==='/admin'||path==='/project/drafts'){res.writeHead(307,{Location:path==='/admin'?'/login':'/#/drafts'});res.end();return}
   if(['/admin/','/login/'].includes(path)){res.writeHead(302,{Location:path.slice(0,-1)});res.end();return}
   if(path.split('/').some(segment=>segment.startsWith('.'))){res.writeHead(404);res.end();return}
   const file=resolve(root,'.'+((['/', '/admin', '/login','/transfer'].includes(path)||/^\/project\/(new|drafts|edit\/[^/]+)$/.test(path))?'/index.html':path));

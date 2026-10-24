@@ -22,7 +22,7 @@ run("filterState.category='photography';filterState.subcategory='wildlife'");ass
 run("filterState.subcategory='apps'");assert(!run("matches(projects.find(p=>p.id==='5-1'))"));
 run("filterState.category='it'");assert(run("matches(projects.find(p=>p.id==='5-1'))"));run("filterState.year='1900'");assert(!run("matches(projects.find(p=>p.id==='5-1'))"));
 run("Object.keys(filterState).forEach(k=>filterState[k]='')");
-element('[name="category"]').value='photography';run('subOptions()');assert(element('[name="subcategory"]').innerHTML.includes('Насекомые'));assert(!element('[name="subcategory"]').innerHTML.includes('Приложения'));
+element('[name="category"]').value='photography';run('subOptions()');assert(element('[name="subcategory"]').innerHTML.includes('Макросъемка'));assert(!element('[name="subcategory"]').innerHTML.includes('Приложения'));
 assert(render('#/category/0/'+encodeURIComponent('Макросъёмка')).includes('<h1>Макросъемка</h1>'));
 for(const p of projects)assert(render('#/project/'+p.id).includes(p.title));assert(render('#/project/5-1?category=missing').includes('aria-label="Закрыть проект"'));
 assert.equal((render('#/').match(/class="card"/g)||[]).length,8);

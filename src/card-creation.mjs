@@ -1,3 +1,4 @@
+import {sameFileContent} from './file-content.mjs';
 import {ensureCategory as ensurePlacement} from './category-placement.mjs';
 import {newProject,publicProject,uid} from './project-model.mjs';
 import {prepareImage} from './image-optimizer.mjs';
@@ -12,18 +13,12 @@ export function createCardCreation({categoryService,projectService,refreshCatego
   const rows=await categoryService.listAdmin(),known=new Set(rows.map(r=>r.id));
   if(input.parentId)await ensurePlacement(categoryService,input.parentId,known);
   if(input.kind==='subcategory'||input.kind==='section'){
-   const path=input.file?input.id+'/'+input.id.replace(/^section-/,'')+'.'+({'image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[input.file.type]||'webp'):null;
-   progress('Создание подраздела…');
-   const row=await rpc('create_a45_category',{doc:{id:input.id,parentId:input.parentId,title:input.title,description:input.description,coverPath:path}});
-   if(row.title!==input.title||row.description!==input.description)throw Error('Данные уже созданного подраздела отличаются. Закройте окно и проверьте раздел перед повторным добавлением.');
-   if(input.file){
-   progress('Загрузка обложки…');
-   const storage=categoryService.client.storage.from('category-covers');
-   const upload=await storage.upload(path,input.file,{upsert:false,contentType:input.file.type,cacheControl:'31536000'});
-   if(upload.error){const existing=await storage.download(path);if(existing.error||existing.data.size!==input.file.size)throw Error('Не удалось загрузить обложку. Повторите сохранение.');}
-   }
+   let job=jobs.get(input.id);
+   if(!job){const path=input.file?input.id+'/'+crypto.randomUUID()+'.'+({'image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[input.file.type]||'webp'):null;progress('Создание раздела…');const row=await rpc('create_a45_category',{doc:{id:input.id,parentId:input.parentId,title:input.title,description:input.description,coverPath:path}});job={row,file:input.file};jobs.set(input.id,job)}
+   if(job.row.title!==input.title||job.row.description!==input.description||job.file!==input.file){const result=await categoryService.save(job.row,{title:input.title,description:input.description,blob:job.file!==input.file?input.file:null,removeCover:!input.file});job.row=result.category;job.file=input.file}
+   if(input.file){progress('Загрузка обложки…');const path=job.row.cover_image_path,storage=categoryService.client.storage.from('category-covers');const upload=await storage.upload(path,input.file,{upsert:false,contentType:input.file.type,cacheControl:'31536000'});if(upload.error){const existing=await storage.download(path);const equal=await sameFileContent(existing.data,input.file);if(existing.error||!equal)throw Error('Не удалось загрузить обложку. Повторите сохранение.')}}
    const saved=await rpc('publish_a45_category',{category_id:input.id});
-   await categoryService.includeNavigation?.(saved);await refreshCategories();
+   job.row=saved;await categoryService.includeNavigation?.(saved);await refreshCategories();jobs.delete(input.id);
    return {category:{id:saved.id,parentId:saved.parent_id,title:saved.title,description:saved.description,image:saved.cover_image_path?categoryService.coverUrl(saved.cover_image_path):'assets/cover-placeholder.svg',slug:saved.slug,sortOrder:saved.sort_order,custom:true}};
   }
   let job=jobs.get(input.id);
@@ -39,5 +34,5 @@ export function createCardCreation({categoryService,projectService,refreshCatego
   const project=publicProject(doc,await projectService.publicUrls(doc));
   await refreshProjects();jobs.delete(input.id);return {project};
  }
- return {create};
+ return {create,release:id=>jobs.delete(id)};
 }

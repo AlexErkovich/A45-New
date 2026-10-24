@@ -5,6 +5,7 @@ globalThis.window={archiveData:{categories}};
 const rows=new Map([['photography',{id:'photography',parent_id:null,title:'Фотография',is_published:true}]]),stored=new Map();
 let admin=true,failUpload=true,failProject=true,refreshes=0,prepares=0,projectCalls=0;
 const service={
+ async save(previous,changes){const next={...previous,title:changes.title,description:changes.description};if(changes.removeCover)next.cover_image_path=null;if(changes.blob){next.cover_image_path=previous.id+'/'+crypto.randomUUID()+'.png';if(failUpload)throw Error('Не удалось загрузить обложку');stored.set(next.cover_image_path,changes.blob)}rows.set(next.id,next);return {category:next}},
  async isAdmin(){return admin},async listAdmin(){return [...rows.values()]},coverUrl:p=>'https://example.org/'+p,
  client:{
   async rpc(name,args){
@@ -22,7 +23,7 @@ const create=createCardCreation({categoryService:service,projectService,refreshC
 const file=new Blob(['image'],{type:'image/png'}),input={kind:'subcategory',id:'section-00000000-0000-4000-8000-000000000003',parentId:'photography',title:'Туристические',description:'Описание',file};
 admin=false;await assert.rejects(create(input),/администратором/);assert.equal(rows.size,1);
 admin=true;await assert.rejects(create(input),/обложку/);assert.equal(rows.get(input.id).is_published,false);
-failUpload=false;const saved=await create(input);assert.equal(saved.category.parentId,'photography');assert.equal(saved.category.custom,true);assert.equal(rows.get(input.id).is_published,true);assert.equal(rows.size,2);
+failUpload=false;input.title='Исправленное название';input.description='Исправленное описание';input.file=new Blob(['other'],{type:'image/png'});const saved=await create(input);assert.equal(saved.category.title,input.title);assert.equal(saved.category.description,input.description);assert.equal(saved.category.parentId,'photography');assert.equal(saved.category.custom,true);assert.equal(rows.get(input.id).is_published,true);assert.equal(rows.size,2);
 const project={kind:'project',id:'00000000-0000-4000-8000-000000000004',parentId:'studio-photo',title:'Съёмка',description:'Описание',file};
 await assert.rejects(create(project),/Upload failed/);assert.equal(rows.get('studio-photo').parent_id,'photography');
 failProject=false;const result=await create(project);assert.equal(prepares,1,'retry reuses prepared media and revision');assert.equal(projectCalls,2);assert.equal(result.project.image,'https://example.org/thumbnail.webp');assert.deepEqual(result.project.categoryIds,['studio-photo']);assert.equal(result.project.slug,'p-'+project.id);assert.equal(refreshes,2);

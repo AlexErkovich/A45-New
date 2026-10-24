@@ -26,10 +26,10 @@ export function createCategoryService(client,{onSessionExpired=()=>{},creationMo
  async isAdmin(requireSession=false){if(creationMode)return true;const {data:{user},error}=await client.auth.getUser();if(error||!user){if((requireSession||hadSession)&&(!error||error.status===401||error.status===403||error.name==='AuthSessionMissingError'))onSessionExpired();return false;}hadSession=true;const result=await client.rpc('is_a45_admin');if(result.error)throw result.error;return result.data===true},
  async listAdmin(){if(!await this.isAdmin(true))throw new Error('Нет прав администратора.');const {data,error}=await client.from('categories').select('*').order('sort_order');if(error)throw error;return data},
  coverUrl(path){if(!path)return null;return storage.getPublicUrl(path).data.publicUrl},
- async save(previous,{title,description,blob,cleanupPrevious=false}){
+ async save(previous,{title,description,blob,cleanupPrevious=false,removeCover=false}){
   if(!await this.isAdmin(true))throw new Error('Сессия истекла или нет прав администратора.');
   title=title.trim();if(!title||title.length>160||description.length>4000)throw new Error('Проверьте название и описание.');
-  let path=previous.cover_image_path;
+  let path=removeCover?null:previous.cover_image_path;
   if(blob){if(!IMAGE_TYPES.includes(blob.type)||!blob.size||blob.size>MAX_IMAGE_BYTES)throw new Error('Некорректная фотография.');const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[blob.type];path=`${previous.id}/${crypto.randomUUID()}.${extension}`;
    const {error}=await storage.upload(path,blob,{upsert:false,contentType:blob.type,cacheControl:'31536000'});if(error)throw new Error('Не удалось загрузить фотографию: '+(error.message||'проверьте соединение и права Storage.'));}
   const {data,error}=await client.from('categories').update({title,description,cover_image_path:path}).eq('id',previous.id).eq('updated_at',previous.updated_at).select().single();

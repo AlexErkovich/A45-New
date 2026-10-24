@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {Window} from 'happy-dom';
+import {createProjectEditor} from '../src/project-editor.mjs';
+const w=new Window({url:'http://localhost/project/new'});
+for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?w:w[key];
+w.archiveData={categories:[{id:'technical',title:'Проекты',parentId:null}],projects:[]};document.body.innerHTML='<main id="main"></main>';
+let release,requests=0;const barrier=new Promise(resolve=>release=resolve);
+const editor=createProjectEditor({service:{async save(){requests++;throw Error('Нет сети')}},categoryService:{async isAdmin(){return true}},requireAdmin:true,recovery:{available:true,async list(){return []},async put(){await barrier},async remove(){}}});
+await editor.mount();editor.doc.description='Существующее описание';
+document.querySelector('[data-action=properties]').click();
+assert.equal(document.querySelector('#canvas-properties [name=description]').value,'Существующее описание');
+document.querySelector('#canvas-properties [name=description]').value='Отменённая правка';document.querySelector('[data-close-properties]').click();assert.equal(editor.doc.description,'Существующее описание');document.querySelector('[data-action=properties]').click();assert.equal(document.querySelector('#canvas-properties [name=description]').value,'Существующее описание');document.querySelector('[data-close-properties]').click();
+const field=document.querySelector('[name=title]');field.value='Проект';field.dispatchEvent(new w.Event('input',{bubbles:true}));const form=document.querySelector('#project-edit-form');form.dispatchEvent(new w.Event('submit',{cancelable:true}));form.dispatchEvent(new w.Event('submit',{cancelable:true}));release();for(let i=0;i<40;i++)await Promise.resolve();
+assert.equal(requests,1,'double submit must have one in-flight save');assert.equal(editor.doc.title,'Проект');assert.equal(editor.doc.description,'Существующее описание');assert(!document.querySelector('[type=submit]').disabled);
+await w.happyDOM.close();console.log('PASS: existing properties, cancellation, pre-await save lock and failure retention.');

@@ -6,8 +6,8 @@
   "installCommand": "npm ci --ignore-scripts",
   "rewrites": [
     {
-      "source": "/admin",
-      "destination": "/index.html"
+      "source": "/share/:project",
+      "destination": "/api/share?project=:project"
     },
     {
       "source": "/login",
@@ -15,10 +15,6 @@
     },
     {
       "source": "/project/new",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/project/drafts",
       "destination": "/index.html"
     },
     {
@@ -56,6 +52,27 @@
           "value": "no-cache, must-revalidate"
         }
       ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/login",
+      "permanent": false
+    },
+    {
+      "source": "/project/drafts",
+      "destination": "/#/drafts",
+      "permanent": false
     }
   ]
 }

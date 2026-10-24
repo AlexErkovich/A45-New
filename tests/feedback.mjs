@@ -40,5 +40,7 @@ for(const [rect,side] of [
  assert.equal(bubble.dataset.side,side);assert(Number.parseFloat(bubble.style.left)>=14);assert(Number.parseFloat(bubble.style.top)>=14);
  assert(bubble.style.getPropertyValue('--feedback-arrow-x'));assert(bubble.style.getPropertyValue('--feedback-arrow-y'));api.dismiss();
 }
+const cancelled=api.confirm(field,{message:'Удалить?',confirmLabel:'Удалить',danger:true});current().querySelector('.feedback-close').click();assert.equal(await cancelled,false);
+const confirmed=api.confirm(field,{message:'Удалить?',confirmLabel:'Удалить',danger:true});current().querySelector('[data-feedback-action=confirm]').click();assert.equal(await confirmed,true);
 await win.happyDOM.close();
 console.log('PASS: shared anchored feedback, status/ARIA, dismiss without losing validation, correction, save/discard, migrated admin errors, modal host and Escape.');
