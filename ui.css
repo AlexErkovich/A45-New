@@ -204,3 +204,4 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 .document-row .document-copy>span{margin:0}
 .document-download>span{margin:0!important;color:inherit!important;font:inherit!important}
 .document-actions{position:sticky;bottom:0;z-index:1;flex-shrink:0;background:#fff;padding-bottom:4px}
+.ui-upload-thumb:has(.document-type){background:transparent;overflow:visible}
