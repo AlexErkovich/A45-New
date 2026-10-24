@@ -231,43 +231,77 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 @media(min-width:1001px){.document-grid>.ui-upload-row:nth-child(3n + 1):not(:nth-last-child(-n + 3))::after{content:"";width:calc(300% + 40px)}}
 @media(min-width:601px) and (max-width:1000px){.document-grid>.ui-upload-row:nth-child(2n + 1):not(:nth-last-child(-n + 2))::after{content:"";width:calc(200% + 20px)}}
 @media(max-width:600px){.document-grid>.ui-upload-row:not(:last-child)::after{content:"";width:100%}}
-/* One viewer shell for photographs, PDF, text and all project files. */
-.media-dialog .document-stage{gap:10px}
+/* Reference photo layout is the single shell for every project file. */
+.media-dialog{
+ --media-top:clamp(48px,13dvh,112px);--media-bottom:clamp(20px,7.5dvh,64px);--media-side:clamp(48px,7.2vw,104px);--media-gap:clamp(40px,6.67vw,96px);--media-strip:clamp(56px,10.25dvh,88px);
+ width:min(1230px,90vw);height:fit-content;max-width:none;max-height:90dvh;padding:var(--media-top) var(--media-side) var(--media-bottom) calc(var(--media-side) - 8px);border-radius:32px;overflow:hidden
+}
+.media-dialog::backdrop{background:#0000001f}
+.media-dialog .document-dialog-header{position:absolute;inset:0;display:block;padding:0;background:transparent;pointer-events:none}
+.media-dialog [data-media-close]{position:absolute;right:clamp(20px,3.75vw,54px);top:clamp(20px,5.35dvh,46px);box-sizing:border-box;width:26px;height:26px;min-width:26px;padding:5px;border:1px solid #777;border-radius:50%;background:#fff;color:#666;pointer-events:auto}
+.media-dialog [data-media-close]>.ui-icon{width:14px;height:14px}
+.media-dialog .document-dialog-body{display:grid;grid-template-columns:minmax(0,2.05fr) minmax(0,1fr);grid-template-rows:auto;gap:var(--media-gap);padding:0;flex:none;min-height:0;align-items:stretch}
+.media-dialog .document-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0;min-height:0}
+.media-dialog .media-preview-shell{position:relative;flex:none;width:100%;aspect-ratio:3/2;max-height:calc(90dvh - var(--media-top) - var(--media-bottom) - var(--media-strip) - 14px);min-height:0}
+.media-dialog .document-preview{position:relative;width:100%;height:100%;min-height:0;flex:none;border-radius:40px;background:#fafafa;overflow:auto}
 .media-dialog .document-preview>.media-image{display:block;width:100%;height:100%;object-fit:contain;min-height:0;border-radius:inherit}
-.media-dialog .media-thumbnails{box-sizing:border-box;display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;height:64px;min-height:64px;flex:none;margin:0;padding:6px;overflow-x:auto;overflow-y:hidden}
-.media-dialog .media-thumbnails button,.media-dialog .media-thumbnails button[aria-current=true]{box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:48px;height:48px;flex:0 0 48px;padding:0;border:1px solid #eee;border-radius:10px;background:transparent;transform:none;cursor:pointer}
-.media-dialog .media-thumbnails button[aria-current=true]{border-color:var(--ui-accent);transform:scale(1.08)}
-.media-dialog .media-thumbnails button:hover{border-color:var(--ui-accent);transform:scale(1.08)}
+.media-dialog .document-navigation{display:contents}
+.media-dialog .document-navigation>.ui-icon-button{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:44px;padding:6px;border:0;border-radius:8px;background:transparent;color:#777}
+.media-dialog .document-navigation>[data-document-prev]{left:-60px}
+.media-dialog .document-navigation>[data-document-next]{right:-60px}
+.media-dialog .document-navigation>.ui-icon-button>.ui-icon{width:24px;height:32px;stroke-width:1}
+.media-dialog .document-navigation>.ui-icon-button:hover{background:#f8f8f8}
+.media-dialog .media-thumbnails{box-sizing:border-box;display:flex;align-items:center;justify-content:safe center;gap:8px;width:100%;height:var(--media-strip);min-height:var(--media-strip);flex:none;margin:0;padding:4px 6px;overflow-x:auto;overflow-y:hidden}
+.media-dialog .media-thumbnails button,.media-dialog .media-thumbnails button[aria-current=true]{box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:calc(var(--media-strip)*.55);height:calc(var(--media-strip)*.55);flex:0 0 calc(var(--media-strip)*.55);padding:0;border:2px solid transparent;border-radius:9px;background:transparent;transform:none;cursor:pointer;transition:width .15s,height .15s,flex-basis .15s,border-color .15s}
+.media-dialog .media-thumbnails button[aria-current=true]{width:calc(var(--media-strip) - 8px);height:calc(var(--media-strip) - 8px);flex-basis:calc(var(--media-strip) - 8px);border-color:var(--ui-accent);border-radius:16px;transform:none}
+.media-dialog .media-thumbnails button:hover{border-color:var(--ui-accent);transform:none}
 .media-dialog .media-thumbnails img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
-.media-dialog .media-thumbnails .document-type{flex:none;width:36px;height:40px;gap:2px}.media-dialog .media-thumbnails .document-type>.ui-icon{width:22px;height:22px}.media-dialog .media-thumbnails .document-type>span{font-size:8px}
-.media-dialog .document-sidebar{gap:16px}
-.media-dialog .media-fields{display:flex;flex-direction:column;gap:20px;flex:1;min-height:0}
-.media-dialog .media-description{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0}
-.media-dialog .media-description h2{flex:none;margin:0}
-.media-dialog .photo-caption-body{box-sizing:border-box;flex:1;min-height:0;overflow:hidden;border-radius:16px;padding:16px;background:#fafafa}
+.media-dialog .media-thumbnails .document-type{flex:none;width:100%;height:100%;gap:2px}.media-dialog .media-thumbnails .document-type>.ui-icon{width:22px;height:22px}.media-dialog .media-thumbnails .document-type>span{font-size:8px}
+.media-dialog .document-sidebar{display:flex;flex-direction:column;gap:18px;justify-content:space-between;min-width:0;min-height:0;overflow:auto;padding:0}
+.media-dialog .media-fields{display:flex;flex-direction:column;gap:18px;flex:none;min-height:0}
+.media-dialog .document-sidebar h2{margin:0;font:650 14px/1.4 Inter,Arial,sans-serif}
+.media-dialog .photo-title-label,.media-dialog .media-description{display:flex;flex-direction:column;gap:8px;flex:none;min-height:0;padding:0;background:#fff}
+.media-dialog .photo-caption-body{box-sizing:border-box;flex:none;height:170px;min-height:0;overflow:hidden;border-radius:16px;padding:16px;background:#fafafa}
 .media-dialog .photo-details-caption{margin:0;font-size:12px;line-height:1.85;color:#333;white-space:pre-wrap;overflow-wrap:anywhere}
-.media-dialog .document-name{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;box-sizing:border-box;min-height:54px;padding:16px;border-radius:16px;background:#fafafa}
-.media-dialog .photo-name-full{align-self:flex-start;margin-top:6px;border:0;background:transparent;color:var(--ui-accent);font-size:11px;cursor:pointer}
-.media-dialog .photo-caption-pages{display:flex;align-items:center;justify-content:flex-end;flex:none;min-height:32px;gap:6px;border:0}
-.media-dialog .photo-cover-toggle{flex:none;margin:0;padding:10px 0;border:0;font-size:12px}
-.media-dialog .document-actions{flex:none;margin-top:0}
-@media(max-width:600px){.media-dialog .media-fields{gap:12px}.media-dialog .media-thumbnails{height:54px;min-height:54px}.media-dialog .media-thumbnails button,.media-dialog .media-thumbnails button[aria-current=true]{width:40px;height:40px;flex-basis:40px}.media-dialog .document-sidebar{gap:12px}}
-.media-dialog .document-actions{display:grid;grid-template-columns:minmax(0,1fr) auto}
+.media-dialog .document-name{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;box-sizing:border-box;min-height:54px;margin:0;padding:16px;border-radius:16px;background:#fafafa;font-size:12px;line-height:1.85}
+.media-dialog .photo-name-full{align-self:flex-start;margin:0;border:0;background:transparent;color:var(--ui-accent);font-size:11px;cursor:pointer}
+.media-dialog .photo-caption-pages{display:flex;align-items:center;justify-content:flex-end;flex:none;min-height:28px;gap:4px;border:0;margin:0}
+.media-dialog .photo-caption-pages:empty{display:none}
+.media-dialog .photo-caption-pages button{width:28px;height:28px;font-size:11px}
+.media-dialog .photo-cover-toggle{flex:none;margin:0 0 0;padding:0 0 16px;border:0;border-bottom:1px solid #f4f4f4;font-size:12px;margin-top:auto}
+.media-dialog .document-actions{position:static;display:grid;grid-template-columns:minmax(0,1fr) auto;flex:none;gap:8px;margin:0;padding:0;background:#fff}
 .media-dialog .document-actions>.document-delete{grid-column:1;justify-self:start}
 .media-dialog .document-actions>.document-download-action{grid-column:2;justify-self:end}
-@media(max-width:600px){
- .media-dialog .document-dialog-body{grid-template-rows:minmax(120px,.8fr) minmax(0,1.2fr)}
- .media-dialog .document-sidebar,.media-dialog .media-fields{gap:8px}
- .media-dialog .photo-title-label{padding-bottom:0}
- .media-dialog .document-sidebar h2{font-size:12px;margin-bottom:6px}
- .media-dialog .media-description{min-height:148px;gap:8px}
- .media-dialog .media-description h2{margin:0}
- .media-dialog .document-name{min-height:42px;padding:10px 12px;font-size:11px;line-height:1.6;-webkit-line-clamp:2}
- .media-dialog .document-meta{font-size:10px;line-height:16px}
- .media-dialog .photo-caption-body{min-height:72px;padding:10px 12px}
- .media-dialog .photo-details-caption{font-size:11px;line-height:1.7}
- .media-dialog .photo-caption-pages{min-height:28px}
- .media-dialog .photo-caption-pages button{width:28px;height:28px;font-size:11px}
-}
-.media-dialog .document-preview{position:relative}
 .media-dialog .media-preview-loading{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#fafafa;color:#999;font-size:12px;pointer-events:none}
+@media(max-width:1000px){
+ .media-dialog{--media-gap:48px;--media-side:64px}
+ .media-dialog .document-navigation>[data-document-prev]{left:-44px}.media-dialog .document-navigation>[data-document-next]{right:-44px}
+ .media-dialog .document-preview{border-radius:24px}
+ .media-dialog .document-sidebar{gap:12px}.media-dialog .media-fields{gap:14px}
+ .media-dialog .photo-title-label input{height:42px;padding:10px 12px}.media-dialog .document-name{min-height:42px;padding:10px 12px}
+ .media-dialog .photo-description-label textarea,.media-dialog .photo-caption-body{height:130px;min-height:0}
+}
+@media(max-height:650px) and (min-width:601px){
+ .media-dialog{--media-top:48px;--media-bottom:24px;--media-strip:56px}
+ .media-dialog .media-fields{gap:10px}.media-dialog .document-sidebar{gap:10px}
+ .media-dialog .document-sidebar h2{font-size:12px}
+ .media-dialog .photo-title-label input,.media-dialog .document-name{height:38px;min-height:38px;padding:8px 12px;font-size:11px}
+ .media-dialog .photo-caption-body,.media-dialog .photo-description-label textarea{height:90px;min-height:0;padding:10px 12px;font-size:11px}
+ .media-dialog .photo-details-caption{font-size:11px;line-height:1.7}
+}
+@media(max-width:600px){
+ .media-dialog{width:calc(100vw - 24px);height:calc(100dvh - 24px);max-height:calc(100dvh - 24px);padding:48px 40px 24px;border-radius:24px;--media-strip:56px}
+ .media-dialog .document-dialog-body{grid-template-columns:1fr;grid-template-rows:minmax(120px,.9fr) minmax(0,1.1fr);gap:20px;flex:1;min-height:0}
+ .media-dialog .media-preview-shell{aspect-ratio:auto;max-height:none;flex:1;min-height:0}
+ .media-dialog .document-navigation>[data-document-prev]{left:-32px}.media-dialog .document-navigation>[data-document-next]{right:-32px}
+ .media-dialog .document-navigation>.ui-icon-button{width:28px;height:36px;padding:4px}
+ .media-dialog .document-navigation>.ui-icon-button>.ui-icon{width:20px;height:28px}
+ .media-dialog .document-sidebar{gap:12px}.media-dialog .media-fields{gap:12px}
+ .media-dialog .document-sidebar h2{font-size:12px}
+ .media-dialog .document-name,.media-dialog .photo-title-label input{min-height:42px;padding:10px 12px;font-size:11px;line-height:1.6}
+ .media-dialog .photo-description-label textarea{height:110px;min-height:90px}
+ .media-dialog .photo-caption-body{height:100px;min-height:72px;padding:10px 12px}
+ .media-dialog .photo-details-caption{font-size:11px;line-height:1.7}
+ .media-dialog .document-actions{position:sticky;bottom:0;padding-top:8px}
+}
+.media-dialog .photo-title-label{position:sticky;top:0;z-index:2}
