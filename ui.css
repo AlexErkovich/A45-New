@@ -211,7 +211,7 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 .ui-button--outline{--button-fill:#fff;--button-ink:var(--ui-accent);--button-hover:#fff6f1}
 :is(#home-actions,#section-actions,#canvas-tab-dialog,#canvas-properties,.home-form-actions,.filter-actions,.canvas-save-actions,.canvas-modal,.admin-page,.feedback-actions,.document-actions,.photo-detail-actions,.ui-dropzone) .ui-button.ui-button,
 #home-actions #home-add.ui-button,#home-actions #home-edit.ui-button,.ui-button.ui-button{
- box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--ui-button-height);width:auto;flex:none;margin:0;padding:var(--ui-button-padding);border:1px solid var(--ui-accent);border-radius:var(--ui-button-radius);background:var(--button-background,var(--button-fill,#fff));color:var(--button-ink,var(--ui-accent));font:var(--ui-button-font);text-align:center;text-decoration:none;line-height:18px;cursor:pointer;box-shadow:none;transition:background .15s,color .15s,opacity .15s
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--ui-button-height);height:var(--ui-button-height);width:auto;flex:none;margin:0;padding:var(--ui-button-padding);border:1px solid var(--ui-accent);border-radius:var(--ui-button-radius);background:var(--button-background,var(--button-fill,#fff));color:var(--button-ink,var(--ui-accent));font:var(--ui-button-font);text-align:center;text-decoration:none;line-height:18px;cursor:pointer;box-shadow:none;transition:background .15s,color .15s,opacity .15s
 }
 .ui-button:hover{--button-background:var(--button-hover,#fff6f1)}
 .ui-button:focus-visible{outline:2px solid var(--ui-accent);outline-offset:3px}
