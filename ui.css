@@ -109,3 +109,30 @@ body .ui-action-icon:hover,body .project-title .ui-action-icon:hover,body .photo
 .photo-caption-pages button[aria-current=page]{background:#fff0eb;color:#f25532}
 .photo-caption-pages button:focus-visible{outline:2px solid #ed5938;outline-offset:2px}
 @media(max-width:600px){.photo-details-paged .photo-details-sidebar{contain:none;height:330px;max-height:55dvh}}
+
+/* Viewing fits the viewport; only editing keeps a scrollable form and divider. */
+.photo-details-paged{width:min(1230px,calc(100vw - 32px));height:min(780px,calc(100dvh - 32px));max-height:calc(100dvh - 32px);padding:clamp(48px,8dvh,88px) clamp(48px,7vw,104px) clamp(20px,4dvh,48px);overflow:hidden}
+.photo-details-paged[open]{grid-template-rows:minmax(0,1fr);gap:clamp(40px,6vw,80px)}
+.photo-details-paged .photo-details-stage{min-height:0;gap:clamp(8px,1.5dvh,14px)}
+.photo-details-paged .photo-details-image{flex:1;min-height:0;aspect-ratio:auto}
+.photo-details-paged .photo-details-sidebar{min-height:0;height:auto;max-height:none}
+.photo-details-paged .photo-detail-fields{gap:clamp(10px,2.2dvh,18px)}
+.photo-details-paged .photo-title-label,.photo-details-paged .photo-description-label{gap:clamp(4px,1dvh,8px)}
+.photo-details-paged .photo-details-sidebar h2{font-size:clamp(12px,1.9dvh,14px)}
+.photo-details-paged .photo-details-name,.photo-details-paged .photo-details-caption{font-size:clamp(11px,1.7dvh,12px);line-height:1.7}
+.photo-details-paged .photo-details-close{top:16px;right:20px}
+.photo-details-paged .photo-thumbnails{height:clamp(56px,11dvh,80px);min-height:0;flex:0 0 clamp(56px,11dvh,80px)}
+.photo-details-paged .photo-thumbnails button,.photo-details-paged .photo-thumbnails button[aria-current=true]{width:clamp(34px,7dvh,54px);height:clamp(34px,7dvh,54px);flex-basis:clamp(34px,7dvh,54px)}
+.photo-details-paged .photo-carousel-prev,.photo-details-paged .photo-carousel-next{top:calc((100% - clamp(56px,11dvh,80px) - 12px)/2)}
+.photo-details-paged .photo-carousel-prev{left:-48px}.photo-details-paged .photo-carousel-next{right:-48px}
+.photo-details-paged .photo-caption-pages{flex-wrap:nowrap;align-items:center;justify-content:flex-end;gap:4px;min-height:28px;height:28px;margin-top:8px}
+.photo-details-paged .photo-caption-pages:empty{display:none}
+.photo-details-paged .photo-caption-pages button{width:auto;min-width:26px;height:28px;flex:0 1 auto;padding:0 5px;font-size:11px}
+.photo-caption-pages .ui-icon{width:14px;height:14px}
+@media(max-width:600px){
+ .photo-details-paged{width:calc(100vw - 24px);height:calc(100dvh - 24px);max-height:calc(100dvh - 24px);padding:48px 40px 18px}
+ .photo-details-paged[open]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:18px}
+ .photo-details-paged .photo-details-sidebar{contain:size;height:auto;max-height:none}
+ .photo-details-paged .photo-details-image,.photo-details-paged .photo-details-image>img{border-radius:20px}
+ .photo-details-paged .photo-carousel-prev{left:-34px}.photo-details-paged .photo-carousel-next{right:-34px}
+}
