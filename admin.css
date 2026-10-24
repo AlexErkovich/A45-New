@@ -45,8 +45,8 @@ body:has(.auth-shell) #layout{display:block;max-width:1000px;width:calc(100% - 4
 
 /* One internal control column; no editor control extends outside its row. */
 .canvas-editor{--canvas-gutter:72px;--canvas-inset:12px}
-.canvas-editor .project-title{gap:16px;padding-left:var(--canvas-gutter)}
-.canvas-editor .canvas-title{box-sizing:border-box;padding:10px var(--canvas-inset);border-radius:8px}
+.canvas-editor .project-title{gap:16px;padding-left:0}
+.canvas-editor .canvas-title{box-sizing:border-box;padding:16px 24px;border-radius:8px}
 .canvas-editor .canvas-title:focus{outline-offset:0}
 .canvas-editor .canvas-tabs{margin:0 0 28px;padding:12px 12px 12px calc(var(--canvas-gutter) + 2px);gap:12px;box-shadow:none;border:0}
 .canvas-editor .canvas-tabs>.canvas-tools{position:absolute;left:var(--canvas-inset);right:auto;top:15px;transform:none;padding:0;gap:4px}
