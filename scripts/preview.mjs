@@ -11,10 +11,10 @@ const port=Number(process.env.A45_PREVIEW_PORT||3001);
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.svg':'image/svg+xml','.mp4':'video/mp4','.zip':'application/zip','.txt':'text/plain; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'};
 if(existsSync('.env.local'))process.loadEnvFile('.env.local');
 const share=createShareHandler();
-const server=createServer(async(req,res)=>{
+export const server=createServer(async(req,res)=>{
  try{
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return}
-  const requestUrl=new URL(req.url,'http://localhost'),path=decodeURIComponent(requestUrl.pathname);if(path==='/api/share'||path.startsWith('/share/')){if(path.startsWith('/share/'))requestUrl.searchParams.set('project',path.slice(7));req.url='/api/share?'+requestUrl.searchParams;await share(req,res);return}if(path==='/admin'||path==='/project/drafts'){res.writeHead(307,{Location:path==='/admin'?'/login':'/#/drafts'});res.end();return}
+  const requestUrl=new URL(req.url,'http://localhost'),path=decodeURIComponent(requestUrl.pathname);if(path==='/api/share'||path.startsWith('/share/')){if(path.startsWith('/share/'))requestUrl.searchParams.set('project',path.slice(7));req.url='/api/share?'+requestUrl.searchParams;await share(req,res);return}if(path==='/project/drafts'){res.writeHead(307,{Location:'/admin#/drafts'});res.end();return}
   if(['/admin/','/login/'].includes(path)){res.writeHead(302,{Location:path.slice(0,-1)});res.end();return}
   if(path.split('/').some(segment=>segment.startsWith('.'))){res.writeHead(404);res.end();return}
   const file=resolve(root,'.'+((['/', '/admin', '/login','/transfer'].includes(path)||/^\/project\/(new|drafts|edit\/[^/]+)$/.test(path))?'/index.html':path));
@@ -25,4 +25,4 @@ const server=createServer(async(req,res)=>{
  }catch{res.writeHead(404);res.end()}
 });
 server.on('error',error=>{console.error(error.code==='EADDRINUSE'?`Port ${port} is in use. Set A45_PREVIEW_PORT to another port.`:error.message);process.exitCode=1});
-server.listen(port,'127.0.0.1',()=>console.log(`A45 preview: http://127.0.0.1:${port}/ · login: /login · admin: /admin (dist only)`));
+server.listen(port,'127.0.0.1',()=>console.log(`A45 preview: http://127.0.0.1:${server.address().port}/ · login: /login · admin: /admin (dist only)`));

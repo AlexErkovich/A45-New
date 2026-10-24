@@ -1,3 +1,4 @@
+import * as accessRoutes from '../src/access-routes.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {Window} from 'happy-dom';
@@ -6,7 +7,7 @@ const source=await Promise.all(['index.html','data/projects.js','project-page.js
 let admin=false;
 async function until(test){for(let i=0;i<150;i++){if(test())return;await new Promise(r=>setTimeout(r,5))}assert.fail('Timed out')}
 async function boot(url){
- const window=new Window({url});
+ const window=new Window({url});window.A45Management=admin;window.A45Routes=accessRoutes;
  for(const key of ['window','document','location','history','Event','CustomEvent'])globalThis[key]=key==='window'?window:window[key];
  Object.defineProperty(document,'scrollingElement',{value:document.documentElement});window.confirm=()=>true;
  document.write(source[0].replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'').replace(/<link\b[^>]*>/g,''));window.eval(source[1]);
@@ -18,18 +19,17 @@ async function boot(url){
  return {window,projectEditor,navigate};
 }
 let app=await boot('http://127.0.0.1:3001/#/category/technical');
-assert(document.querySelector('#section-add'),'shared add action exists for visitors');
-assert.equal(document.querySelector('#section-add').dataset.createKind,'subcategory');
+assert(!document.querySelector('#section-add'),'public visitors do not see creation actions');
 assert(!document.querySelector('[data-create-project]'),'obsolete direct editor link is absent');
-admin=true;
+await app.window.happyDOM.close();admin=true;app=await boot('http://127.0.0.1:3001/admin#/category/technical');
 for(const cat of window.archiveData.categories){
- app.navigate('/#/category/'+cat.id);
+ window.A45Management=true;app.navigate('/admin#/category/'+cat.id);
  const button=document.querySelector('#section-add');
  assert.equal(button.dataset.parentCategory,cat.id);
  assert.equal(button.dataset.createKind,cat.parentId===null?'subcategory':'project');
  assert(!document.querySelector('[data-create-project]'));
  // Existing editor deep links retain their exact category context for later editing.
- app.navigate('/project/new?'+new URLSearchParams({category:cat.id}));
+ app.navigate('/admin#/project/new?'+new URLSearchParams({category:cat.id}));
  await until(()=>!!document.querySelector('#project-edit-form'));
  assert.equal(app.projectEditor.doc.primaryCategoryId,cat.id);assert.deepEqual(app.projectEditor.doc.categoryIds,[cat.id]);
 }

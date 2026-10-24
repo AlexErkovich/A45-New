@@ -1,7 +1,7 @@
 import {Window} from 'happy-dom';
 import assert from 'node:assert/strict';
 import {createProjectEditor} from '../src/project-editor.mjs';
-const win=new Window({url:'http://localhost/project/new'});
+const win=new Window({url:'http://localhost/admin#/project/new'});
 for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?win:win[key];
 document.body.innerHTML='<main id="main"></main>';
 win.archiveData={categories:[{id:'technical',parentId:null,title:'Проекты'}],projects:[]};
@@ -12,9 +12,9 @@ const editor=createProjectEditor({service:{async save(doc){if(fail)throw Error('
 await editor.mount();
 function title(value){const field=document.querySelector('[name=title]');field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}))}
 title('Изменения');history.replaceState(null,'','/#/about');
-assert.equal(editor.beforeRouteChange(),false);assert.equal(location.pathname,'/project/new');assert.equal(feedback.tone,'warning');assert.equal(editor.dirty,true);
-await feedback.actions[0].run();assert.equal(editor.dirty,true);assert.equal(location.pathname,'/project/new');assert.match(document.querySelector('[data-project-status]').textContent,/Нет сети/);
+assert.equal(editor.beforeRouteChange(),false);assert.equal(location.pathname,'/admin');assert.equal(location.hash,'#/project/new');assert.equal(feedback.tone,'warning');assert.equal(editor.dirty,true);
+await feedback.actions[0].run();assert.equal(editor.dirty,true);assert.equal(location.pathname,'/admin');assert.equal(location.hash,'#/project/new');assert.match(document.querySelector('[data-project-status]').textContent,/Нет сети/);
 fail=false;history.replaceState(null,'','/#/about');editor.beforeRouteChange();await feedback.actions[0].run();assert.equal(location.hash,'#/about');assert.equal(editor.dirty,false);assert.equal(editor.doc,null);
-history.replaceState(null,'','/project/new');await editor.mount();title('Не сохранять');history.replaceState(null,'','/#/');editor.beforeRouteChange();feedback.actions[1].run();assert.equal(location.hash,'#/');assert.equal(editor.dirty,false);assert.equal(editor.doc,null);
+history.replaceState(null,'','/admin#/project/new');await editor.mount();title('Не сохранять');history.replaceState(null,'','/#/');editor.beforeRouteChange();feedback.actions[1].run();assert.equal(location.hash,'#/');assert.equal(editor.dirty,false);assert.equal(editor.doc,null);
 await win.happyDOM.close();
 console.log('PASS: project navigation feedback blocks exit, failed save retains data/route, successful save navigates, discard navigates without saving.');

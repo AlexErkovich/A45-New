@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
 import {createProjectEditor} from '../src/project-editor.mjs';
-const w=new Window({url:'http://localhost/project/new'});
+const w=new Window({url:'http://localhost/admin#/project/new'});
 for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?w:w[key];
 document.body.innerHTML='<main id="main"></main>';
 let accept=false,confirms=0;

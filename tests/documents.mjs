@@ -5,7 +5,7 @@ import {fileType,fileSize,documentGrid,installDocumentNameTooltips} from '../src
 import {openDocumentDialog} from '../src/ui/document-dialog.mjs';
 import {serializeCanvas,hydrateCanvas} from '../src/canvas-model.mjs';
 import {publicProject} from '../src/project-model.mjs';
-const w=new Window({url:'http://localhost/project/new'});for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?w:w[key];document.body.innerHTML='<main id="main"></main>';w.A45Feedback={async confirm(){return true}};
+const w=new Window({url:'http://localhost/admin#/project/new'});for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?w:w[key];document.body.innerHTML='<main id="main"></main>';w.A45Feedback={async confirm(){return true}};
 const originalFetch=globalThis.fetch;globalThis.fetch=async()=>new Response('<script>plain text</script>');
 assert.equal(fileType({name:'plan.XLSX'}).icon,'fileSpreadsheet');assert.equal(fileType({name:'report.pdf'}).preview,'pdf');assert.equal(fileType({name:'archive.zip'}).icon,'fileArchive');assert.equal(fileSize(1024),'1 КБ');assert.equal(fileSize(1048576),'1 МБ');assert.equal(fileSize(undefined),'Размер не указан');
 let uploads=0,saved,failUpload=false;

@@ -22,3 +22,7 @@ secrets*.json
 !.env.example
 
 /supabase/backups/
+
+# Python test supervisor caches
+__pycache__/
+*.pyc

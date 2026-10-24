@@ -1,0 +1,22 @@
+// Static source audit only: intentionally does not start PostgreSQL/WASM or contact Supabase.
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const sql=name=>readFileSync(new URL('../supabase/migrations/'+name,import.meta.url),'utf8');
+const categories=sql('001_categories.sql'),projects=sql('003_projects.sql'),media=sql('004_image_variants.sql'),save=sql('005_project_media_reconcile.sql'),storage=sql('006_staged_variant_uploads.sql'),create=sql('007_create_categories.sql'),navigation=sql('008_navigation_catalog.sql');
+assert(categories.includes('where user_id = (select auth.uid())'),'admin status uses the authenticated user, not browser state');
+assert(categories.includes('alter table public.categories enable row level security'));
+assert(categories.includes('using (public.category_is_published(id))'));
+assert(categories.includes('using (public.is_a45_admin()) with check (public.is_a45_admin())'));
+for(const table of ['projects','project_categories','project_tabs','project_blocks','project_media'])assert(projects.includes('alter table public.'+table+' enable row level security'));
+assert(projects.includes("select public.is_a45_admin() or exists(select 1 from public.projects where id=target and status='published')"));
+for(const table of ['projects','project_categories','project_tabs','project_blocks'])assert(projects.includes('create policy '+table+'_read'));
+assert(projects.includes('revoke all on public.projects,public.project_categories,public.project_tabs,public.project_blocks,public.project_media from anon,authenticated'));
+assert(projects.includes('grant select on public.projects,public.project_categories,public.project_tabs,public.project_blocks,public.project_media to anon,authenticated'));
+assert(save.includes("if not public.is_a45_admin() then raise exception 'Administrator required'"));
+assert(projects.includes('grant execute on function public.save_a45_project(jsonb,integer) to authenticated'));
+assert(projects.includes("bucket_id='project-media' and public.a45_media_access(name,true)"));
+assert(projects.includes('as restrictive for insert to anon,authenticated'));assert(projects.includes('as restrictive for select to anon,authenticated'));
+assert(media.includes("where m.id=target and p.status='published'"));assert(storage.includes('case when writing then public.is_a45_admin() and'));assert(storage.includes('public.a45_media_readable(m.id)'));
+assert(create.includes("if not public.is_a45_admin() then raise exception 'Administrator required'"));assert(navigation.includes("if not public.is_a45_admin() then raise exception 'Administrator required'"));
+const cloud=readFileSync(new URL('../src/cloud-entry.js',import.meta.url),'utf8');assert(cloud.includes('const publicClient=createPublicClient(createClient,config)'));assert(cloud.includes('await publicProjects.publicList('));assert(cloud.includes('await publicCategories.listPublic()'));assert(cloud.includes('createCard:managed(cardCreation.create)'));
+console.log('PASS: local RLS source guards for published-only reads, protected project children/media, admin-only writes/RPC/Storage, isolated public read client. Static audit; applied production policies were not inspected.');

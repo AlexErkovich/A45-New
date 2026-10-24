@@ -2,8 +2,8 @@ import * as sharedUI from '../src/ui/components.mjs';
 import {Window} from 'happy-dom';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const win=new Window({url:'http://localhost/#/category/photography'});
-win.A45UI=sharedUI;
+const win=new Window({url:'http://localhost/admin#/category/photography'});
+win.A45UI=sharedUI;win.A45Management=true;
 win.matchMedia=()=>({matches:false,addEventListener(){}});
 win.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
 win.eval('window.Image=class {async decode(){}}');
@@ -36,8 +36,8 @@ assert($('#archive [data-category="'+subsection.id+'"]'),'new subsection appears
 assert($('#main').textContent.includes('Поездка'),'project aggregates into its ancestor');
 // Simulate a fresh visit using only server data, with no browser-local section draft.
 const savedProject=win.archiveData.projects.find(p=>p.id===project.id);
-const fresh=new Window({url:'http://localhost/#/project/'+savedProject.slug+'?category='+subsection.id});
-fresh.A45UI=sharedUI;fresh.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
+const fresh=new Window({url:'http://localhost/admin#/project/'+savedProject.slug+'?category='+subsection.id});
+fresh.A45UI=sharedUI;fresh.A45Management=true;fresh.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
 fresh.A45Cloud={projectEditor:{beforeRouteChange(){return true}},releaseImage(){},start(callback){fresh.queueMicrotask(()=>{callback([{id:subsection.id,parent_id:'photography',title:subsection.title,description:subsection.description,slug:subsection.id,sort_order:99,cover_image_path:'saved/cover.png'}],()=> 'https://example.org/saved.png');fresh.dispatchEvent(new fresh.CustomEvent('a45-projects',{detail:[savedProject]}))})}};
 fresh.eval(['data/projects.js','project-page.js','feedback.js','home-page.js','app.js'].map(f=>readFileSync(new URL('../'+f,import.meta.url),'utf8')).join('\n;\n'));
 await until(()=>fresh.document.querySelector('.project-title h1')?.textContent==='Поездка');

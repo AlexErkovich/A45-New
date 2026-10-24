@@ -1,9 +1,10 @@
+import * as accessRoutes from '../src/access-routes.mjs';
 import * as sharedUI from '../src/ui/components.mjs';
 import {Window} from 'happy-dom';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const win=new Window({url:'http://localhost/'});
-win.A45UI=sharedUI;
+const win=new Window({url:'http://localhost/admin'});
+win.A45UI=sharedUI;win.A45Management=true;win.A45Routes=accessRoutes;
 win.matchMedia=query=>({matches:query.includes('prefers-reduced-motion'),addEventListener(){}});
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'');
 win.document.write(html);
@@ -146,11 +147,12 @@ $('#section-edit').click();assert(!win.document.body.classList.contains('listing
 $('#section-edit').click();
 $('#main [data-project-card="automatic-greenhouse"]').click();
 assert.equal(win.location.hash,'#/category/eco');assert(win.document.body.classList.contains('listing-editing'));assert($('#home-section-dialog').open);assert.equal($('#home-section-dialog [name=title]').value,'Автоматическая теплица');assert.equal($('#home-section-dialog [name=description]').value,win.archiveData.projects.find(p=>p.id==='automatic-greenhouse').description);$('#home-section-dialog').close();$('#section-edit').click();
-win.history.replaceState(null,'','/#/category/eco');win.dispatchEvent(new win.HashChangeEvent('hashchange'));
+win.history.replaceState(null,'','/admin#/category/eco');win.dispatchEvent(new win.HashChangeEvent('hashchange'));
 assert.equal($('#section-edit').getAttribute('aria-pressed'),'false');
-assert.equal($('#visual-controls'),null);win.location.hash='#/project/automatic-greenhouse?category=eco';win.dispatchEvent(new win.HashChangeEvent('hashchange'));$('#section-edit').click();assert.equal(win.location.pathname,'/project/edit/automatic-greenhouse');
+assert.equal($('#visual-controls'),null);win.location.hash='#/project/automatic-greenhouse?category=eco';win.dispatchEvent(new win.HashChangeEvent('hashchange'));$('#section-edit').click();assert.equal(win.location.pathname,'/admin');assert.equal(win.location.hash,'#/project/edit/automatic-greenhouse?tab=overview');
 
 
+win.history.replaceState(null,'','/admin#/');win.A45Management=true;win.A45Routes=accessRoutes;win.dispatchEvent(new win.HashChangeEvent('hashchange'));
 // Recreating a root must not hide projects still attached to its original ID.
 const duplicateRoot={id:'technical-recreated',parentId:null,title:'Техническое творчество',slug:'technical-recreated',sortOrder:99,custom:true};
 win.archiveData.categories.push(duplicateRoot,{id:'new-technical-child',parentId:duplicateRoot.id,title:'Новый подраздел',slug:'new-technical-child',sortOrder:0,custom:true});

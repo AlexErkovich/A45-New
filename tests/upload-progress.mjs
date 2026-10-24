@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {newProject,uid} from '../src/project-model.mjs';
 import {editorView} from '../src/project-editor-view.mjs';
 const doc=newProject('technical');doc.title='Фотографии';doc.tabs[0].kind='photos';const a=uid(),b=uid();doc.media=[a,b].map(id=>({id,name:'same-name.jpg'}));doc.tabs[0].blocks=[{id:uid(),type:'GALLERY',content:{items:[{mediaId:a},{mediaId:b}]}}];
-const win=new Window({url:'https://example.test/project/new'}),pendingIds=new Set([a,b]),fileStates=new Map([[a,{state:'ready',status:'Ожидает сохранения'}],[b,{state:'uploading',status:'Загрузка…'}]]);
+const win=new Window({url:'https://example.test/admin#/project/new'}),pendingIds=new Set([a,b]),fileStates=new Map([[a,{state:'ready',status:'Ожидает сохранения'}],[b,{state:'uploading',status:'Загрузка…'}]]);
 const paint=()=>win.document.body.innerHTML=editorView({doc,currentTab:0,busy:true,saving:true,localUrls:{},pendingIds,fileStates});paint();
 const row=id=>win.document.querySelector(`[data-upload-row="media-${id}"]`);
 assert.equal(row(a).getAttribute('aria-busy'),'true');assert.equal(row(b).getAttribute('aria-busy'),'true');assert.equal(row(b).querySelector('[data-loading=true]').getAttribute('aria-label'),'Идёт загрузка');assert(!win.document.querySelector('.ui-icon-check'),'preparing/queued photos are never shown as uploaded');

@@ -1,3 +1,8 @@
+import * as accessRoutes from './access-routes.mjs';
+import {createManagementAccess} from './management-access.mjs';
+import {createPublicClient} from './public-client.mjs';
+window.A45Routes=accessRoutes;
+window.A45Management=false;
 import {documentGrid,installDocumentNameTooltips} from './ui/document-types.mjs';
 import {installMediaRefresh,refreshMediaElements} from './ui/media-refresh.mjs';
 import {createTransferPage} from './transfer-page.mjs';
@@ -23,23 +28,58 @@ const config=__A45_SUPABASE_CONFIG__;
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const baseClient=config?createClient(config.url,config.key,{auth:{detectSessionInUrl:false,persistSession:true,autoRefreshToken:true}}):null;
 const client=baseClient;
+const publicClient=createPublicClient(createClient,config);
+const publicCategories=publicClient?createCategoryService(publicClient,{navigation:true}):null;
+const publicProjects=publicClient?createProjectService(publicClient,publicCategories):null;
+const viewingMedia=()=>management.active()?projectService:publicProjects;
 const authService=baseClient?createCategoryService(baseClient):null;
 const service=client?createCategoryService(client,{navigation:true,onSessionExpired:redirectToLogin}):null;
 const projectService=client?createProjectService(client,service):null;
 const editableProjects=projectService;
-if(projectService){installMediaRefresh(document,projectService.resolveMedia);window.addEventListener('a45-refresh-project-media',event=>{const sources=refreshMediaElements(document,event.detail);window.dispatchEvent(new CustomEvent('a45-media-urls',{detail:sources}))})}
+if(projectService){installMediaRefresh(document,(...args)=>viewingMedia()?.resolveMedia(...args));window.addEventListener('a45-refresh-project-media',event=>{const sources=refreshMediaElements(document,event.detail);window.dispatchEvent(new CustomEvent('a45-media-urls',{detail:sources}))})}
 const saveProjectCard=createProjectCardEditor({service:editableProjects,ensureCategory:async id=>{const rows=await service.listAdmin();await ensureCategory(service,id,new Set(rows.map(r=>r.id)))}});
 const transferPage=createTransferPage({authService,projectService:baseClient?createProjectService(baseClient,authService):null,refresh:async()=>{lastData='';await refresh();await refreshProjects()}});
 const projectEditor=createProjectEditor({service:editableProjects,categoryService:service,refresh:refreshProjects,requireAdmin:true});
 const cardCreation=createCardCreation({categoryService:service,projectService,refreshCategories:async()=>{lastData='';await refresh()},refreshProjects});
 let projectRefreshing=false,hasProjectMetadata=false;
-async function refreshProjects(){if(!projectService||projectRefreshing)return;projectRefreshing=true;try{const emit=projects=>window.dispatchEvent(new CustomEvent('a45-projects',{detail:projects}));const projects=await projectService.publicList(projects=>{if(!hasProjectMetadata){hasProjectMetadata=true;emit(projects)}});emit(projects)}catch(error){window.dispatchEvent(new CustomEvent('a45-project-error',{detail:error.message}))}finally{projectRefreshing=false}}
+async function refreshProjects(){if(!publicProjects||projectRefreshing)return;projectRefreshing=true;try{const emit=projects=>window.dispatchEvent(new CustomEvent('a45-projects',{detail:projects}));const projects=await publicProjects.publicList(projects=>{if(!hasProjectMetadata){hasProjectMetadata=true;emit(projects)}});emit(projects)}catch(error){window.dispatchEvent(new CustomEvent('a45-project-error',{detail:error.message}))}finally{projectRefreshing=false}}
 let refreshCallback,refreshing=false,lastData='';
-async function refresh(){if(!service||refreshing)return;refreshing=true;try{const rows=(await service.listPublic()).map(visibleCategory);const snapshot=JSON.stringify(rows);if(snapshot!==lastData){lastData=snapshot;refreshCallback?.(rows,service.coverUrl,{navigation:service.navigation})}}catch{window.dispatchEvent(new CustomEvent('a45-cloud-error'))}finally{refreshing=false}}
-function mountLogin(){const root=document.querySelector('#main');if(!service){root.innerHTML='<section class="admin-page"><h1>Вход</h1><p>Supabase не настроен.</p></section>';return}const returnTo=new URLSearchParams(location.hash.split('?')[1]||location.search.slice(1)).get('return');mountAuthForm({root,client,service:authService,current:isLoginRoute,onSuccess:()=>{if(isLoginRoute())returnFromLogin(returnTo)}});client.auth.getSession().then(async({data:{session}})=>{if(!session||!isLoginRoute()||!await authService.isAdmin()||!isLoginRoute())return;const panel=root.querySelector('.admin-login');if(!panel)return;panel.innerHTML='<h1>Вы вошли</h1><p>Изменения сохраняются в облачном архиве.</p><p><a href="/#/">Разделы</a></p><p><a href="/#/drafts">Черновики проектов</a></p><p><a href="/#/transfer">Данные и перенос</a></p><button type="button" class="ui-button ui-button--outline" data-account-signout>Выйти</button>';panel.querySelector('[data-account-signout]').onclick=async event=>{const button=event.currentTarget;button.disabled=true;const {error}=await client.auth.signOut({scope:'local'});if(error){button.disabled=false;window.A45Feedback?.show(button,{tone:'error',message:'Не удалось выйти.'});return}if(isLoginRoute())mountLogin()}}).catch(()=>{})}
+async function refresh(){if(!publicCategories||refreshing)return;refreshing=true;try{const rows=(await publicCategories.listPublic()).map(visibleCategory);const snapshot=JSON.stringify(rows);if(snapshot!==lastData){lastData=snapshot;refreshCallback?.(rows,publicCategories.coverUrl,{navigation:publicCategories.navigation})}}catch{window.dispatchEvent(new CustomEvent('a45-cloud-error'))}finally{refreshing=false}}
+function mountLogin(){
+ const root=document.querySelector('#main');
+ if(!service){root.innerHTML='<section class="admin-page"><h1>Вход</h1><p>Supabase не настроен.</p></section>';return}
+ const returnTo=new URLSearchParams(location.hash.split('?')[1]||location.search.slice(1)).get('return');
+ mountAuthForm({root,client,service:authService,current:isLoginRoute,onSuccess:()=>{if(isLoginRoute())returnFromLogin(returnTo)}});
+ client.auth.getSession().then(async({data:{session}})=>{
+  if(!session||!isLoginRoute()||!await authService.isAdmin()||!isLoginRoute())return;
+  returnFromLogin(returnTo);
+ }).catch(()=>{});
+}
 function releaseImage(){}
-async function listDraftProjects(){if(!projectService)throw Error('Серверное сохранение недоступно.');const docs=(await projectService.list(true)).filter(doc=>doc.status==='draft');return Promise.all(docs.map(async doc=>({...projectServiceToPublic(doc,await projectService.publicUrls(doc)),editorPreview:true,status:'draft'})))}
-function updateAccount(){const nav=document.querySelector('#navigation');if(!nav)return;const button=nav.querySelector('[data-account]');if(!button)return;client?.auth.getSession().then(({data:{session}})=>{button.textContent=session?'Выйти':'Вход';button.dataset.signedIn=String(!!session)})}
+function requireManagement(){if(!management.active())throw Error('Управление доступно только после входа в /admin.')}
+const managed=fn=>(...args)=>{requireManagement();return fn(...args)};
+async function loadManagedProject(id){requireManagement();const doc=await projectService.get(id);const project={...projectServiceToPublic(doc,await projectService.publicUrls(doc)),editorPreview:doc.status!=='published',status:doc.status};requireManagement();return project}
+async function listDraftProjects(){
+ requireManagement();if(!projectService)throw Error('Серверное сохранение недоступно.');
+ const docs=(await projectService.list(true)).filter(doc=>doc.status==='draft');
+ const rows=await Promise.all(docs.map(async doc=>({...projectServiceToPublic(doc,await projectService.publicUrls(doc)),editorPreview:true,status:'draft'})));
+ requireManagement();return rows;
+}
+const management=createManagementAccess({window,authService,client,projectEditor,redirectToLogin,
+ onClear(){projectService?.clearMedia();window.dispatchEvent(new Event('a45-clear-previews'))},
+ onAuthorized(){
+  const nav=document.querySelector('#navigation');
+  nav.innerHTML='<a href="/admin#/about">Обо мне</a><a href="/" data-public-site>Просмотр сайта</a><a href="/admin#/drafts">Черновики</a><a href="/admin#/transfer">Данные и перенос</a><button type="button" class="account-action" data-admin-logout>Выйти</button>';
+  nav.querySelector('[data-admin-logout]').onclick=()=>management.logout();
+  window.dispatchEvent(new Event('hashchange'));
+ },
+ onError(message){
+  if(management.active()){window.A45Feedback?.show(document.querySelector('#navigation'),{tone:'error',message});return}
+  const root=document.querySelector('#main');if(!accessRoutes.isAdminRoute())return;
+  root.innerHTML='<section class="admin-page"><p role="alert"></p><button type="button" class="ui-button ui-button--outline" data-retry-access>Повторить</button></section>';
+  root.querySelector('p').textContent=message;root.querySelector('[data-retry-access]').onclick=()=>management.authorize();
+ }
+});
 async function deleteSection(id){
  if(!await authService.isAdmin()){redirectToLogin();throw Error('Войдите администратором для удаления раздела.')}
  const nav=await authService.getNavigation();if(!nav?.entries)throw Error('Сначала синхронизируйте структуру на странице «Данные и перенос».');
@@ -47,4 +87,31 @@ async function deleteSection(id){
  const result=await authService.saveNavigation(nav.entries.filter(row=>!removed.has(row.id)),nav.revision);lastData='';await refresh();
  return {restore:async()=>{await authService.saveNavigation(nav.entries,result.revision);lastData='';await refresh()}};
 }
-window.A45Cloud={onlineOnly:true,releaseCard:id=>{saveProjectCard.release(id);cardCreation.release(id)},mountTransfer:transferPage.mount,deleteSection,deleteProjectCard:id=>removeProject({id,onlineOnly:true,service:editableProjects,storage:localStorage,projects:window.archiveData.projects,refresh:refreshProjects}),saveProjectCard,saveCategory:async(row,changes)=>{const result=await service.save(row,changes);lastData="";await refresh();return result},createCard:cardCreation.create,largeImage:path=>projectService.largeUrl(path),resolveMedia:(path,options)=>projectService.resolveMedia(path,options),configured:!!config,retryCategories:refresh,listDraftProjects,mountLogin,projectEditor,richText,projectEscape,safeUrl,releaseImage,start(callback){if(authService)document.addEventListener('click',event=>{const button=event.target.closest('#home-edit,#home-add,#section-edit,#section-add,[data-nav-add]');if(!button||button.dataset.accessChecked==='true')return;event.preventDefault();event.stopImmediatePropagation();authService.isAdmin().then(allowed=>{if(allowed){button.dataset.accessChecked='true';button.click();delete button.dataset.accessChecked}else redirectToLogin()}).catch(()=>window.A45Feedback?.show(button,{tone:'error',message:'Не удалось проверить доступ. Повторите попытку.'}))},true);refreshCallback=callback;const nav=document.querySelector('#navigation');if(nav&&!nav.querySelector('[data-data-transfer]'))nav.insertAdjacentHTML('beforeend','<a href="/#/transfer" data-data-transfer>Данные и перенос</a><a href="/#/drafts">Черновики</a><button type="button" class="account-action" data-account data-signed-in="false">Вход</button>');nav?.querySelector('[data-account]')?.addEventListener('click',async event=>{const accountButton=event.currentTarget;if(accountButton.dataset.signedIn!=='true'){history.pushState(null,'','/login');window.dispatchEvent(new Event('hashchange'));return}const signout=async()=>{const {error}=await client.auth.signOut({scope:'local'});if(error){window.A45Feedback?.show(accountButton,{tone:'error',message:'Не удалось выйти. Повторите попытку.'});return}history.replaceState(null,'','/#/');window.dispatchEvent(new Event('hashchange'))};if(projectEditor.dirty){window.A45Feedback?.show(accountButton,{tone:'warning',title:'Есть несохранённые изменения',message:'Сначала сохраните проект или выйдите из редактора без сохранения.'});return}await signout()});updateAccount();projectEditor.start();refresh();refreshProjects();if(service){setInterval(()=>{refresh();refreshProjects();window.dispatchEvent(new Event('a45-drafts-refresh'))},60000);window.addEventListener('focus',()=>{refresh();refreshProjects()});document.addEventListener('visibilitychange',()=>{if(!document.hidden){refresh()}});client.auth.onAuthStateChange(event=>{setTimeout(()=>{if(event==='SIGNED_OUT'){projectService?.clearMedia();window.dispatchEvent(new Event('a45-clear-previews'));refreshProjects()}},0);setTimeout(updateAccount,0)})}}};
+window.A45Cloud={
+ onlineOnly:true,authorizeManagement:management.authorize,leaveManagement:management.leave,
+ releaseCard:id=>{saveProjectCard.release(id);cardCreation.release(id)},
+ mountTransfer:managed(transferPage.mount),deleteSection:managed(deleteSection),
+ deleteProjectCard:managed(id=>removeProject({id,onlineOnly:true,service:editableProjects,storage:localStorage,projects:window.archiveData.projects,refresh:refreshProjects})),
+ saveProjectCard:managed(saveProjectCard),saveCategory:managed(async(row,changes)=>{const result=await service.save(row,changes);lastData='';await refresh();return result}),
+ createCard:managed(cardCreation.create),largeImage:path=>viewingMedia()?.largeUrl(path),resolveMedia:(path,options)=>viewingMedia()?.resolveMedia(path,options),
+ configured:!!config,retryCategories:refresh,listDraftProjects,loadManagedProject,mountLogin,projectEditor,richText,projectEscape,safeUrl,releaseImage,
+ start(callback){
+  if(authService)document.addEventListener('click',event=>{
+   const button=event.target.closest('#home-edit,#home-add,#section-edit,#section-add,[data-nav-add]');
+   if(!button||button.dataset.accessChecked==='true')return;
+   event.preventDefault();event.stopImmediatePropagation();if(!management.active())return;
+   authService.isAdmin().then(allowed=>{
+    if(!management.active()||!button.isConnected)return;
+    if(allowed){button.dataset.accessChecked='true';try{button.click()}finally{delete button.dataset.accessChecked}}
+    else{management.invalidate();redirectToLogin()}
+   }).catch(()=>window.A45Feedback?.show(button,{tone:'error',message:'Не удалось проверить доступ. Повторите попытку.'}));
+  },true);
+  refreshCallback=callback;projectEditor.start();refresh();refreshProjects();
+  if(service){
+   setInterval(()=>{refresh();refreshProjects();if(management.active())window.dispatchEvent(new Event('a45-drafts-refresh'))},60000);
+   window.addEventListener('focus',()=>{refresh();refreshProjects()});
+   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
+   client.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')setTimeout(()=>{management.sessionEnded();refreshProjects()},0)});
+  }
+ }
+};

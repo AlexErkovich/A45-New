@@ -10,6 +10,10 @@
       "destination": "/api/share?project=:project"
     },
     {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
       "source": "/login",
       "destination": "/index.html"
     },
@@ -65,13 +69,8 @@
   ],
   "redirects": [
     {
-      "source": "/admin",
-      "destination": "/login",
-      "permanent": false
-    },
-    {
       "source": "/project/drafts",
-      "destination": "/#/drafts",
+      "destination": "/admin#/drafts",
       "permanent": false
     }
   ]

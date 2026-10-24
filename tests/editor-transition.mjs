@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
 import {newProject,newTab} from '../src/project-model.mjs';
 import {createProjectEditor} from '../src/project-editor.mjs';
-const win=new Window({url:'https://example.test/project/edit/project?tab=photos'});for(const k of ['window','document','location','history','Event'])globalThis[k]=k==='window'?win:win[k];win.archiveData={projects:[],categories:[]};
+const win=new Window({url:'https://example.test/admin#/project/edit/project?tab=photos'});for(const k of ['window','document','location','history','Event'])globalThis[k]=k==='window'?win:win[k];win.archiveData={projects:[],categories:[]};
 const doc=newProject('technical');doc.id='project';doc.title='Мой проект';doc.tabs.push({...newTab('Фотографии'),key:'photos',kind:'photos'});let release;const ready=new Promise(resolve=>release=resolve);
 const service={async get(){await ready;return structuredClone(doc)},async mediaUrls(){return {}}};
 document.body.innerHTML='<header class="header">A45</header><div id="layout" class="internal"><main id="main"><article class="project-page"><h1>Мой проект</h1><p>Содержимое остаётся на месте</p></article></main></div><footer>Архив</footer>';
