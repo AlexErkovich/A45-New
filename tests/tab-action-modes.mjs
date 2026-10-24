@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import {Window} from 'happy-dom';
+import {createProjectEditor} from '../src/project-editor.mjs';
+const w=new Window({url:'http://localhost/project/new'});
+for(const key of ['window','document','location','history','Event'])globalThis[key]=key==='window'?w:w[key];
+document.body.innerHTML='<main id="main"></main>';
+let accept=false,confirms=0;
+w.A45Feedback={show(){},async confirm(){confirms++;return accept}};
+const editor=createProjectEditor({service:{},categoryService:{async isAdmin(){return true}},recovery:{available:false}});
+await editor.mount();const $=s=>document.querySelector(s),all=s=>[...document.querySelectorAll(s)];
+const command=name=>$(`[data-command="${name}"]`).click();
+const actions=()=> $('[data-menu=tab]').click();
+const mode=value=>{actions();command('tab-mode-'+value)};
+function add(title){actions();command('add-tab');const form=$('[data-tab-form]');assert($('#canvas-tab-dialog').open);form.elements.tabTitle.value=title;form.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}))}
+add('Вторая');add('Третья');const [one,two,three]=editor.doc.tabs.map(t=>t.id);
+assert.equal(all('.canvas-tab-action').length,0);assert.equal(all('.canvas-tabs>.canvas-tools button').length,1);
+mode('edit');assert.equal(all('[data-command=edit-tab]').length,3);assert.equal(all('[data-drag=tab]').length,0);
+$(`[data-command=edit-tab][data-id="${one}"]`).click();assert.equal($('[name=tabTitle]').value,'Идея');$('[name=tabTitle]').value='Переименована';$('[data-tab-form]').dispatchEvent(new Event('submit',{cancelable:true}));assert.equal(editor.doc.tabs[0].title,'Переименована');assert.equal($('[data-tab][aria-selected=true]').dataset.tab,'2','editing inactive tab keeps selected tab');
+mode('move');assert.equal(all('[data-drag=tab]').length,3);assert.equal(all('[data-command=edit-tab]').length,0);
+$(`[data-move-menu=tab][data-id="${two}"]`).click();command('before');assert.deepEqual(editor.doc.tabs.map(t=>t.id),[two,one,three]);assert.equal(editor.doc.tabs[Number($('[data-tab][aria-selected=true]').dataset.tab)].id,three);
+const drag=new Event('dragstart',{bubbles:true});Object.defineProperty(drag,'dataTransfer',{value:{setData(){},effectAllowed:''}});$(`[data-drag=tab][data-id="${one}"]`).dispatchEvent(drag);$(`[data-drop-tab="${three}"]`).dispatchEvent(new Event('drop',{bubbles:true,cancelable:true}));assert.deepEqual(editor.doc.tabs.map(t=>t.id),[two,three,one]);
+mode('delete');assert.equal(all('[data-command=delete-tab]').length,3);assert.equal(all('[data-drag=tab]').length,0);
+$(`[data-command=delete-tab][data-id="${two}"]`).click();await Promise.resolve();await Promise.resolve();assert.equal(editor.doc.tabs.length,3,'cancel retains tab');accept=true;$(`[data-command=delete-tab][data-id="${two}"]`).click();await Promise.resolve();await Promise.resolve();assert.deepEqual(editor.doc.tabs.map(t=>t.id),[three,one]);assert.equal(editor.doc.tabs[Number($('[data-tab][aria-selected=true]').dataset.tab)].id,three,'deleting preceding tab retains active tab');
+$(`[data-command=delete-tab][data-id="${one}"]`).click();await Promise.resolve();await Promise.resolve();assert.equal(editor.doc.tabs.length,1);const count=confirms;$('[data-command=delete-tab]').click();await Promise.resolve();assert.equal(confirms,count,'last tab cannot be deleted');assert.equal(editor.doc.tabs.length,1);
+$('[data-action=exit-tab-mode]').click();assert.equal(all('.canvas-tab-action').length,0);
+mode('move');const esc=new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true});$('.canvas-tab-action').dispatchEvent(esc);assert.equal(all('.canvas-tab-action').length,0);
+mode('delete');add('Новая');assert.equal(all('.canvas-tab-action').length,0,'add leaves targeting mode');assert.equal(editor.doc.tabs.at(-1).title,'Новая');
+await w.happyDOM.close();console.log('PASS: global tab action modes, targeting inactive tabs, move/drag ordering, selected-tab retention, confirmed deletion, last-tab guard and mode exit.');

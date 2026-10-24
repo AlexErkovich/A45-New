@@ -75,3 +75,14 @@ body:has(.auth-shell) #layout{display:block;max-width:1000px;width:calc(100% - 4
 .canvas-editor .canvas-tab>button[aria-selected=true]{color:#999}
 .canvas-editor .canvas-tab>button[aria-selected=true]>.ui-icon{color:#b8b8b8}
 .canvas-editor .canvas-tab>button:hover>.ui-icon{color:#777}
+/* Tab actions target every tab, with one explicit mode at a time. */
+.canvas-editor .canvas-tab.has-tab-action{padding-left:32px}
+.canvas-editor .canvas-tab>.canvas-tab-action{position:absolute;left:0;top:50%;transform:translateY(-50%);width:28px;height:32px;min-height:32px;padding:5px;flex:none;color:#999}
+.canvas-editor .canvas-tab>.canvas-tab-action .ui-icon{width:17px;height:17px;color:inherit}
+.canvas-editor .canvas-tab>.canvas-tab-action[data-drag]{cursor:grab}
+.canvas-editor .canvas-tab>.canvas-tab-action[data-command=delete-tab]:hover{color:#d94b35;background:#fff0ec}
+.canvas-editor .canvas-tab-mode-exit{width:28px;height:32px;padding:5px;flex:none}
+.canvas-editor .canvas-tab{max-width:100%;box-sizing:border-box}
+.canvas-editor .canvas-tab>button[data-tab]{min-width:0;max-width:100%}
+.canvas-editor .canvas-tab>button[data-tab]>span{overflow:hidden;text-overflow:ellipsis}
+.canvas-editor .canvas-tab>button[data-tab]>.ui-icon{flex:none}
