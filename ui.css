@@ -330,7 +330,10 @@ body .media-dialog .document-navigation>.ui-icon-button>.ui-icon{width:var(--ico
 body .canvas-editor .canvas-tools button:hover{background:var(--color-hover)}
 
 .media-dialog .document-actions:empty{display:none}
-/* The readable description fills the sidebar down to its pagination footer. */
-.media-dialog .document-sidebar:has(>.photo-caption-pages) .media-fields{flex:1 1 0;min-height:0}
+/* Match the preview/thumbnail rows; the caption background follows its text. */
+.media-dialog .document-sidebar:has(>.photo-caption-pages){display:grid;grid-template-rows:minmax(0,1fr) var(--media-strip);gap:14px;align-content:stretch}
+.media-dialog .document-sidebar:has(>.photo-caption-pages) .media-fields{min-height:0;overflow:hidden}
 .media-dialog .document-sidebar:has(>.photo-caption-pages) .media-description{flex:1 1 0;min-height:0}
-.media-dialog .document-sidebar:has(>.photo-caption-pages) .photo-caption-body{flex:1 1 0;height:auto;min-height:0}
+.media-dialog .document-sidebar:has(>.photo-caption-pages) .photo-caption-body{flex:0 1 auto;height:auto;min-height:0;max-height:100%}
+.media-dialog .document-sidebar>.photo-caption-pages{grid-row:2;align-self:center;margin:0}
+@media(max-width:600px){.media-dialog .document-sidebar:has(>.photo-caption-pages){grid-template-rows:minmax(0,1fr) auto}}
