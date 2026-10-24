@@ -12,3 +12,9 @@ const ui=await read('ui.css');assert(ui.includes('height:var(--ui-button-height)
 for(const source of ['project-page.js','src/project-editor-view.mjs','src/project-editor.mjs'])assert((await read(source)).includes('ui-action-menu'),`${source}: use shared action menus`);
 const rules=await read('AGENTS.md');assert(rules.includes('design-tokens.css'));assert(rules.includes('docs/DESIGN-SYSTEM.md'));assert((await read('scripts/generate-icons.mjs')).includes("from 'lucide-react'"));
 console.log('PASS: centralized UI colors, token load/build order, shared button/menu/media metrics and persistent component rules.');
+
+assert.match(tokens,/--ui-control-radius:16px/);
+assert.ok(![ui,admin,await read('styles.css')].some(source=>source.includes('var(--color-surface)-space')));
+
+assert.match(definitions.get('--ui-control-size'),/^44px$/);
+assert.ok(ui.includes('body .canvas-editor .canvas-tools button'));
