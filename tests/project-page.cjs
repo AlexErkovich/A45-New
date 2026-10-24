@@ -26,7 +26,7 @@ render('#/project/camera-crane?tab=docs');const share=new URL(run('ProjectPage.s
 function inspect(type,c){if(type==='mixed')return c.forEach(b=>inspect(b.type,b.content));if(type==='files')for(const f of c.files){assert.equal(fs.statSync(path.join(root,f.url)).size,f.size);assert(f.size>0)}if(type==='image')assert(fs.existsSync(path.join(root,c.src)));if(type==='gallery')for(const i of c.images)assert(fs.existsSync(path.join(root,i.src)));if(type==='video'){assert(fs.statSync(path.join(root,c.src)).size>0);assert(fs.existsSync(path.join(root,c.poster)))}}
 for(const p of ctx.window.archiveData.projects)for(const t of p.tabs)inspect(t.type,t.content);
 // Sorting and overview fallback are independent of each project's chosen tab set.
-const generic=run("ProjectTabs.list({description:'Test',tabs:[{id:'late',title:'Late',sortOrder:90},{id:'early',title:'Early',sortOrder:1}]})");assert.deepEqual(Array.from(generic,t=>t.id),['overview','early','late']);
+const generic=run("ProjectTabs.list({description:'Test',tabs:[{id:'late',title:'Late',sortOrder:90},{id:'early',title:'Early',sortOrder:1}]})");assert.deepEqual(Array.from(generic,t=>t.id),['early','late']);
 console.log('PASS: all project/tab routes, 8 crane tabs, URL/history events, unchanged tree/main scroll, active state, gallery, local downloads/video, Telegram URL/text, variable tab sets and sorting.');
 
 const publication=render('#/project/camera-crane?category=technical');assert(publication.includes('class="project-actions"'));assert(publication.includes('data-copy-project-link'));assert(publication.includes('href="#/category/technical"'));assert(!publication.includes('class="back-link"'));assert(run('ProjectPage.content("divider")').includes('<hr'));
@@ -39,3 +39,9 @@ assert.deepEqual(Array.from(cloudTabs,t=>t.id),['t-idea','t-history']);
 assert.equal(cloudTabs[0].title,'Идея');
 assert.equal(cloudTabs[0].content[0].content.text,'Full saved idea');
 console.log('PASS: cloud projects preserve real tabs/content without phantom overview after deleting original overview.');
+
+// The real tab list is authoritative even when an intermediate snapshot lacks cloud metadata.
+const unmarked=run("ProjectTabs.list({description:'Summary',tabs:[{id:'overview',title:'Идея',sortOrder:0},{id:'history',title:'История',sortOrder:1}]})");
+assert.equal(unmarked[0].title,'Идея');
+assert.equal(unmarked.length,2);
+assert.equal(run("ProjectTabs.list({tabs:[{id:'idea',title:'Идея'}]})").length,1);
