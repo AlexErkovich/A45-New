@@ -1,7 +1,7 @@
 import { validateOriginal as validateImage } from './image-optimizer.mjs';
 import {sameFileContent} from './file-content.mjs';
 import {createMediaCache} from './media-cache.mjs';
-import { fromRow,validateProject,publicProject } from './project-model.mjs';
+import { fromRow,validateProject,publicProject,projectCommitSnapshot } from './project-model.mjs';
 export const PROJECT_FILE_LIMIT=20*1024*1024;
 const select='*,project_categories(*),project_tabs!project_tabs_project_id_fkey(*),project_blocks!project_blocks_project_id_fkey(*),project_media!project_media_project_id_fkey(*)';
 export async function validateProjectFile(file,image=false){if(image){await validateImage(file);return file.type}if(!file||file.size<1||file.size>PROJECT_FILE_LIMIT)throw Error('Файл должен быть не больше 20 МБ.');if(['text/html','application/javascript','text/javascript','image/svg+xml'].includes(file.type))throw Error('Небезопасный тип документа.');const ext=(file.name||'').split('.').pop().toLowerCase();if(['html','htm','js','mjs','svg','exe','sh','bat','com'].includes(ext))throw Error('Исполняемые файлы, HTML и SVG не принимаются. Используйте PDF, ZIP или документ.');const bytes=new Uint8Array(await file.slice(0,5).arrayBuffer());if(ext==='pdf'&&String.fromCharCode(...bytes)!=='%PDF-')throw Error('Содержимое не соответствует PDF.');if(ext==='zip'&&(bytes[0]!==80||bytes[1]!==75))throw Error('Содержимое не соответствует ZIP.');return ext==='pdf'?'application/pdf':ext==='zip'?'application/zip':ext==='txt'?'text/plain':'application/octet-stream'}
@@ -10,7 +10,7 @@ export function createProjectService(client,categoryService){
  const check=async()=>{if(!await categoryService.isAdmin(true))throw Error('Нужны права администратора.')};
  async function list(admin=false){if(admin)await check();let q=client.from('projects').select(select);if(!admin)q=q.eq('status','published');const {data,error}=await q.order('created_at',{ascending:false});if(error)throw Error('Проекты не загружены. Проверьте подключение и применена ли миграция 003_projects.sql.');return data.map(fromRow)}
  async function get(id){await check();if(!/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(id)){const doc=(await list(true)).find(d=>d.slug===id||d.sourceId===id);if(doc)return doc;throw Object.assign(Error('Проект не найден на сервере.'),{code:'PGRST116'})}const {data,error}=await client.from('projects').select(select).eq('id',id).single();if(error)throw error;return fromRow(data)}
- async function commit(doc){const {data,error}=await client.rpc('save_a45_project',{doc,expected_revision:doc.revision});if(error)throw Error(error.message||'Не удалось сохранить проект.');doc.revision=data.revision;doc.slug=data.slug;return data}
+ async function commit(doc){const {data,error}=await client.rpc('save_a45_project',{doc:projectCommitSnapshot(doc),expected_revision:doc.revision});if(error)throw Error(error.message||'Не удалось сохранить проект.');doc.revision=data.revision;doc.slug=data.slug;return data}
  async function save(doc,pending,status,progress=()=>{},uploadOnly=false){await check();const candidate=validateProject({...doc,status,...(uploadOnly&&!doc.title.trim()?{title:'Без названия'}:{})});
   // Register staged media under a draft or the PREVIOUS published snapshot, before upload.
   // Never expose incomplete edited content on a published page.

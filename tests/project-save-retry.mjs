@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {newProject,uid} from '../src/project-model.mjs';
+import {newProject,uid,projectCommitSnapshot} from '../src/project-model.mjs';
 import {createProjectService} from '../src/project-service.mjs';
 let stored=newProject('technical');stored.title='Файлы';stored.revision=1;stored.status='published';
 const doc=structuredClone(stored),a=uid(),b=uid(),files=[new File(['first'],'one.txt',{type:'text/plain'}),new File(['second'],'two.txt',{type:'text/plain'})];
@@ -8,7 +8,7 @@ const pending=new Map([[a,files[0]],[b,files[1]]]),uploads=new Map();let fail=tr
 const row=()=>({id:stored.id,title:stored.title,description:stored.description,year:stored.year,primary_category_id:stored.primaryCategoryId,status:stored.status,revision:stored.revision,project_categories:stored.categoryIds.map(category_id=>({category_id})),project_media:stored.media.map(m=>({...m,mime_type:m.mimeType})),project_tabs:stored.tabs.map(t=>({...t,sort_order:t.sortOrder})),project_blocks:[]});
 const client={
  from(){return {select(){return this},eq(){return this},async single(){return {data:row()}}}},
- async rpc(name,{doc:next,expected_revision}){assert.equal(expected_revision,stored.revision);stored={...structuredClone(next),revision:stored.revision+1,slug:'retry-project'};return {data:{revision:stored.revision,slug:stored.slug}}},
+ async rpc(name,{doc:next,expected_revision}){assert.equal(next.tabs[0].key,'overview','every RPC, including upload staging, meets server contract');assert.equal(expected_revision,stored.revision);stored={...structuredClone(next),revision:stored.revision+1,slug:'retry-project'};return {data:{revision:stored.revision,slug:stored.slug}}},
  storage:{from(){return {
   async upload(path,file){if(path.endsWith(b)&&fail)return {error:{message:'Offline'}};if(uploads.has(path))return {error:{message:'Exists'}};uploads.set(path,file);return {}},
   async download(path){return uploads.has(path)?{data:uploads.get(path)}:{error:{message:'Missing'}}}
@@ -30,3 +30,13 @@ await service.uploadMedia(next,staged,(text,event)=>{if(event)stageEvents.push(e
 assert.equal(staged.size,0);assert(uploads.has(next.id+'/'+c));assert.equal(stored.title,publishedTitle);assert.notEqual(stored.description,next.description);assert.equal(next.revision,stored.revision);assert(stageEvents.some(event=>event.mediaId===c&&event.state==='done'));
 await service.save(next,staged,'published');assert.equal(stored.title,'Несохранённый заголовок');assert.equal(stored.description,'Несохранённое описание');assert.equal(uploads.size,3);
 console.log('PASS: immediate server uploads preserve published content until explicit project Save.');
+
+// Production regression: an existing tab promoted after overview deletion retains its old DB key.
+stored.tabs[0].key='t-retained-idea';stored.tabs[0].title='Идея';
+const afterDeletion=projectCommitSnapshot(stored),newId=uid(),attachment=new File(['after deletion'],'attached.txt',{type:'text/plain'});
+afterDeletion.media.push({id:newId,kind:'file',name:attachment.name,path:afterDeletion.id+'/'+newId,mimeType:attachment.type,size:attachment.size});
+const retryPending=new Map([[newId,attachment]]);
+await service.uploadMedia(afterDeletion,retryPending);
+assert.equal(retryPending.size,0);assert.ok(uploads.has(afterDeletion.id+'/'+newId));assert.equal(stored.tabs.length,1);assert.equal(stored.tabs[0].title,'Идея');
+await service.save(afterDeletion,retryPending,'published');assert.equal(stored.tabs[0].title,'Идея');
+console.log('PASS: upload staging and final save after overview deletion obey server contract without restoring or renaming visible tabs.');
