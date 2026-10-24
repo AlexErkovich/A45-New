@@ -175,7 +175,7 @@ function sectionActions(cat,internal){
  if(!internal)return;
  $('#navigation').hidden=true;
  const categoryId=cat?.id||(route.page==='drafts'?window.A45Navigation.categories().find(c=>!c.parentId)?.id:'')||'';
- actions.innerHTML=`<button type="button" id="section-edit" ${route.page==='project'?`data-edit-project="${esc(findProject(route.id)?.id||route.id)}"`:`data-edit-listing="${esc(categoryId)}" aria-pressed="${listingEditKey!==null}"`}>${window.A45Icons?.pencil||''} Редактировать</button><button type="button" class="section-add" id="section-add" data-parent-category="${esc(categoryId)}" data-create-kind="${cat?.parentId===null?'subcategory':'project'}">${window.A45Icons?.plus||''} Добавить</button>`;
+ actions.innerHTML=`<button type="button" class="ui-button ui-button--outline" id="section-edit" ${route.page==='project'?`data-edit-project="${esc(findProject(route.id)?.id||route.id)}"`:`data-edit-listing="${esc(categoryId)}" aria-pressed="${listingEditKey!==null}"`}>${window.A45Icons?.pencil||''} Редактировать</button><button type="button" class="section-add ui-button ui-button--primary" id="section-add" data-parent-category="${esc(categoryId)}" data-create-kind="${cat?.parentId===null?'subcategory':'project'}">${window.A45Icons?.plus||''} Добавить</button>`;
 }
 
 function decorateListingEdit(){
