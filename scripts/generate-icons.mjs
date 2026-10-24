@@ -1,3 +1,5 @@
+import {tabKind} from '../src/ui/tab-kind.mjs';
+import {isDocumentsTab} from '../src/ui/document-types.mjs';
 import {tabIconName} from '../src/ui/tab-icons.mjs';
 import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
@@ -10,6 +12,6 @@ const runtime=`\n(()=>{const names={'✎':'pencil','＋':'plus','✕':'x','×':'
 function decorate(root){if(root.nodeType!==1)return;for(const slot of [...(root.matches('[data-ui-icon]')?[root]:[]),...root.querySelectorAll('[data-ui-icon]')]){if(!slot.querySelector('svg')&&window.A45Icons[slot.dataset.uiIcon])slot.innerHTML=window.A45Icons[slot.dataset.uiIcon]}const targets=[...(root.matches('button,a')?[root]:[]),...root.querySelectorAll('button,a')];for(const target of targets){for(const node of [...target.childNodes,...[...target.querySelectorAll('span[aria-hidden="true"]')].flatMap(span=>[...span.childNodes])]){if(node.nodeType!==3||!/[✎＋✕×☰←↗✓]/.test(node.textContent))continue;const fragment=document.createDocumentFragment();for(const part of node.textContent.split(/([✎＋✕×☰←↗✓])/)){if(names[part]){const template=document.createElement('template');template.innerHTML=window.A45Icons[names[part]];fragment.append(template.content)}else fragment.append(document.createTextNode(part))}node.replaceWith(fragment)}}}
 const observer=new MutationObserver(records=>{for(const record of records){if(record.type==='characterData'){const parent=record.target.parentElement?.closest('button,a');if(parent)decorate(parent)}else for(const node of record.addedNodes){if(node.nodeType===1)decorate(node);else if(node.nodeType===3&&node.parentElement?.matches('button,a'))decorate(node.parentElement)}}});
 decorate(document.body);observer.observe(document.body,{childList:true,subtree:true,characterData:true});})();\n`;
-await writeFile(new URL('../icons.js',import.meta.url),'// Generated from lucide-react by scripts/generate-icons.mjs.\nwindow.A45Icons='+JSON.stringify(icons)+';window.A45TabIconName='+tabIconName.toString()+';'+runtime);
+await writeFile(new URL('../icons.js',import.meta.url),'// Generated from lucide-react by scripts/generate-icons.mjs.\nwindow.A45Icons='+JSON.stringify(icons)+';window.A45TabIconName=(()=>{const isDocumentsTab='+isDocumentsTab.toString()+';const tabKind='+tabKind.toString()+';return '+tabIconName.toString()+'})();'+runtime);
 
 await writeFile(new URL("../src/ui/icons.mjs",import.meta.url),"// Generated from official lucide-react components. Do not hand-edit.\nexport const icons="+JSON.stringify(icons)+";\n");

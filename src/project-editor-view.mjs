@@ -1,9 +1,10 @@
+import {tabKind} from './ui/tab-kind.mjs';
 import {isDocumentsTab} from './ui/document-types.mjs';
 import {escape as e} from './project-model.mjs';
 export const blockLabels={TEXT:'Текстовый блок',HEADING:'Заголовок',IMAGE:'Фотография',GALLERY:'Карусель',DIVIDER:'Разделитель',VIDEO:'Видео',FILE:'Документ',LIST:'Список'};
 import {icon,tabIcon,iconButton,editorTools as tools,photoDropzone,documentDropzone,uploadDropzone,uploadFileList,dialogHeader} from './ui/components.mjs';
 export function editorView({doc,currentTab,busy,saving=false,tabMode=null,localUrls,uploads=[],pendingIds=new Set(),fileStates=new Map()}){
- const tab=doc.tabs[currentTab],photosTab=tab.kind==='photos'||/фотограф|photos/i.test(tab.title);
+ const tab=doc.tabs[currentTab],photosTab=tabKind(tab)==='photos';
  const documentsTab=isDocumentsTab(tab);
  const photoIds=photosTab?[...new Set(tab.blocks.flatMap(b=>b.type==='IMAGE'?[b.content.mediaId]:b.type==='GALLERY'?(b.content.items||[]).map(i=>i.mediaId):[]).filter(Boolean))]:[];
  const fileIds=[...new Set(tab.blocks.filter(b=>b.type==='FILE'&&b.content.mediaId).map(b=>b.content.mediaId))];
