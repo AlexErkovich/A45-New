@@ -1,5 +1,5 @@
 export {openDocumentDialog} from './document-dialog.mjs';
-import {documentRow,fileBadge,fileSize} from './document-types.mjs';
+import {documentRow,fileBadge,fileSize,installDocumentNameTooltips} from './document-types.mjs';
 export {openProjectPhotoPicker} from './project-photo-picker.mjs';
 export {openPhotoCarousel,openPhotoDialog} from './photo-carousel.mjs';
 export {categoryPicker,bindCategoryPicker} from './category-picker.mjs';
@@ -15,7 +15,7 @@ export function uploadDropzone({className='',label='Загрузка файло�
 }
 export function documentDropzone(options={}){return uploadDropzone({...options,className:'canvas-document-dropzone',label:'Документация проекта',hint:'PDF, Word, Excel, архивы и другие документы · до 20 МБ',buttonLabel:'Загрузить документы',attributes:'data-tab-drop',inputAttributes:'data-upload="documents" multiple aria-label="Выбрать документы"'})}
 export function photoDropzone(options={}){return uploadDropzone({...options,className:'canvas-dropzone',label:'Фотографии проекта',hint:'JPEG, PNG, WebP · до 30 МБ',attributes:'data-tab-drop',buttonAttributes:'data-action="upload-photos"',inputAttributes:'data-upload="tab" multiple accept="image/jpeg,image/png,image/webp" aria-label="Выбрать фотографии"'})}
-export function bindDropzones(root){installPageDrop(root.ownerDocument);if(root.a45DropzonesBound)return;root.a45DropzonesBound=true;root.addEventListener('click',event=>{const picker=event.target.closest('[data-ui-pick]');if(picker&&root.contains(picker))picker.closest('[data-ui-dropzone]').querySelector('input[type=file]').click()})}
+export function bindDropzones(root){installPageDrop(root.ownerDocument);installDocumentNameTooltips(root.ownerDocument);if(root.a45DropzonesBound)return;root.a45DropzonesBound=true;root.addEventListener('click',event=>{const picker=event.target.closest('[data-ui-pick]');if(picker&&root.contains(picker))picker.closest('[data-ui-dropzone]').querySelector('input[type=file]').click()})}
 export function setDropzoneState(zone,{busy,preview,error}={}){if(!zone)return;if(busy!==undefined){zone.setAttribute('aria-busy',String(busy));zone.querySelector('.ui-dropzone-progress').hidden=!busy}if(error!==undefined)zone.classList.toggle('is-error',error);if(preview!==undefined){const img=zone.querySelector('.ui-dropzone-preview');img.hidden=!preview;if(preview)img.src=preview;zone.querySelector('.ui-dropzone-empty').hidden=!!preview}}
 
 const blockIcons={TEXT:'text',HEADING:'heading',IMAGE:'imagePlus',GALLERY:'gallery',DIVIDER:'divider',VIDEO:'video',FILE:'file',LIST:'list'};

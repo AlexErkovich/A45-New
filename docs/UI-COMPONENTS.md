@@ -37,3 +37,5 @@
 ## Документы
 
 Общие компоненты: documentDropzone / uploadFileList в components.mjs, documentGrid / documentRow / fileBadge / fileSize в document-types.mjs и openDocumentDialog в document-dialog.mjs. Иконки типов файлов генерируются из бесплатной Lucide React. PDF-просмотр — отдельный лениво загружаемый модуль pdf-preview.mjs (Mozilla PDF.js, Apache-2.0), без iframe и внешних сервисов.
+
+Карточки документов показывают тип файла без фоновой плашки и оранжевую иконку скачивания с доступной подписью. Название обрезается многоточием; нативный tooltip с полным названием добавляется при наведении или фокусе только при фактическом переполнении текста.
