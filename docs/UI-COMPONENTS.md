@@ -32,3 +32,8 @@
 ## Уточнения аудита 24 октября 2026
 
 Модальные формы используют общую закреплённую шапку с кнопкой закрытия. Ошибки и подтверждения выводятся общим tooltip-компонентом без сдвига формы. Подписанные ссылки медиа обновляются через ограниченный кеш с TTL и восстанавливаются на месте; замена URL не должна перестраивать читаемую страницу. См. [отчёт](AUDIT-FIXES-2026-10-24.md).
+
+
+## Документы
+
+Общие компоненты: documentDropzone / uploadFileList в components.mjs, documentGrid / documentRow / fileBadge / fileSize в document-types.mjs и openDocumentDialog в document-dialog.mjs. Иконки типов файлов генерируются из бесплатной Lucide React. PDF-просмотр — отдельный лениво загружаемый модуль pdf-preview.mjs (Mozilla PDF.js, Apache-2.0), без iframe и внешних сервисов.

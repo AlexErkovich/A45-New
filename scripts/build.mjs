@@ -25,3 +25,9 @@ await cp(resolve(output, 'integration.js'), resolve(root, 'integration.js'));
 console.log('Production frontend ready in dist/. Supabase: ' + (config ? 'configured' : 'disabled (local fallback)'));
 
 await build({entryPoints:[resolve(root,'src/image-worker.mjs')],bundle:true,platform:'browser',format:'iife',target:['es2022'],minify:true,outfile:resolve(output,'image-worker.js')});
+
+// PDF viewer is loaded only when a PDF is opened; worker/fonts remain first-party assets.
+await build({entryPoints:[resolve(root,'src/ui/pdf-preview.mjs')],bundle:true,platform:'browser',format:'esm',target:['es2022'],minify:true,outfile:resolve(output,'pdf-preview.js')});
+await cp(resolve(root,'node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),resolve(output,'pdf.worker.min.mjs'));
+for(const directory of ['cmaps','standard_fonts','wasm'])await cp(resolve(root,'node_modules/pdfjs-dist',directory),resolve(output,'pdf-assets',directory),{recursive:true});
+await cp(resolve(root,'node_modules/pdfjs-dist/LICENSE'),resolve(output,'pdf-assets/LICENSE'));

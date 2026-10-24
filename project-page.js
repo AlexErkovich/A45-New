@@ -2,7 +2,7 @@
 // Shared, data-driven publication components. Content is plain text, not executable HTML.
 const FileList={
  size(bytes){return bytes<1024?`${bytes} Б`:bytes<1048576?`${(bytes/1024).toFixed(1)} КБ`:`${(bytes/1048576).toFixed(1)} МБ`},
- render(files=[]){return files.length?`<ul class="file-list">${files.map(f=>`<li><div><strong>${esc(f.name)}</strong><span>${esc(f.type)} · ${FileList.size(f.size)}</span></div><a href="${esc(f.url)}" ${f.mediaPath?`data-media-path="${esc(f.mediaPath)}"`: ""} download="${esc(f.name)}">Скачать</a></li>`).join('')}</ul>`:'<p>Файлы пока не добавлены.</p>'}
+ render(files=[]){if(window.A45Documents)return window.A45Documents.render(files);return files.length?`<ul class="file-list">${files.map(f=>`<li><div><strong>${esc(f.name)}</strong><span>${esc(f.type)} · ${FileList.size(f.size)}</span></div><a href="${esc(f.url)}" ${f.mediaPath?`data-media-path="${esc(f.mediaPath)}"`: ""} download="${esc(f.name)}">Скачать</a></li>`).join('')}</ul>`:'<p>Файлы пока не добавлены.</p>'}
 };
 const ProjectTabs={
  list(project){const tabs=[...(project.tabs||[])];const overview=tabs.find(t=>t.id==='overview')||{id:'overview',title:'Обзор',type:'text',sortOrder:0,content:{paragraphs:[project.description]}};const ordered=[{...overview,title:project.overviewTitle||'Обзор'},...tabs.filter(t=>t.id!=='overview').sort((a,b)=>a.sortOrder-b.sortOrder)];return project.tabOrder?ordered.sort((a,b)=>project.tabOrder.indexOf(a.id)-project.tabOrder.indexOf(b.id)):ordered},

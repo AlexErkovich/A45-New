@@ -8,7 +8,7 @@ import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root=fileURLToPath(new URL('../dist/',import.meta.url));
 const port=Number(process.env.A45_PREVIEW_PORT||3001);
-const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.mp4':'video/mp4','.zip':'application/zip','.txt':'text/plain; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'};
+const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.svg':'image/svg+xml','.mp4':'video/mp4','.zip':'application/zip','.txt':'text/plain; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg'};
 if(existsSync('.env.local'))process.loadEnvFile('.env.local');
 const share=createShareHandler();
 const server=createServer(async(req,res)=>{

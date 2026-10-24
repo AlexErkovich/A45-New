@@ -1,3 +1,4 @@
+import {documentGrid} from './ui/document-types.mjs';
 import {installMediaRefresh,refreshMediaElements} from './ui/media-refresh.mjs';
 import {createTransferPage} from './transfer-page.mjs';
 import {removeProject} from './project-removal.mjs';
@@ -6,6 +7,8 @@ import {createProjectCardEditor} from './project-card.mjs';
 import * as sharedUI from './ui/components.mjs';
 window.A45UI=sharedUI;
 window.A45PhotoCarousel=sharedUI.openPhotoCarousel;
+window.A45Documents={render:documentGrid};
+document.addEventListener('click',event=>{const button=event.target.closest('[data-open-document]');if(!button||button.closest('[data-document-editor]'))return;const grid=button.closest('.document-grid'),items=[...grid.querySelectorAll('[data-document-item]')].map(row=>JSON.parse(row.dataset.documentItem));sharedUI.openDocumentDialog({items,id:button.dataset.openDocument,resolveMedia:(path,options)=>window.A45Cloud?.resolveMedia(path,options)})});
 import {visibleCategory} from './category-covers.mjs';
 import { createCardCreation } from './card-creation.mjs';
 import { createProjectService } from './project-service.mjs';
