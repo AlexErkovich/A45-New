@@ -21,3 +21,12 @@ await assert.rejects(service.save(doc,pending,'published',progress),/two.txt/);a
 assert(events.some(e=>e.mediaId===b&&e.state==='error'));assert(!events.some(e=>e.state==='done'),'no green checks until final commit');events.length=0;
 fail=false;await service.save(doc,pending,'published',progress);assert.equal(pending.size,0);assert.equal(stored.media.length,2);assert.equal(uploads.size,2);assert.deepEqual(events.filter(e=>e.state==='done').map(e=>e.mediaId),[a,b]);
 console.log('PASS: partial file failure and retry retain all media through the final atomic commit.');
+
+// Uploading new media preserves the published snapshot until the explicit Save.
+const next=structuredClone(stored),c=uid(),third=new File(['third'],'three.txt',{type:'text/plain'});
+next.title='Несохранённый заголовок';next.description='Несохранённое описание';next.media.push({id:c,kind:'file',name:third.name,path:next.id+'/'+c,mimeType:third.type,size:third.size});
+const staged=new Map([[c,third]]),stageEvents=[];const publishedTitle=stored.title;
+await service.uploadMedia(next,staged,(text,event)=>{if(event)stageEvents.push(event)});
+assert.equal(staged.size,0);assert(uploads.has(next.id+'/'+c));assert.equal(stored.title,publishedTitle);assert.notEqual(stored.description,next.description);assert.equal(next.revision,stored.revision);assert(stageEvents.some(event=>event.mediaId===c&&event.state==='done'));
+await service.save(next,staged,'published');assert.equal(stored.title,'Несохранённый заголовок');assert.equal(stored.description,'Несохранённое описание');assert.equal(uploads.size,3);
+console.log('PASS: immediate server uploads preserve published content until explicit project Save.');

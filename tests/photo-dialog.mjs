@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {Window} from 'happy-dom';
-import {openPhotoDialog,openPhotoCarousel} from '../src/ui/components.mjs';
+import {openPhotoDialog,openPhotoCarousel,openProjectPhotoPicker} from '../src/ui/components.mjs';
 import {paginateCaption} from '../src/ui/photo-carousel.mjs';
 const text='Первый абзац.\n\nВторой абзац с 🍅 и длиннымсловомбезпробелов.'.repeat(5);
 const pages=paginateCaption(text,value=>Array.from(value).length<=42);
@@ -36,4 +36,8 @@ assert.equal(paged.querySelector('[data-caption-page="1"]').getAttribute('aria-c
 resize();assert.equal(paged.querySelector('[data-caption-page="1"]').getAttribute('aria-current'),'page');
 paged.querySelector('[data-photo-next]').click();assert.equal(paged.querySelector('.photo-details-caption').textContent,'Короткое');assert.equal(paged.querySelectorAll('[data-caption-page]').length,0);
 paged.querySelector('[data-photo-prev]').click();assert.equal(paged.querySelector('[data-caption-page="0"]').getAttribute('aria-current'),'page');paged.close();
+let selected;
+const picker=openProjectPhotoPicker({doc:{tabs:[{title:'Фотографии',kind:'photos',blocks:[{type:'GALLERY',content:{items:[{mediaId:'a'},{mediaId:'b'},{mediaId:'a'}]}}]}],media:[{id:'a',name:'a.jpg'},{id:'b',name:'b.jpg'}]},urls:{a:'a.jpg',b:'b.jpg'},onSelect:ids=>selected=ids});
+assert.equal(picker.querySelectorAll('input').length,2);assert(picker.querySelector('[type=submit]').disabled);
+const checkbox=picker.querySelector('input');checkbox.checked=true;checkbox.dispatchEvent(new win.Event('change',{bubbles:true}));assert(!picker.querySelector('[type=submit]').disabled);picker.querySelector('form').dispatchEvent(new win.Event('submit',{cancelable:true}));assert.deepEqual(selected,['a']);assert(!picker.isConnected);
 await win.happyDOM.close();console.log('PASS: photo navigation, descriptions, exclusive cover selection and clearing.');

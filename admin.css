@@ -21,5 +21,20 @@ body:has(.auth-shell) #layout{display:block;max-width:1000px;width:calc(100% - 4
 @media(max-width:620px){body:has(.auth-shell) #layout{width:calc(100% - 32px);padding:24px 0}.auth-shell{grid-template-columns:1fr;min-height:0;border-radius:24px}.auth-art{padding:24px;background:#f0efeb}.auth-logo{max-width:170px}.auth-panel{padding:20px 28px 32px}.auth-panel .admin-login{padding-top:16px;max-width:280px}}
 
 /* Editing opens in the current project surface, without site chrome or a loading page. */
-.project-editor-route>.header{visibility:hidden;pointer-events:none}.project-editor-route>footer{display:none}.project-canvas-open>.header{display:none}.project-canvas-open #layout{padding-top:112px}.project-canvas-open #layout.internal{display:grid;padding-left:0;padding-right:0}.project-canvas-open #layout.internal .canvas-editor .project-page{padding:34px 40px 48px}.project-canvas-open #layout.internal .canvas-editor .project-header{margin:-34px -40px 0;padding:34px 40px 0}.canvas-loading{min-height:60vh;display:grid;place-items:center}.canvas-loading-indicator{width:24px;height:24px;border:2px solid #eee;border-top-color:#ed5938;border-radius:50%;animation:ui-upload-spin .8s linear infinite}
-@media(max-width:767px){.project-canvas-open #layout{padding-top:88px}.project-canvas-open #layout.internal{display:block}.project-canvas-open #layout.internal .canvas-editor .project-page{padding:24px 40px}.project-canvas-open #layout.internal .canvas-editor .project-header{margin:-24px -40px 0;padding:24px 40px 0}}@media(prefers-reduced-motion:reduce){.canvas-loading-indicator{animation:none}}
+.project-editor-route>.header{position:fixed;inset:0 0 auto;display:flex;visibility:visible;pointer-events:auto;width:100%;max-width:none;margin:0;padding:0 max(24px,calc((100vw - 1540px)/2));height:112px;min-height:112px;background:var(--paper);z-index:50}.project-editor-route>.header #navigation,.project-editor-route>.header #section-actions{display:none}.project-editor-route #layout{padding-top:112px}.project-editor-route>footer{display:none}.project-canvas-open #layout{padding-top:112px}.project-canvas-open #layout.internal{display:grid;padding-left:0;padding-right:0}.project-canvas-open #layout.internal .canvas-editor .project-page{padding:34px 40px 48px}.project-canvas-open #layout.internal .canvas-editor .project-header{margin:-34px -40px 0;padding:34px 40px 0}.canvas-loading{min-height:60vh;display:grid;place-items:center}.canvas-loading-indicator{width:24px;height:24px;border:2px solid #eee;border-top-color:#ed5938;border-radius:50%;animation:ui-upload-spin .8s linear infinite}
+@media(max-width:767px){.project-editor-route>.header{height:88px;min-height:88px;padding:0 16px}.project-editor-route #layout,.project-canvas-open #layout{padding-top:88px}.project-canvas-open #layout.internal{display:block}.project-canvas-open #layout.internal .canvas-editor .project-page{padding:24px 40px}.project-canvas-open #layout.internal .canvas-editor .project-header{margin:-24px -40px 0;padding:24px 40px 0}}@media(prefers-reduced-motion:reduce){.canvas-loading-indicator{animation:none}}
+
+/* Keep navigation below the opaque editor header while the document scrolls. */
+.project-editor-route #layout.internal #archive{top:128px;height:calc(100dvh - 144px)}
+@media(max-width:767px){.project-editor-route #layout.internal #archive{top:88px;height:calc(100dvh - 104px)}}
+
+.project-photo-picker{width:min(720px,94vw);max-height:85dvh;overflow:auto;padding:28px}
+.project-photo-picker .photo-picker-close{position:absolute;top:16px;right:16px}
+.project-photo-picker h2{padding-right:36px;font-size:20px}
+.project-photo-picker .photo-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;justify-content:initial;margin:0}
+.project-photo-picker .photo-picker-grid label{position:relative;display:block;min-width:0;margin:0;padding:6px;border:1px solid #eee;border-radius:12px;cursor:pointer}
+.project-photo-picker .photo-picker-grid label:has(:checked){border-color:#ed5938;background:#fff5f1}
+.project-photo-picker .photo-picker-grid input{position:absolute;width:16px;height:16px;top:12px;left:12px;margin:0;accent-color:#ed5938}
+.project-photo-picker .photo-picker-grid img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px}
+.project-photo-picker .photo-picker-grid span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;margin:8px 2px 2px}
+@media(max-width:600px){.project-photo-picker .photo-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}

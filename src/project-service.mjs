@@ -9,7 +9,7 @@ export function createProjectService(client,categoryService){
  async function list(admin=false){if(admin)await check();let q=client.from('projects').select(select);if(!admin)q=q.eq('status','published');const {data,error}=await q.order('created_at',{ascending:false});if(error)throw Error('Проекты не загружены. Проверьте подключение и применена ли миграция 003_projects.sql.');return data.map(fromRow)}
  async function get(id){await check();if(!/^[a-f0-9]{8}-[a-f0-9-]{27}$/i.test(id)){const doc=(await list(true)).find(d=>d.slug===id||d.sourceId===id);if(doc)return doc;throw Object.assign(Error('Проект не найден на сервере.'),{code:'PGRST116'})}const {data,error}=await client.from('projects').select(select).eq('id',id).single();if(error)throw error;return fromRow(data)}
  async function commit(doc){const {data,error}=await client.rpc('save_a45_project',{doc,expected_revision:doc.revision});if(error)throw Error(error.message||'Не удалось сохранить проект.');doc.revision=data.revision;doc.slug=data.slug;return data}
- async function save(doc,pending,status,progress=()=>{}){await check();const candidate=validateProject({...doc,status});
+ async function save(doc,pending,status,progress=()=>{},uploadOnly=false){await check();const candidate=validateProject({...doc,status,...(uploadOnly&&!doc.title.trim()?{title:'Без названия'}:{})});
   // Register staged media under a draft or the PREVIOUS published snapshot, before upload.
   // Never expose incomplete edited content on a published page.
   const waiting=[...pending.entries()].filter(([id])=>candidate.media.some(m=>m.id===id));
@@ -20,6 +20,7 @@ export function createProjectService(client,categoryService){
     for(const {path,file} of files){await validateProjectFile(file,['image','cover','original'].includes(m.kind));const {error}=await client.storage.from('project-media').upload(path,file,{contentType:file.type||m.mimeType,upsert:false,cacheControl:'0'});if(error){const existing=await client.storage.from('project-media').download(path);if(existing.error)throw Error('Не удалось загрузить «'+m.name+'». Повторите сохранение: '+error.message);if(existing.data.size!==file.size)throw Error('Конфликт файла. Загрузка не подтверждена.')}}progress('Загружен файл: '+m.name,{mediaId:id,state:'saving'});}catch(error){progress(error.message,{mediaId:id,state:'error',message:error.message});throw error}
    }
   }
+  if(uploadOnly){for(const [id] of waiting){pending.delete(id);progress('Фотография загружена',{mediaId:id,state:'done'})}return doc}
   progress('Сохранение…');await commit(candidate);for(const [id] of waiting){pending.delete(id);progress('Фотография загружена',{mediaId:id,state:'done'})}Object.assign(doc,candidate);return doc;
  }
  async function mediaUrls(doc,variant='content'){const result={};for(const m of doc.media){if(m.kind==='original')continue;const key=m.variants?.[variant]||m.path||doc.id+'/'+m.id;if(!urls.has(key)){const {data,error}=await client.storage.from('project-media').download(key);if(error)continue;urls.set(key,URL.createObjectURL(data))}result[m.id]=urls.get(key)}return result}
@@ -30,5 +31,5 @@ export function createProjectService(client,categoryService){
 
  async function publicList(onMetadata){const docs=await list();onMetadata?.(docs.map(d=>publicProject(d,{})));return Promise.all(docs.map(async d=>publicProject(d,await publicUrls(d))))}
  function clearMedia(){for(const url of urls.values())URL.revokeObjectURL(url);urls.clear()}
- return {list,get,save,mediaUrls,publicUrls,largeUrl,publicList,clearMedia};
+ return {list,get,save,uploadMedia:(doc,pending,progress)=>save(doc,pending,doc.status,progress,true),mediaUrls,publicUrls,largeUrl,publicList,clearMedia};
 }
