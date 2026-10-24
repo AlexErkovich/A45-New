@@ -11,7 +11,7 @@ const tab={blocks:[{type:'GALLERY',content:{items:[{mediaId:'a',caption:'Пер�
 const doc={tabs:[tab],media:[{id:'a',name:'a.jpg'},{id:'b',name:'b.jpg'}],coverMediaId:null};
 let changes=0;const dialog=openPhotoDialog({root:document.body,doc,tab,urls:{a:'a.jpg',b:'b.jpg'},id:'a',onChange:()=>changes++});
 const $=s=>dialog.querySelector(s);
-assert(dialog.open);assert(dialog.querySelector('.photo-detail-actions'));assert.equal(dialog.querySelectorAll('[data-photo-thumbnail]').length,2);assert.equal(dialog.querySelector('[data-photo-thumbnail="0"]').getAttribute('aria-current'),'true');assert.equal($('textarea').value,'Первая');
+assert(dialog.open);assert(dialog.querySelector('.document-actions'));assert.equal(dialog.querySelectorAll('[data-photo-thumbnail]').length,2);assert.equal(dialog.querySelector('[data-photo-thumbnail="0"]').getAttribute('aria-current'),'true');assert.equal($('textarea').value,'Первая');
 $('textarea').value='Описание';$('textarea').dispatchEvent(new win.Event('input'));
 assert.equal(doc.media[0].caption,'Описание');assert.equal(tab.blocks[0].content.items[0].caption,'Описание');
 $('[data-photo-cover]').checked=true;$('[data-photo-cover]').dispatchEvent(new win.Event('change'));assert.equal(doc.coverMediaId,'a');assert.equal(doc.coverOriginalId,'a');
@@ -20,7 +20,7 @@ $('[data-photo-next]').click();assert.equal($('textarea').value,'Описани�
 $('[data-photo-prev]').click();$('[data-photo-cover]').checked=false;$('[data-photo-cover]').dispatchEvent(new win.Event('change'));assert.equal(doc.coverMediaId,null);assert.equal(doc.coverOriginalId,null);
 assert.equal(changes,4);$('[data-photo-close]').click();assert(!dialog.open);
 const viewer=openPhotoCarousel({items:[{id:'one',src:'one.jpg',caption:'Первое'},{id:'two',src:'two.jpg',caption:'Второе'}],id:'one'});
-assert.equal(viewer.querySelector('.photo-detail-actions'),null);assert.equal(viewer.querySelector('textarea'),null);assert.equal(viewer.querySelector('[data-photo-cover]'),null);
+assert(viewer.querySelector('.document-actions a[download]'));assert.equal(viewer.querySelector('textarea'),null);assert.equal(viewer.querySelector('[data-photo-cover]'),null);
 viewer.querySelector('[data-photo-thumbnail="1"]').click();assert.equal(viewer.querySelector('.photo-details-caption').textContent,'Второе');assert.equal(viewer.querySelector('img').getAttribute('src'),'two.jpg');viewer.close();
 // Simulate a narrow description column and a resize without depending on fonts.
 let resize;

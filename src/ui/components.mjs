@@ -1,3 +1,4 @@
+export {openMediaDialog} from './media-dialog.mjs';
 export {actionButton} from './buttons.mjs';
 export {openDocumentDialog} from './document-dialog.mjs';
 import {documentRow,fileBadge,fileSize,installDocumentNameTooltips} from './document-types.mjs';
