@@ -19,7 +19,7 @@ const scriptNames=[...html.matchAll(/<script\b[^>]*src="([^"]+)"[^>]*><\/script>
 const stylesheetNames=[...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)].map(match=>match[1]).filter(name=>!/^https?:/.test(name)).map(name=>name.split('?')[0]);
 for(const name of stylesheetNames){const css=await readFile(new URL(name,root),'utf8');html=html.replace(new RegExp('<link\\b[^>]*href="'+name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?:\\?[^"]*)?"[^>]*>'),`<style data-stylesheet="${name}">${css}</style>`)}
 html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'').replace(/<link\b[^>]*href="https?:[^>]*>/g,'');window.document.write(html);
-assert.deepEqual(stylesheetNames,['styles.css','ui.css','admin.css']);assert.equal(window.document.querySelectorAll('style[data-stylesheet]').length,3);
+assert.deepEqual(stylesheetNames,['design-tokens.css','styles.css','ui.css','admin.css']);assert.equal(window.document.querySelectorAll('style[data-stylesheet]').length,4);
 assert(scriptNames.includes('icons.js')&&scriptNames.includes('feedback.js'));
 const scripts=await Promise.all(scriptNames.map(name=>readFile(new URL(name,root),'utf8')));localData=JSON.parse(scripts[scriptNames.indexOf('data/projects.js')].replace('window.archiveData = ','').trim().replace(/;$/,''));
 // Happy DOM isolates lexical bindings between eval calls; a single evaluation models shared classic script scope.

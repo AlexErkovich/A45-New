@@ -1,0 +1,201 @@
+/* Single source for A45 UI colors and component metrics. Preserve approved layouts. */
+:root{
+  /* Semantic color roles */
+  --color-accent:#ed5938;
+  --color-accent-hover:#d94b2c;
+  --color-accent-soft:#fff6f1;
+  --color-surface:#ffffff;
+  --color-page:#f5f5f5;
+  --color-field:#fafafa;
+  --color-dropzone:#fcfcfc;
+  --color-hover:#f8f8f8;
+  --color-heading:#171717;
+  --color-text:#333333;
+  --color-muted:#999999;
+  --color-icon:#777777;
+  --color-divider:#eeeeee;
+  --color-border:#dddddd;
+  --color-success:#38965b;
+  --color-error:#cf4731;
+  --color-warning:#b27a22;
+  --color-info:#5478a0;
+  --color-switch-checked:#242651;
+  --color-tab-icon:#b8b8b8;
+  --color-backdrop:#0000001f;
+  --color-backdrop-strong:#00000044;
+  --color-shadow:#00000022;
+
+  /* Existing neutral palette: exact values retained for visual compatibility */
+  --palette-neutral-01:#fff8f5;
+  --palette-neutral-02:#fff7f5;
+  --palette-neutral-03:#f9faf7;
+  --palette-neutral-04:#f5f8fc;
+  --palette-neutral-05:#f8f8f7;
+  --palette-neutral-06:#f7f7f7;
+  --palette-neutral-07:#f4faf6;
+  --palette-neutral-08:#f6f6f4;
+  --palette-neutral-09:#f5f5f3;
+  --palette-neutral-10:#f4f4f4;
+  --palette-neutral-11:#f3f3f3;
+  --palette-neutral-12:#f2f2f2;
+  --palette-neutral-13:#f3f3ef;
+  --palette-neutral-14:#f2f2ef;
+  --palette-neutral-15:#f0f0f0;
+  --palette-neutral-16:#efefed;
+  --palette-neutral-17:#f0efeb;
+  --palette-neutral-18:#ededed;
+  --palette-neutral-19:#eeeeeb;
+  --palette-neutral-20:#ededeb;
+  --palette-neutral-21:#ebebeb;
+  --palette-neutral-22:#eaeaea;
+  --palette-neutral-23:#e9ede4;
+  --palette-neutral-24:#e7e7e4;
+  --palette-neutral-25:#e7e8e3;
+  --palette-neutral-26:#e4e4e4;
+  --palette-neutral-27:#e3e3e3;
+  --palette-neutral-28:#e1e3dc;
+  --palette-neutral-29:#d2d2d2;
+  --palette-neutral-30:#cccccc;
+  --palette-neutral-31:#b4b8b4;
+  --palette-neutral-32:#aaaaaa;
+  --palette-neutral-33:#a0a0a0;
+  --palette-neutral-34:#a0a09a;
+  --palette-neutral-35:#949690;
+  --palette-neutral-36:#92948f;
+  --palette-neutral-37:#8d8d8d;
+  --palette-neutral-38:#888888;
+  --palette-neutral-39:#858585;
+  --palette-neutral-40:#868880;
+  --palette-neutral-41:#85857f;
+  --palette-neutral-42:#7a7e77;
+  --palette-neutral-43:#74766e;
+  --palette-neutral-44:#727272;
+  --palette-neutral-45:#666666;
+  --palette-neutral-46:#62645d;
+  --palette-neutral-47:#555555;
+  --palette-neutral-48:#444444;
+  --palette-neutral-49:#343631;
+  --palette-neutral-50:#303030;
+  --palette-neutral-51:#272727;
+  --palette-neutral-52:#242724;
+  --palette-neutral-53:#222222;
+  --palette-neutral-54:#191b19;
+  --palette-neutral-55:#181818;
+  --palette-neutral-56:#161616;
+  --palette-neutral-57:#111111;
+  --palette-neutral-58:#000000;
+
+  /* Existing warm palette: exact values retained for visual compatibility */
+  --palette-warm-01:#fffaf0;
+  --palette-warm-02:#fff5f1;
+  --palette-warm-03:#fff2f0;
+  --palette-warm-04:#fff2ee;
+  --palette-warm-05:#fff3ed;
+  --palette-warm-06:#fff2ec;
+  --palette-warm-07:#fff0ec;
+  --palette-warm-08:#fff0eb;
+  --palette-warm-09:#ffede6;
+  --palette-warm-10:#f9dedb;
+  --palette-warm-11:#f4b5a5;
+  --palette-warm-12:#ed5b54;
+  --palette-warm-13:#f25532;
+  --palette-warm-14:#f45332;
+  --palette-warm-15:#e85837;
+  --palette-warm-16:#e34f38;
+  --palette-warm-17:#e64b2b;
+  --palette-warm-18:#d94b35;
+  --palette-warm-19:#cc4444;
+  --palette-warm-20:#d94c2d;
+  --palette-warm-21:#d44b2e;
+  --palette-warm-22:#bd493a;
+  --palette-warm-23:#b34226;
+  --palette-warm-24:#a73c2f;
+  --palette-warm-25:#b43925;
+  --palette-warm-26:#a13930;
+  --palette-warm-27:#63372b;
+
+  /* Existing green palette: exact values retained for visual compatibility */
+  --palette-green-01:#8a9a78;
+  --palette-green-02:#879974;
+  --palette-green-03:#65a077;
+  --palette-green-04:#438263;
+  --palette-green-05:#586953;
+  --palette-green-06:#43533e;
+
+  /* Existing cool palette: exact values retained for visual compatibility */
+
+  /* Existing effect palette: exact values retained for visual compatibility */
+  --palette-effect-01:#fffffff0;
+  --palette-effect-02:#ffffffb3;
+  --palette-effect-03:#fff8f5ed;
+  --palette-effect-04:#f4533214;
+  --palette-effect-05:#252d2510;
+  --palette-effect-06:#232a2366;
+  --palette-effect-07:#24272420;
+  --palette-effect-08:#20262018;
+  --palette-effect-09:#20262012;
+  --palette-effect-10:#20262006;
+  --palette-effect-11:#00000014;
+  --palette-effect-12:#00000012;
+  --palette-effect-13:#0000000b;
+  --palette-effect-14:#0000000a;
+  --palette-effect-15:#00000007;
+  --palette-effect-16:#00000006;
+  --palette-effect-17:#00000003;
+
+  --color-backdrop-card:rgb(0 0 0 / 12%);
+
+  /* Typography */
+  --font-body:Inter,Arial,sans-serif;
+  --font-body-simple:Inter,sans-serif;
+  --font-body-system:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-heading:"Space Grotesk",Inter,sans-serif;
+
+  /* Shared component sizes */
+  --menu-width:230px;
+  --menu-item-gap:10px;
+  --menu-row-radius:8px;
+  --menu-padding:8px;
+  --menu-radius:10px;
+  --menu-row-height:36px;
+  --menu-row-padding:9px 10px;
+  --menu-icon-size:16px;
+  --dialog-sm-width:340px;
+  --dialog-form-width:440px;
+  --dialog-form-padding:28px;
+  --dialog-form-radius:16px;
+  --media-width:1230px;
+  --media-radius:32px;
+  --media-preview-radius:40px;
+  --media-columns:minmax(0,2.05fr) minmax(0,1fr);
+  --media-preview-ratio:3/2;
+  --media-layout-top:clamp(48px,13dvh,112px);
+  --media-layout-bottom:clamp(20px,7.5dvh,64px);
+  --media-layout-side:clamp(48px,7.2vw,104px);
+  --media-layout-gap:clamp(40px,6.67vw,96px);
+  --media-layout-strip:clamp(56px,10.25dvh,88px);
+
+  /* Existing public aliases: one source, no page-local palettes */
+  --ink:var(--palette-neutral-54);
+  --muted:var(--palette-neutral-36);
+  --line:var(--palette-neutral-28);
+  --paper:var(--color-page);
+  --green:var(--color-accent);
+  --status-error:var(--palette-warm-22);
+  --status-warning:var(--color-warning);
+  --status-success:var(--palette-green-04);
+  --status-info:var(--color-info);
+  --ui-control-size:30px;
+  --ui-control-radius:7px;
+  --ui-control-gap:6px;
+  --ui-muted:var(--palette-neutral-37);
+  --ui-hover:var(--palette-neutral-22);
+  --ui-accent:var(--color-accent);
+  --ui-action-size:40px;
+  --ui-action-glyph:20px;
+  --ui-action-hover:var(--color-page);
+  --ui-button-height:40px;
+  --ui-button-radius:8px;
+  --ui-button-padding:10px 18px;
+  --ui-button-font:600 12px/18px var(--font-body);
+}
