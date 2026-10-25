@@ -38,7 +38,7 @@ assert($('#main').textContent.includes('Поездка'),'project aggregates int
 const savedProject=win.archiveData.projects.find(p=>p.id===project.id);
 const fresh=new Window({url:'http://localhost/admin#/project/'+savedProject.slug+'?category='+subsection.id});
 fresh.A45UI=sharedUI;fresh.A45Management=true;fresh.document.write(readFileSync(new URL('../index.html',import.meta.url),'utf8').replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,''));
-fresh.A45Cloud={projectEditor:{beforeRouteChange(){return true}},releaseImage(){},start(callback){fresh.queueMicrotask(()=>{callback([{id:subsection.id,parent_id:'photography',title:subsection.title,description:subsection.description,slug:subsection.id,sort_order:99,cover_image_path:'saved/cover.png'}],()=> 'https://example.org/saved.png');fresh.dispatchEvent(new fresh.CustomEvent('a45-projects',{detail:[savedProject]}))})}};
+fresh.A45Cloud={projectEditor:{beforeRouteChange(){return true}},releaseImage(){},start(callback){fresh.queueMicrotask(()=>{callback([{id:'photography',parent_id:null,title:'Фотография',slug:'photography',sort_order:0},{id:subsection.id,parent_id:'photography',title:subsection.title,description:subsection.description,slug:subsection.id,sort_order:99,cover_image_path:'saved/cover.png'}],()=> 'https://example.org/saved.png');fresh.dispatchEvent(new fresh.CustomEvent('a45-projects',{detail:[savedProject]}))})}};
 fresh.eval(['data/projects.js','project-page.js','feedback.js','home-page.js','app.js'].map(f=>readFileSync(new URL('../'+f,import.meta.url),'utf8')).join('\n;\n'));
 await until(()=>fresh.document.querySelector('.project-title h1')?.textContent==='Поездка');
 assert.equal(fresh.document.querySelector('#section-edit').dataset.editProject,project.id);

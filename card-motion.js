@@ -4,7 +4,7 @@ window.A45Cards=(()=>{
  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
  const registered=new WeakSet(),shown=new WeakSet(),images=new WeakSet(),skipImageFade=new WeakSet(),pendingImages=new WeakMap();
  let observer=null,pageKey=null;
- function fadeImage(image){if(skipImageFade.delete(image)||motion.matches||typeof image.animate!=='function')return;image.animate([{opacity:.25},{opacity:1}],{duration:320,easing:'ease-out'}).finished?.catch(()=>{})}
+ function fadeImage(image){if(skipImageFade.delete(image)||motion.matches||typeof image.animate!=='function')return;image.a45ImageAnimation?.cancel();image.a45ImageAnimation=image.animate([{opacity:.25},{opacity:1}],{duration:320,easing:'ease-out'});image.a45ImageAnimation.finished?.catch(()=>{})}
  function bindImage(image){if(!image||images.has(image))return;images.add(image);image.addEventListener('load',()=>fadeImage(image))}
  function updateImage(image,src){
   if(!image||!src)return;
@@ -20,7 +20,7 @@ window.A45Cards=(()=>{
  function reveal(card,index=0){
   observer?.unobserve(card);if(shown.has(card))return;shown.add(card);card.classList.remove('card-reveal-pending');
   if(motion.matches)return;
-  card.style.setProperty('--card-reveal-delay',Math.min(index,5)*55+'ms');card.classList.add('card-reveal-enter');
+  card.style.setProperty('--card-reveal-delay',Math.min(index,4)*35+'ms');card.classList.add('card-reveal-enter');
   card.addEventListener('animationend',event=>{if(event.target===card&&event.animationName==='a45-card-reveal')card.classList.remove('card-reveal-enter')});
  }
  function prepare(root){
@@ -31,6 +31,7 @@ window.A45Cards=(()=>{
    card.classList.add('card-reveal-pending');observer.observe(card);
   });
  }
+ function cardKey(card){return card.hasAttribute('data-project-card')?'project:'+card.dataset.projectCard:card.hasAttribute('data-category-card')?'category:'+card.dataset.categoryCard:card.getAttribute('href')}
  function syncCard(card,next){
   for(const selector of ['h2','.card-body p']){const target=card.querySelector(selector),source=next.querySelector(selector);if(target&&source&&target.textContent!==source.textContent)target.textContent=source.textContent}
   const image=card.querySelector('img'),source=next.querySelector('img');if(image&&source){image.alt=source.alt;updateImage(image,source.getAttribute('src'))}
@@ -41,8 +42,8 @@ window.A45Cards=(()=>{
   const positions=new Map();
   if(key===pageKey&&oldGrid&&!motion.matches)oldGrid.querySelectorAll(':scope > .card').forEach(card=>{const r=card.getBoundingClientRect();if(shown.has(card)&&!card.classList.contains('card-reveal-enter')&&r.bottom>0&&r.top<window.innerHeight)positions.set(card,r)});
   if(key===pageKey&&oldGrid&&newGrid){
-   const previous=new Map([...oldGrid.querySelectorAll(':scope > .card')].map(card=>[card.getAttribute('href'),card]));
-   const cards=[...newGrid.children].map(next=>{const existing=previous.get(next.getAttribute('href'));if(!existing)return next;syncCard(existing,next);return existing});
+   const previous=new Map([...oldGrid.querySelectorAll(':scope > .card')].map(card=>[cardKey(card),card]));
+   const cards=[...newGrid.children].map(next=>{const existing=previous.get(cardKey(next));if(!existing)return next;syncCard(existing,next);return existing});
    oldGrid.replaceChildren(...cards);newGrid.replaceWith(oldGrid);
   }else{observer?.disconnect();pageKey=key}
   root.replaceChildren(fragment.content);prepare(root);
@@ -53,6 +54,6 @@ window.A45Cards=(()=>{
    card.a45LayoutAnimation=card.animate([{translate:x+'px '+y+'px'},{translate:'0 0'}],{duration:400,easing:'cubic-bezier(.2,.7,.2,1)'});card.a45LayoutAnimation.finished?.catch(()=>{});
   }
  }
- motion.addEventListener?.('change',()=>{if(!motion.matches)return;document.querySelectorAll('.card-reveal-pending').forEach(card=>reveal(card));document.querySelectorAll('.card-reveal-enter').forEach(card=>card.classList.remove('card-reveal-enter'))});
+ motion.addEventListener?.('change',()=>{if(!motion.matches)return;document.querySelectorAll('.card-grid > .card').forEach(card=>{card.a45LayoutAnimation?.cancel();card.querySelector('img')?.a45ImageAnimation?.cancel()});document.querySelectorAll('.card-reveal-pending').forEach(card=>reveal(card));document.querySelectorAll('.card-reveal-enter').forEach(card=>card.classList.remove('card-reveal-enter'))});
  return {render,image:updateImage};
 })();

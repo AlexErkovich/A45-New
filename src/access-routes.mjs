@@ -33,8 +33,7 @@ export function adminReturnTarget(value,origin=globalThis.location.origin){
  return '/admin';
 }
 export function contextualHref(href,location=globalThis.location){
- if(!isAdminRoute(location))return href;
- if(href.startsWith('#/'))return '/admin'+href;
- if(href.startsWith('/#/'))return '/admin'+href.slice(1);
+ const hash=href.startsWith('/admin#/')?href.slice('/admin'.length):href.startsWith('/#/')?href.slice(1):href.startsWith('#/')?href:null;
+ if(hash)return (isAdminRoute(location)?'/admin':'/')+hash;
  return href;
 }

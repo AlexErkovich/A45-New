@@ -58,6 +58,17 @@ function mountLogin(){
 function releaseImage(){}
 function requireManagement(){if(!management.active())throw Error('Управление доступно только после входа в /admin.')}
 const managed=fn=>(...args)=>{requireManagement();return fn(...args)};
+// Approve a logical action once; DOM replacement must not replay or discard a click.
+async function runAdminAction(action,anchor){
+ if(!management.active())return false;
+ const context=location.pathname+location.search+location.hash;
+ let allowed;
+ try{allowed=await authService.isAdmin()}
+ catch{if(management.active()&&context===location.pathname+location.search+location.hash)window.A45Feedback?.show((anchor?.id?document.getElementById(anchor.id):null)||document.querySelector('#section-actions')||anchor,{tone:'error',message:'Не удалось проверить доступ. Повторите попытку.'});return false}
+ if(!management.active()||context!==location.pathname+location.search+location.hash)return false;
+ if(!allowed){management.invalidate();redirectToLogin();return false}
+ await action();return true;
+}
 async function loadManagedProject(id){requireManagement();const doc=await projectService.get(id);const project={...projectServiceToPublic(doc,await projectService.publicUrls(doc)),editorPreview:doc.status!=='published',status:doc.status};requireManagement();return project}
 async function listDraftProjects(){
  requireManagement();if(!projectService)throw Error('Серверное сохранение недоступно.');
@@ -66,15 +77,15 @@ async function listDraftProjects(){
  requireManagement();return rows;
 }
 const management=createManagementAccess({window,authService,client,projectEditor,redirectToLogin,
- onClear(){projectService?.clearMedia();window.dispatchEvent(new Event('a45-clear-previews'))},
+ onClear(){sharedUI.clearManagementNavigation();projectService?.clearMedia();window.dispatchEvent(new Event('a45-clear-previews'))},
  onAuthorized(){
   const nav=document.querySelector('#navigation');
-  nav.innerHTML='<a href="/admin#/about">Обо мне</a><a href="/" data-public-site>Просмотр сайта</a><a href="/admin#/drafts">Черновики</a><a href="/admin#/transfer">Данные и перенос</a><button type="button" class="account-action" data-admin-logout>Выйти</button>';
-  nav.querySelector('[data-admin-logout]').onclick=()=>management.logout();
+  nav.replaceChildren();nav.hidden=true;
+  sharedUI.renderManagementNavigation({active:management.active(),onLogout:()=>management.logout()});
   window.dispatchEvent(new Event('hashchange'));
  },
  onError(message){
-  if(management.active()){window.A45Feedback?.show(document.querySelector('#navigation'),{tone:'error',message});return}
+  if(management.active()){window.A45Feedback?.show(document.querySelector('#management-navigation')||document.querySelector('#navigation'),{tone:'error',message});return}
   const root=document.querySelector('#main');if(!accessRoutes.isAdminRoute())return;
   root.innerHTML='<section class="admin-page"><p role="alert"></p><button type="button" class="ui-button ui-button--outline" data-retry-access>Повторить</button></section>';
   root.querySelector('p').textContent=message;root.querySelector('[data-retry-access]').onclick=()=>management.authorize();
@@ -94,18 +105,8 @@ window.A45Cloud={
  deleteProjectCard:managed(id=>removeProject({id,onlineOnly:true,service:editableProjects,storage:localStorage,projects:window.archiveData.projects,refresh:refreshProjects})),
  saveProjectCard:managed(saveProjectCard),saveCategory:managed(async(row,changes)=>{const result=await service.save(row,changes);lastData='';await refresh();return result}),
  createCard:managed(cardCreation.create),largeImage:path=>viewingMedia()?.largeUrl(path),resolveMedia:(path,options)=>viewingMedia()?.resolveMedia(path,options),
- configured:!!config,retryCategories:refresh,listDraftProjects,loadManagedProject,mountLogin,projectEditor,richText,projectEscape,safeUrl,releaseImage,
+ runAdminAction,configured:!!config,retryCategories:refresh,listDraftProjects,loadManagedProject,mountLogin,projectEditor,richText,projectEscape,safeUrl,releaseImage,
  start(callback){
-  if(authService)document.addEventListener('click',event=>{
-   const button=event.target.closest('#home-edit,#home-add,#section-edit,#section-add,[data-nav-add]');
-   if(!button||button.dataset.accessChecked==='true')return;
-   event.preventDefault();event.stopImmediatePropagation();if(!management.active())return;
-   authService.isAdmin().then(allowed=>{
-    if(!management.active()||!button.isConnected)return;
-    if(allowed){button.dataset.accessChecked='true';try{button.click()}finally{delete button.dataset.accessChecked}}
-    else{management.invalidate();redirectToLogin()}
-   }).catch(()=>window.A45Feedback?.show(button,{tone:'error',message:'Не удалось проверить доступ. Повторите попытку.'}));
-  },true);
   refreshCallback=callback;projectEditor.start();refresh();refreshProjects();
   if(service){
    setInterval(()=>{refresh();refreshProjects();if(management.active())window.dispatchEvent(new Event('a45-drafts-refresh'))},60000);

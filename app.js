@@ -18,18 +18,21 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const filterState={category:'',subcategory:'',year:'',type:''};
 const expanded=new Set();
+let navigationDisclosureKey=null;
 let route={},renderedContext='';
 let draftGeneration=0,privateGeneration=0;
 const managedProjectLoads=new Map();
-let listingEditKey=null;
+let listingEditKey=null,restoreListingEdit=true;
 let remoteRootCategories=null;
 let authoritativeNavigation=null;
+let visibleCategoryIds=null;
 let projectsLoading=!!window.A45Cloud?.configured;
 let draftsStatus='idle',draftProjects=[],draftsError='';
 let categoriesLoading=!!window.A45Cloud?.configured,categoriesError=false;
 let archiveScrollTop=0;
 let pinnedBlockId=null;
 let menuScrollInProgress=false,menuScrollTimer=null;
+let menuPinRequest=0;
 let pinnedResizeObserver=null,observedPinnedBlock=null;
 let mobileMenuOpen=false;
 let backgroundScrollTop=0;
@@ -38,7 +41,8 @@ const legacyRoots=['photography','video','drawing','texts','technical','it','gra
 // Duplicate root records can exist after a section was recreated. Keep their
 // projects and children reachable from either entry without rewriting stored IDs.
 function sameCategory(a,b){const aliases={'film-equipment':'camera-equipment'};a=aliases[a]||a;b=aliases[b]||b;if(a===b)return true;const left=categoryById.get(a),right=categoryById.get(b);return !!left&&!!right&&left.parentId===null&&right.parentId===null&&left.title.trim().toLocaleLowerCase('ru')===right.title.trim().toLocaleLowerCase('ru')}
-function childrenOf(id=null){return categories.filter(c=>(id===null?c.parentId===null:sameCategory(c.parentId,id))&&!window.A45Home?.isDeleted(c.id)).sort((a,b)=>a.sortOrder-b.sortOrder||a.title.localeCompare(b.title,'ru'))}
+function isVisibleCategory(id){return visibleCategoryIds===null||visibleCategoryIds.has(id)}
+function childrenOf(id=null){return categories.filter(c=>isVisibleCategory(c.id)&&(id===null?c.parentId===null:sameCategory(c.parentId,id))&&!window.A45Home?.isDeleted(c.id)).sort((a,b)=>a.sortOrder-b.sortOrder||a.title.localeCompare(b.title,'ru'))}
 function categoryPath(id){const path=[];for(let c=categoryById.get(id);c;c=categoryById.get(c.parentId))path.unshift(c);return path}
 function isWithin(id,parentId){return categoryPath(id).some(c=>sameCategory(c.id,parentId))}
 function belongsTo(project,categoryId=''){return !categoryId||project.categoryIds.some(id=>id===categoryId||isWithin(id,categoryId))}
@@ -59,10 +63,10 @@ function card(item,isCategory=false){return `<a class="card" ${isCategory?`data-
 function navigationBlocks(){
  const home=window.A45Home?.sections(remoteRootCategories)??remoteRootCategories??childrenOf();
  const titleKey=title=>title.trim().toLocaleLowerCase('ru');
- const existing=menuBlocks.filter(block=>(!authoritativeNavigation||authoritativeNavigation.some(c=>c.id===block.id))&&!window.A45Home?.isDeleted(block.id)).map(block=>{
+ const existing=menuBlocks.filter(block=>isVisibleCategory(block.id)&&(!authoritativeNavigation||authoritativeNavigation.some(c=>c.id===block.id))&&!window.A45Home?.isDeleted(block.id)).map(block=>{
   const categoryId=home.find(c=>c.id===block.id)?.id||home.find(c=>titleKey(c.title)===titleKey(block.title))?.id||block.id;
-  const extra=categories.filter(c=>[block.id,categoryId].includes(c.parentId)&&c.custom&&c.id.startsWith('section-')&&!window.A45Home?.isDeleted(c.id)&&!block.items.some(([id])=>id===c.id)).map(c=>[c.id,c.title]);
-  return {...block,title:window.A45Home?.editedTitle(categoryId)||categoryById.get(categoryId)?.menuTitle||block.title,categoryId,items:[...block.items.filter(([id])=>(!authoritativeNavigation||authoritativeNavigation.some(c=>c.id===id))&&!window.A45Home?.isDeleted(id)).map(([id,title])=>[id,categoryById.get(id)?.menuTitle||window.A45Home?.editedTitle(id)||title]),...extra]};
+  const extra=categories.filter(c=>[block.id,categoryId].includes(c.parentId)&&isVisibleCategory(c.id)&&c.custom&&c.id.startsWith('section-')&&!window.A45Home?.isDeleted(c.id)&&!block.items.some(([id])=>id===c.id)).map(c=>[c.id,c.title]);
+  return {...block,title:window.A45Home?.editedTitle(categoryId)||categoryById.get(categoryId)?.menuTitle||block.title,categoryId,items:[...block.items.filter(([id])=>isVisibleCategory(id)&&(!authoritativeNavigation||authoritativeNavigation.some(c=>c.id===id))&&!window.A45Home?.isDeleted(id)).map(([id,title])=>[id,categoryById.get(id)?.menuTitle||window.A45Home?.editedTitle(id)||title]),...extra]};
  });
  return [...existing,...home.filter(c=>!existing.some(b=>b.id===c.id||titleKey(b.title)===titleKey(c.title))).map(c=>({id:c.id,categoryId:c.id,title:c.title,items:childrenOf(c.id).filter(child=>child.custom&&child.id.startsWith('section-')).map(child=>[child.id,child.title])}))];
 }
@@ -86,17 +90,26 @@ function navigationTailSpace(){
 }
 function pinNavigationBlock(id){
  const archive=$('#archive'),block=$(`[data-menu-block="${id}"]`);if(!block)return;
- pinnedBlockId=id;navigationTailSpace();
- const top=Math.max(0,archive.scrollTop+block.getBoundingClientRect().top-archive.getBoundingClientRect().top-12);
- const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(typeof archive.scrollTo==='function'&&!reduced&&Math.abs(top-archive.scrollTop)>1){
-  menuScrollInProgress=true;
-  if(menuScrollTimer)window.clearTimeout(menuScrollTimer);
-  archive.scrollTo({top,behavior:'smooth'});
-  menuScrollTimer=window.setTimeout(finishMenuScroll,800);
- }else{finishMenuScroll();archive.scrollTop=top}
- archiveScrollTop=archive.scrollTop;
+ pinnedBlockId=id;
+ const request=++menuPinRequest;
+ // Measure after the route has replaced its content, using the final sidebar position.
+ queueMicrotask(()=>{
+  if(request!==menuPinRequest||pinnedBlockId!==id||!block.isConnected)return;
+  navigationTailSpace();
+  const headerBottom=$('.header')?.getBoundingClientRect().bottom||0;
+  const visibleTop=Math.max(archive.getBoundingClientRect().top,headerBottom);
+  const top=Math.max(0,archive.scrollTop+block.getBoundingClientRect().top-visibleTop-12);
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(typeof archive.scrollTo==='function'&&!reduced&&Math.abs(top-archive.scrollTop)>1){
+   menuScrollInProgress=true;
+   if(menuScrollTimer)window.clearTimeout(menuScrollTimer);
+   archive.scrollTo({top,behavior:'smooth'});
+   menuScrollTimer=window.setTimeout(finishMenuScroll,800);
+  }else{finishMenuScroll();archive.scrollTop=top}
+  archiveScrollTop=archive.scrollTop;
+ });
 }
+
 function finishMenuScroll(){menuScrollInProgress=false;if(menuScrollTimer)window.clearTimeout(menuScrollTimer);menuScrollTimer=null;archiveScrollTop=$('#archive').scrollTop}
 function tree(){
  const archive=$('#archive'),signature=JSON.stringify([!!window.A45Management,navigationBlocks()]);
@@ -109,12 +122,15 @@ function tree(){
  document.querySelectorAll('#archive .menu-item').forEach(link=>{if(link.dataset.category===active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')});
  const activeBlock=navigationBlocks().find(b=>categoryPath(active).some(c=>c.id===b.id||c.id===b.categoryId||b.items.some(([id])=>id===c.id)));
  document.querySelectorAll('#archive [data-menu-block]').forEach(block=>block.setAttribute('data-active',String(block.dataset.menuBlock===activeBlock?.id)));
+ const disclosureKey=location.pathname+':'+route.page+':'+active+':'+(activeBlock?.id||'');
+ if(disclosureKey!==navigationDisclosureKey){navigationDisclosureKey=disclosureKey;if(activeBlock)toggleBranch(activeBlock.id,true)}
  if(activeBlock&&activeBlock.id!==pinnedBlockId)pinNavigationBlock(activeBlock.id);else navigationTailSpace();
  if(!menuScrollInProgress&&Math.abs(archive.scrollTop-archiveScrollTop)>1)archive.scrollTop=archiveScrollTop;
 }
-function toggleBranch(id,force){
+function toggleBranch(id,force,immediate=false){
  const open=force??!expanded.has(id);
- if(open)for(const other of [...expanded]){if(other===id)continue;expanded.delete(other);const previous=$('#branch-'+other);if(previous){previous.a45Animation?.cancel();previous.a45Animation=null;previous.hidden=true;previous.inert=true;previous.closest?.('[data-menu-block]')?.setAttribute('data-open','false');previous.querySelectorAll?.('.menu-item').forEach(item=>item.a45Animation?.cancel())}$(`[data-category="${other}"]`)?.setAttribute('aria-expanded','false')}
+ if(force!==undefined&&open===expanded.has(id)&&!immediate)return;
+ if(open)for(const other of [...expanded])if(other!==id)toggleBranch(other,false,true);
  if(open)expanded.add(id);else expanded.delete(id);
  const branch=$('#branch-'+id);
  if(!branch)return;
@@ -124,7 +140,7 @@ function toggleBranch(id,force){
  $(`[data-category="${id}"]`).setAttribute('aria-expanded',String(open));
  branch.inert=!open;
  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(!hasItems||typeof branch.animate!=='function'||reduced){branch.hidden=!open||!hasItems;archive.scrollTop=top;return}
+ if(immediate||!hasItems||typeof branch.animate!=='function'||reduced){branch.a45Animation?.cancel();branch.a45Animation=null;branch.querySelectorAll('.menu-item').forEach(item=>{item.a45Animation?.cancel();item.a45Animation=null});branch.hidden=!open||!hasItems;archive.scrollTop=top;return}
  const fromHeight=branch.hidden?0:branch.getBoundingClientRect().height;
  const fromOpacity=branch.hidden?0:getComputedStyle(branch).opacity;
  const fromMargin=branch.hidden?'0px':getComputedStyle(branch).marginTop;
@@ -133,12 +149,14 @@ function toggleBranch(id,force){
  const animation=branch.animate([
   {height:fromHeight+'px',opacity:fromOpacity,marginTop:fromMargin},
   {height:(open?branch.scrollHeight:0)+'px',opacity:open?1:0,marginTop:open?'12px':'0px'}
- ],{duration:open?440:320,easing:'cubic-bezier(.22,1,.36,1)',fill:'both'});
- branch.a45Animation=animation;
+ ],{duration:320,easing:'cubic-bezier(.4,0,.2,1)',fill:'both'});
+ branch.a45Animation=animation;animation.finished?.catch(()=>{});
  animation.onfinish=()=>{branch.hidden=!open;animation.cancel();branch.a45Animation=null;navigationTailSpace()};
  if(open)branch.querySelectorAll('.menu-item').forEach((item,index)=>{
+  const current=item.a45Animation?getComputedStyle(item):null;
+  const from={opacity:current?.opacity||0,transform:current?.transform||'translateY(-4px)'};
   item.a45Animation?.cancel();
-  item.a45Animation=item.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,delay:Math.min(index,6)*28,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
+  item.a45Animation=item.animate([from,{opacity:1,transform:'translateY(0)'}],{duration:280,delay:Math.min(index,4)*10,easing:'cubic-bezier(.4,0,.2,1)',fill:'backwards'});item.a45Animation.finished?.catch(()=>{});
  });
  archive.scrollTop=top;
 }
@@ -157,18 +175,19 @@ function setMobileMenu(open){
 }
 function render(){route=parseRoute();
  if(location.pathname!=='/admin'){
-  window.A45Cloud?.leaveManagement?.();window.A45Management=false;listingEditKey=null;clearPrivateProjects();
+  window.A45Cloud?.leaveManagement?.();window.A45Management=false;window.A45UI?.clearManagementNavigation?.({document});listingEditKey=null;restoreListingEdit=false;try{sessionStorage.removeItem('a45-admin-listing-edit')}catch{}clearPrivateProjects();
   document.querySelectorAll('#archive [data-nav-add]').forEach(button=>{button.remove();$('#archive').a45MenuSignature=null});
   window.A45Home?.resetManagement?.({preserveDialog:route.page==='login'});
-  const nav=$('#navigation');if(nav)nav.innerHTML='<a href="/#/about" data-nav="about">Обо мне</a>';
+  const nav=$('#navigation');if(nav)nav.replaceChildren();
  }
  renderedContext=location.pathname+':'+!!window.A45Management;
  if(location.pathname==='/admin'&&!window.A45Management){
-  listingEditKey=null;window.A45Home?.header(false);sectionActions(null,false);$('#archive').replaceChildren();$('#archive').a45MenuSignature=null;
+  listingEditKey=null;window.A45UI?.clearManagementNavigation?.({document});window.A45Home?.header(false);sectionActions(null,false);$('#archive').replaceChildren();$('#archive').a45MenuSignature=null;
   document.body.classList.remove('home-section-editing','listing-editing','project-canvas-open','project-editor-route');
   $('#main').innerHTML='<section class="admin-page"><p>Проверяем доступ…</p></section>';window.A45Cloud?.authorizeManagement?.();return;
  }
- if(route.page==='project-editor'){sectionActions(null,false);document.body.classList?.add('project-editor-route');document.querySelector('#main')?.classList.remove('home','listing');window.A45Home?.header(false);window.A45Cloud?.projectEditor?.mount();scopeLinks();document.title='Редактирование проекта — A45';return}document.body.classList?.remove('project-editor-route','project-canvas-open');if(listingEditKey!==route.page+':'+route.id)listingEditKey=null;window.A45Home?.header(route.page==='home');document.body.classList?.toggle('archive-page',['category','project','year','projects','drafts'].includes(route.page));const internal=['category','project','year','projects','drafts'].includes(route.page);const project=findProject(route.id);const cat=route.page==='project'&&project?projectContext(project):categoryById.get(route.id);$('#layout').classList.toggle('internal',internal);if(internal)tree();else{$('#archive').replaceChildren();$('#archive').a45MenuSignature=null;pinnedResizeObserver?.disconnect();observedPinnedBlock=null;pinnedBlockId=null}$('#main').classList.toggle('home',route.page==='home');$('#main').classList.toggle('listing',['category','projects','year','drafts'].includes(route.page));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===route.page));let html='';const archiveButton=internal?`<button class="archive-toggle" id="archive-toggle" aria-expanded="false" aria-controls="archive">${window.A45Icons?.menu||''} Дерево архива</button>`:'';
+ if(restoreListingEdit){restoreListingEdit=false;try{if(sessionStorage.getItem('a45-admin-listing-edit')==='1')listingEditKey='restored'}catch{}}
+ if(route.page==='project-editor'){sectionActions(null,false);document.body.classList?.add('project-editor-route');document.querySelector('#main')?.classList.remove('home','listing');window.A45Home?.header(false);window.A45Cloud?.projectEditor?.mount();scopeLinks();document.title='Редактирование проекта — A45';return}document.body.classList?.remove('project-editor-route','project-canvas-open');if(listingEditKey!==null&&['category','projects','year','drafts'].includes(route.page))listingEditKey=route.page+':'+route.id;window.A45Home?.header(route.page==='home');document.body.classList?.toggle('archive-page',['category','project','year','projects','drafts'].includes(route.page));const internal=['category','project','year','projects','drafts'].includes(route.page);const project=findProject(route.id);const cat=route.page==='project'&&project?projectContext(project):((categoriesLoading&&window.A45Cloud?.onlineOnly)||!isVisibleCategory(route.id)?null:categoryById.get(route.id));$('#layout').classList.toggle('internal',internal);if(internal)tree();else{navigationDisclosureKey=null;$('#archive').replaceChildren();$('#archive').a45MenuSignature=null;pinnedResizeObserver?.disconnect();observedPinnedBlock=null;pinnedBlockId=null}$('#main').classList.toggle('home',route.page==='home');$('#main').classList.toggle('listing',['category','projects','year','drafts'].includes(route.page));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===route.page));let html='';const archiveButton=internal?`<button class="archive-toggle" id="archive-toggle" aria-expanded="false" aria-controls="archive">${window.A45Icons?.menu||''} Дерево архива</button>`:'';
 if(['admin','login','transfer','project-editor'].includes(route.page)){html='<section class="admin-page"><h1>Администрирование</h1><p>Загрузка…</p></section>'}
 else if(route.page==='about'){html=`<div class="about"><div class="eyebrow">ОБ АРХИВЕ</div><h1>Творчество —<br>способ смотреть на мир.</h1><p>A45 — персональная творческая библиотека. Здесь собираются фотографии, тексты, визуальные исследования и проекты на пересечении искусства и технологий.</p><p>Это пространство для поиска, экспериментов и сохранения того, что хочется помнить.</p><p>Здесь собраны мои работы и истории их создания. Архив пополняется новыми проектами, наблюдениями и открытиями.</p><a class="back-link" href="#/">К направлениям творчества ↗</a></div>`}
 else if(route.page==='drafts'){if(draftsStatus==='idle'){const generation=++draftGeneration;draftsStatus='loading';Promise.resolve().then(()=>window.A45Cloud.listDraftProjects()).then(rows=>{if(generation!==draftGeneration||location.pathname!=='/admin'||!window.A45Management)return;draftProjects=rows;draftsStatus='ready';for(const row of rows){const index=projects.findIndex(p=>p.id===row.id);if(index<0)projects.push(row);else projects[index]=row}if(parseRoute().page==='drafts')renderKeepingState()}).catch(error=>{if(generation!==draftGeneration||location.pathname!=='/admin'||!window.A45Management)return;draftsStatus='error';draftsError=error.message;if(parseRoute().page==='drafts')renderKeepingState()})}html=`<div class="section-heading"><h1>Черновики</h1></div>${draftsStatus==='loading'&&!draftProjects.length?'<div class="empty" role="status">Загружаем черновики…</div>':draftsStatus==='error'?`<div class="empty" role="alert">${esc(draftsError)} <button type="button" id="retry-drafts">Повторить</button></div>`:draftProjects.length?`<div class="card-grid">${draftProjects.map(p=>card(p)).join('')}</div>`:'<div class="empty">Черновиков пока нет.</div>'}`}
@@ -195,15 +214,15 @@ if(window.A45Cards)window.A45Cards.render($('#main'),archiveButton+html,location
 function sectionActions(cat,internal){
  let actions=$('#section-actions');
  if(!actions)return;
- actions.hidden=!internal||!window.A45Management;
- if(!internal||!window.A45Management){actions.innerHTML='';$('#navigation').hidden=false;return;}
- $('#navigation').hidden=false;
+ actions.hidden=!internal||!window.A45Management||(route.page==='category'&&!cat);
+ if(actions.hidden){actions.innerHTML='';$('#navigation').hidden=!$('#navigation').childElementCount;return;}
+ $('#navigation').hidden=!$('#navigation').childElementCount;
  const categoryId=cat?.id||(route.page==='drafts'?window.A45Navigation.categories().find(c=>!c.parentId)?.id:'')||'';
  actions.innerHTML=`<button type="button" class="ui-button ui-button--outline" id="section-edit" ${route.page==='project'?`data-edit-project="${esc(findProject(route.id)?.id||route.id)}"`:`data-edit-listing="${esc(categoryId)}" aria-pressed="${listingEditKey!==null}"`}>${window.A45Icons?.pencil||''} Редактировать</button><button type="button" class="section-add ui-button ui-button--primary" id="section-add" data-parent-category="${esc(categoryId)}" data-create-kind="${cat?.parentId===null?'subcategory':'project'}">${window.A45Icons?.plus||''} Добавить</button>`;
 }
 
 function decorateListingEdit(){
- const active=!!window.A45Management&&listingEditKey!==null;document.body.classList?.toggle('listing-editing',active);
+ const active=!!window.A45Management&&listingEditKey!==null&&['category','projects','year','drafts'].includes(route.page);document.body.classList?.toggle('listing-editing',active);
  const button=$('[data-edit-listing]');if(button){button.setAttribute('aria-pressed',String(active));button.innerHTML=active?`${window.A45Icons?.check||'✓'} Готово`:`${window.A45Icons?.pencil||''} Редактировать`}
  if(!active)return;
  document.querySelectorAll('#main.listing .card').forEach(card=>{if(card.querySelector('.card-edit-outline'))return;const svg=document.createElementNS('http://www.w3.org/2000/svg','svg'),rect=document.createElementNS('http://www.w3.org/2000/svg','rect');svg.classList.add('card-edit-outline');svg.setAttribute('aria-hidden','true');svg.setAttribute('focusable','false');rect.setAttribute('x','1');rect.setAttribute('y','1');svg.append(rect);card.append(svg)})
@@ -212,7 +231,7 @@ function decorateListingEdit(){
 function options(name,values,selected){const select=$(`[name="${name}"]`);select.innerHTML='<option value="">Все</option>'+values.map(v=>{const [id,label]=Array.isArray(v)?v:[v,v];return `<option value="${esc(id)}">${esc(label)}</option>`}).join('');select.value=selected}
 function subOptions(){const root=$('[name="category"]').value,current=window.A45Navigation?.categories()||[],byId=new Map(current.map(c=>[c.id,c]));const descendants=current.filter(c=>c.parentId!==null&&(!root||isWithin(c.id,root)));const label=c=>{const path=[],seen=new Set();for(let node=c;node&&!seen.has(node.id);node=byId.get(node.parentId)){seen.add(node.id);if(node.id!==root)path.unshift(node.title)}return path.join(' / ')};options('subcategory',descendants.map(c=>[c.id,label(c)]),filterState.subcategory)}
 function openFilters(){options('category',(window.A45Navigation?.categories()||[]).filter(c=>c.parentId===null).map(c=>[c.id,c.title]),filterState.category);subOptions();options('year',[...new Set(projects.map(p=>p.year))].sort((a,b)=>b-a),filterState.year);options('type',['Статья','Фотография','Видео','Проект','Исследование'],filterState.type);$('#filters').showModal()}
-document.addEventListener('click',e=>{if(e.target.closest('[data-retry-managed-project]')){managedProjectLoads.delete(route.id);render();return}if(e.target.closest('#retry-categories')){categoriesError=false;categoriesLoading=true;render();window.A45Cloud?.retryCategories();return}if(e.target.closest('#retry-drafts')){draftsStatus='idle';render();return}const navAdd=e.target.closest('[data-nav-add]');if(navAdd){e.preventDefault();window.A45Home?.open(null,{kind:'subcategory',parentId:navAdd.dataset.navAdd});return}const listingToggle=e.target.closest('[data-edit-listing]');if(listingToggle){listingEditKey=listingEditKey===null?route.page+':'+route.id:null;decorateListingEdit();return}const editCard=e.target.closest('#main.listing .card');if(editCard&&listingEditKey!==null&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&!e.altKey){e.preventDefault();if(editCard.dataset.projectCard){const project=findProject(editCard.dataset.projectCard);window.A45Home?.open(project.id,{kind:'project',parentId:route.page==='category'?route.id:project.categoryIds[0]})}else if(editCard.dataset.categoryCard){const c=categoryById.get(editCard.dataset.categoryCard);window.A45Home?.open(c.id,{kind:c.parentId?'subcategory':'section',parentId:c.parentId})}return}const collapse=e.target.closest('[data-collapse-project]');if(collapse){ProjectPage.collapseText(collapse);return}if(e.target.closest('[data-copy-project-link]')){ProjectPage.copyLink(e.target.closest('[data-copy-project-link]'));return}const add=e.target.closest('#section-add');if(add){window.A45Home?.open(null,{kind:add.dataset.createKind,parentId:add.dataset.parentCategory});return}const categoryEdit=e.target.closest('[data-edit-category]');if(categoryEdit){const c=categoryById.get(categoryEdit.dataset.editCategory);window.A45Home?.open(c.id,{kind:c.parentId?'subcategory':'section',parentId:c.parentId});return}const edit=e.target.closest('[data-edit-project]');if(edit&&window.A45Management&&location.pathname==='/admin'){history.pushState(null,'','/admin#/project/edit/'+encodeURIComponent(edit.dataset.editProject)+'?'+new URLSearchParams({tab:route.tab||'overview'}));handleRouteChange();return}const tabLink=e.target.closest('[data-project-tab]');if(tabLink&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&!e.altKey){e.preventDefault();if(location.hash!==tabLink.getAttribute('href'))history.pushState(null,'',tabLink.getAttribute('href'));handleRouteChange();return}const image=e.target.closest('[data-project-image]');if(image)ProjectPage.openImage(image);const blockSurface=e.target.closest('[data-menu-block]');if(blockSurface&&!e.target.closest('a')){e.preventDefault();toggleBranch(blockSurface.dataset.menuBlock);pinNavigationBlock(blockSurface.dataset.menuBlock);const href='#/category/'+blockSurface.dataset.menuCategory;if(location.hash!==href)history.pushState(null,'',href);handleRouteChange();return}if(e.target.closest('#open-filter'))openFilters();if(e.target.closest('#close-filter'))$('#filters').close();if(e.target.closest('#clear-all')){Object.keys(filterState).forEach(k=>filterState[k]='');render()}if(e.target.closest('#archive-toggle'))setMobileMenu(!mobileMenuOpen);if(e.target.closest('#close-archive'))setMobileMenu(false)});
+document.addEventListener('click',e=>{if(e.target.closest('[data-retry-managed-project]')){managedProjectLoads.delete(route.id);render();return}if(e.target.closest('#retry-categories')){categoriesError=false;categoriesLoading=true;render();window.A45Cloud?.retryCategories();return}if(e.target.closest('#retry-drafts')){draftsStatus='idle';render();return}const navAdd=e.target.closest('[data-nav-add]');if(navAdd){e.preventDefault();window.A45Home?.runAction(()=>window.A45Home.open(null,{kind:'subcategory',parentId:navAdd.dataset.navAdd}),navAdd);return}const listingToggle=e.target.closest('[data-edit-listing]');if(listingToggle){e.preventDefault();window.A45Home?.runAction(()=>{listingEditKey=listingEditKey===null?route.page+':'+route.id:null;try{if(listingEditKey===null)sessionStorage.removeItem('a45-admin-listing-edit');else sessionStorage.setItem('a45-admin-listing-edit','1')}catch{}decorateListingEdit()},listingToggle);return}const editCard=e.target.closest('#main.listing .card');if(editCard&&listingEditKey!==null&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&!e.altKey){e.preventDefault();window.A45Home?.runAction(()=>{if(editCard.dataset.projectCard){const project=findProject(editCard.dataset.projectCard);window.A45Home.open(project.id,{kind:'project',parentId:route.page==='category'?route.id:project.categoryIds[0]})}else if(editCard.dataset.categoryCard){const c=categoryById.get(editCard.dataset.categoryCard);window.A45Home.open(c.id,{kind:c.parentId?'subcategory':'section',parentId:c.parentId})}},editCard);return}const collapse=e.target.closest('[data-collapse-project]');if(collapse){ProjectPage.collapseText(collapse);return}if(e.target.closest('[data-copy-project-link]')){ProjectPage.copyLink(e.target.closest('[data-copy-project-link]'));return}const add=e.target.closest('#section-add');if(add){e.preventDefault();window.A45Home?.runAction(()=>window.A45Home.open(null,{kind:add.dataset.createKind,parentId:add.dataset.parentCategory}),add);return}const categoryEdit=e.target.closest('[data-edit-category]');if(categoryEdit){e.preventDefault();window.A45Home?.runAction(()=>{const c=categoryById.get(categoryEdit.dataset.editCategory);window.A45Home.open(c.id,{kind:c.parentId?'subcategory':'section',parentId:c.parentId})},categoryEdit);return}const edit=e.target.closest('[data-edit-project]');if(edit&&window.A45Management&&location.pathname==='/admin'){e.preventDefault();window.A45Home?.runAction(()=>{history.pushState(null,'','/admin#/project/edit/'+encodeURIComponent(edit.dataset.editProject)+'?'+new URLSearchParams({tab:route.tab||'overview'}));handleRouteChange()},edit);return}const tabLink=e.target.closest('[data-project-tab]');if(tabLink&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&!e.altKey){e.preventDefault();if(location.hash!==tabLink.getAttribute('href'))history.pushState(null,'',tabLink.getAttribute('href'));handleRouteChange();return}const image=e.target.closest('[data-project-image]');if(image)ProjectPage.openImage(image);const blockSurface=e.target.closest('[data-menu-block]');if(blockSurface&&!e.target.closest('a')){e.preventDefault();toggleBranch(blockSurface.dataset.menuBlock);navigationDisclosureKey=location.pathname+':category:'+blockSurface.dataset.menuCategory+':'+blockSurface.dataset.menuBlock;pinNavigationBlock(blockSurface.dataset.menuBlock);const href=location.pathname+location.search+'#/category/'+blockSurface.dataset.menuCategory;if(location.pathname+location.search+location.hash!==href)history.pushState(null,'',href);handleRouteChange();return}if(e.target.closest('#open-filter'))openFilters();if(e.target.closest('#close-filter'))$('#filters').close();if(e.target.closest('#clear-all')){Object.keys(filterState).forEach(k=>filterState[k]='');render()}if(e.target.closest('#archive-toggle'))setMobileMenu(!mobileMenuOpen);if(e.target.closest('#close-archive'))setMobileMenu(false)});
 $('[name="category"]').addEventListener('change',subOptions);
 $('#filter-form').addEventListener('submit',e=>{e.preventDefault();const data=new FormData(e.target);Object.keys(filterState).forEach(k=>filterState[k]=data.get(k));$('#filters').close();render()});
 $('#reset-filter').addEventListener('click',()=>{Object.keys(filterState).forEach(k=>filterState[k]='');openFiltersReset();render()});function openFiltersReset(){for(const s of document.querySelectorAll('select'))s.value='';subOptions()}
@@ -222,13 +241,18 @@ $('#archive').addEventListener('scroll',()=>{if(['category','project','year','pr
 document.addEventListener('keydown',e=>{ProjectPage.keydown(e);if(mobileMenuOpen&&e.key==='Escape')setMobileMenu(false)});
 const mobileViewport=window.matchMedia('(max-width: 767px)');
 mobileViewport.addEventListener('change',e=>{if(!e.matches)setMobileMenu(false)});
-function handleRouteChange(){if(window.A45Cloud?.projectEditor?.beforeRouteChange()===false)return;const next=parseRoute();if(next.page==='drafts'&&route.page!=='drafts')draftsStatus='idle';if(next.page==='project-editor'){setMobileMenu(false);render();return}const previousProject=route.page==='project'?findProject(route.id):null;const nextProject=next.page==='project'?findProject(next.id):null;if(previousProject&&previousProject===nextProject&&route.category===next.category&&renderedContext===location.pathname+':'+!!window.A45Management){route=next;ProjectPage.update(nextProject,next.tab);scopeLinks();return}setMobileMenu(false);render();document.scrollingElement.scrollTop=0;const main=$('#main');main.a45RouteAnimation?.cancel();if(typeof main.animate==='function'&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){main.a45RouteAnimation=main.animate([{opacity:.55},{opacity:1}],{duration:180,easing:'ease-out'});main.a45RouteAnimation.finished?.catch(()=>{})}}
+function handleRouteChange(){if(window.A45Cloud?.projectEditor?.beforeRouteChange()===false)return;const next=parseRoute();if(next.page==='drafts'&&route.page!=='drafts')draftsStatus='idle';if(next.page==='project-editor'){setMobileMenu(false);render();return}const previousProject=route.page==='project'?findProject(route.id):null;const nextProject=next.page==='project'?findProject(next.id):null;if(previousProject&&previousProject===nextProject&&route.category===next.category&&renderedContext===location.pathname+':'+!!window.A45Management){route=next;ProjectPage.update(nextProject,next.tab);scopeLinks();return}setMobileMenu(false);render();if(next.page!=='category')document.scrollingElement.scrollTop=0;const main=$('#main'),animationKey=location.pathname+location.search+location.hash,changed=main.a45RouteAnimationKey!==animationKey;main.a45RouteAnimationKey=animationKey;if(changed){main.a45RouteAnimation?.cancel();if(typeof main.animate==='function'&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){main.a45RouteAnimation=main.animate([{opacity:.85},{opacity:1}],{duration:300,easing:'cubic-bezier(.4,0,.2,1)'});main.a45RouteAnimation.finished?.catch(()=>{})}}}
 if(typeof history!=='undefined'&&'scrollRestoration' in history)history.scrollRestoration='manual';
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change',event=>{
+ if(!event.matches)return;
+ document.querySelectorAll('#archive [data-menu-block]').forEach(block=>toggleBranch(block.dataset.menuBlock,expanded.has(block.dataset.menuBlock),true));
+ $('#main').a45RouteAnimation?.cancel();
+});
 window.addEventListener('hashchange',handleRouteChange);render();
 
 // Cloud metadata overlays the existing stable category IDs; routing/tree structure stays local.
 window.A45Cloud?.start((rows,coverUrl,metadata)=>{
- authoritativeNavigation=metadata?.navigation||null;window.A45Home?.setNavigation(authoritativeNavigation);
+ visibleCategoryIds=new Set(rows.map(c=>c.id));authoritativeNavigation=metadata?.navigation?.filter(c=>visibleCategoryIds.has(c.id))||null;window.A45Home?.setNavigation(authoritativeNavigation||rows.map(c=>({id:c.id,parentId:c.parent_id})));
  categoriesLoading=false;categoriesError=false;
  const byId=new Map(rows.map(c=>[c.id,c]));
  for(const remote of rows){let local=categoryById.get(remote.id);const data={id:remote.id,parentId:remote.parent_id,slug:remote.slug,title:remote.title,description:remote.description,sortOrder:remote.sort_order,remoteRow:remote};if(remote.cover_image_path)data.image=coverUrl(remote.cover_image_path);if(local)Object.assign(local,data);else{local={...data,custom:true};categories.push(local);categoryById.set(local.id,local)}}

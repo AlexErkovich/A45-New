@@ -4,6 +4,12 @@
       "tests/design-system.mjs"
     ],
     [
+      "tests/management-navigation.mjs"
+    ],
+    [
+      "tests/system-navigation.mjs"
+    ],
+    [
       "tests/public-admin-pages.mjs"
     ],
     [
@@ -152,6 +158,12 @@
       "tests/design-system.mjs"
     ],
     [
+      "tests/management-navigation.mjs"
+    ],
+    [
+      "tests/system-navigation.mjs"
+    ],
+    [
       "tests/access-control.mjs"
     ],
     [
@@ -198,6 +210,12 @@
     [
       "--check",
       "app.js"
+    ],
+    [
+      "tests/management-navigation.mjs"
+    ],
+    [
+      "tests/system-navigation.mjs"
     ],
     [
       "--check",
@@ -256,6 +274,12 @@
       "tests/design-system.mjs"
     ],
     [
+      "tests/management-navigation.mjs"
+    ],
+    [
+      "tests/system-navigation.mjs"
+    ],
+    [
       "tests/access-control.mjs"
     ],
     [
@@ -298,6 +322,12 @@
   "build-full": [
     [
       "tests/design-system.mjs"
+    ],
+    [
+      "tests/management-navigation.mjs"
+    ],
+    [
+      "tests/system-navigation.mjs"
     ],
     [
       "tests/public-admin-pages.mjs"

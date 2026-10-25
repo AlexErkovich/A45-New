@@ -337,3 +337,8 @@ body .canvas-editor .canvas-tools button:hover{background:var(--color-hover)}
 .media-dialog .document-sidebar:has(>.photo-caption-pages) .photo-caption-body{flex:0 1 auto;height:auto;min-height:0;max-height:100%}
 .media-dialog .document-sidebar>.photo-caption-pages{grid-row:2;align-self:center;margin:0}
 @media(max-width:600px){.media-dialog .document-sidebar:has(>.photo-caption-pages){grid-template-rows:minmax(0,1fr) auto}}
+
+/* One management-only service navigation, in the existing footer. */
+.ui-management-nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:var(--service-nav-gap);margin-left:auto;font:var(--service-nav-font)}
+.ui-management-nav a{padding:var(--service-nav-link-padding);color:var(--color-icon);font:inherit}
+.ui-management-nav a:hover,.ui-management-nav a:focus-visible{color:var(--color-text);text-decoration:underline}

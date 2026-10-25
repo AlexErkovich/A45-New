@@ -86,3 +86,11 @@ body:has(.auth-shell) #layout{display:block;max-width:1000px;width:calc(100% - 4
 .canvas-editor .canvas-tab>button[data-tab]{min-width:0;max-width:100%}
 .canvas-editor .canvas-tab>button[data-tab]>span{overflow:hidden;text-overflow:ellipsis}
 .canvas-editor .canvas-tab>button[data-tab]>.ui-icon{flex:none}
+
+/* Login-only presentation: keep shared button geometry and authentication intact. */
+body:has(.auth-shell){background:var(--palette-neutral-21)}
+.auth-panel #admin-login-form .ui-button.ui-button{margin-top:20px}
+.auth-panel #admin-login-form .ui-button.ui-button:disabled{opacity:1;cursor:wait}
+.auth-panel #admin-login-form .ui-button.ui-button:is(:active,:disabled){--button-background:var(--button-fill)}
+.auth-panel #admin-login-form .ui-button.ui-button:focus-visible{outline:2px solid var(--ui-accent);outline-offset:3px}
+.auth-panel #admin-login-form [data-admin-status]{position:static;overflow-wrap:anywhere}

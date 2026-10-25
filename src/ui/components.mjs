@@ -1,3 +1,4 @@
+export {renderManagementNavigation,clearManagementNavigation} from './management-navigation.mjs';
 export {openMediaDialog} from './media-dialog.mjs';
 export {actionButton} from './buttons.mjs';
 export {openDocumentDialog} from './document-dialog.mjs';

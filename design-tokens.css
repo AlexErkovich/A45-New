@@ -1,5 +1,10 @@
 /* Single source for A45 UI colors and component metrics. Preserve approved layouts. */
 :root{
+  /* Compact management links in the existing page footer. */
+  --service-nav-gap:12px;
+  --service-nav-font:400 11px/1.6 var(--font-body);
+  --service-nav-link-padding:4px 0;
+
   /* Semantic color roles */
   --color-accent:#ed5938;
   --color-accent-hover:#d94b2c;

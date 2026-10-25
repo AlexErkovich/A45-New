@@ -18,7 +18,7 @@ function boot(url,authorized=false){
 }
 function go(w,path){w.history.replaceState(null,'',path);w.dispatchEvent(new w.Event('hashchange'))}
 const tools='#home-edit,#home-add,#section-edit,#section-add,[data-nav-add],.card-edit-outline,#home-section-dialog,#project-edit-form';
-function publicOnly(w){assert.equal(w.A45Management,false);assert.equal(w.document.querySelector(tools)===null,true,'no management DOM, including hidden nodes');assert(w.document.querySelector('#navigation').textContent.includes('Обо мне'));assert.equal(w.document.querySelector('#navigation').hidden,false)}
+function publicOnly(w){assert.equal(w.A45Management,false);assert.equal(w.document.querySelector(tools)===null,true,'no management DOM, including hidden nodes');assert.equal(w.document.querySelector('#navigation').textContent.trim(),'');assert.equal(w.document.querySelector('footer .footer-about a').textContent,'Обо мне');assert.equal(w.document.querySelector('#navigation').hidden,true)}
 for(const page of ['','#/category/eco','#/project/automatic-greenhouse']){
  const w=boot('https://example.org/'+page,true);
  publicOnly(w);w.A45Home.open(null);assert.equal(w.document.querySelector('#home-section-dialog')===null,true,'public modal creation is blocked');

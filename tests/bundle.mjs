@@ -22,6 +22,7 @@ html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'').replace(/<link\b[^>]*
 assert.deepEqual(stylesheetNames,['design-tokens.css','styles.css','ui.css','admin.css']);assert.equal(window.document.querySelectorAll('style[data-stylesheet]').length,4);
 assert(scriptNames.includes('icons.js')&&scriptNames.includes('feedback.js'));
 const scripts=await Promise.all(scriptNames.map(name=>readFile(new URL(name,root),'utf8')));localData=JSON.parse(scripts[scriptNames.indexOf('data/projects.js')].replace('window.archiveData = ','').trim().replace(/;$/,''));
+for(const [id,title] of [['photography','Фотография'],['video','Видео'],['technical','Техническое творчество'],['pedagogy','Педагогика'],['ideas','Идеи и концепции'],['tourism','Туризм'],['decorative','Декоративное творчество'],['texts','Тексты'],['it','IT-проекты'],['garden','Огородные дела']])if(!localData.categories.some(c=>c.id===id))localData.categories.push({id,title,parentId:null,slug:id,description:'',sortOrder:99});
 // Happy DOM isolates lexical bindings between eval calls; a single evaluation models shared classic script scope.
 window.eval(scripts.join('\n;\n'));
 async function until(test){for(let i=0;i<200;i++){if(test())return;await new Promise(r=>setTimeout(r,5))}throw new Error('Built app failed to reach expected state: '+errors.join('; '))}

@@ -1,0 +1,1638 @@
+{
+  "categories": [
+    {
+      "id": "macro",
+      "parent_id": "photography",
+      "slug": "macro",
+      "title": "Макросъемка",
+      "sort_order": 0,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "teaching-methods",
+      "parent_id": "pedagogy",
+      "slug": "teaching-methods",
+      "title": "Методические разработки",
+      "sort_order": 0,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "section-401d34c6-b05a-4380-a56c-5bccf17450cf",
+      "parent_id": "section-5e36cdbe-8c77-425f-a091-66a122c5d21a",
+      "slug": "section-401d34c6-b05a-4380-a56c-5bccf17450cf",
+      "title": "Разное",
+      "sort_order": 0,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "photography",
+      "parent_id": null,
+      "slug": "photography",
+      "title": "Фотография",
+      "sort_order": 0,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "editing",
+      "parent_id": "video",
+      "slug": "editing",
+      "title": "Монтаж",
+      "sort_order": 1,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "video",
+      "parent_id": null,
+      "slug": "video",
+      "title": "Видео",
+      "sort_order": 1,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "product-photo",
+      "parent_id": "photography",
+      "slug": "product-photo",
+      "title": "Предметная фотография",
+      "sort_order": 1,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "teaching-projects",
+      "parent_id": "pedagogy",
+      "slug": "teaching-projects",
+      "title": "Проекты",
+      "sort_order": 1,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "section-ca87c9dd-1dea-4be6-9572-ff08e9f79825",
+      "parent_id": "texts",
+      "slug": "section-ca87c9dd-1dea-4be6-9572-ff08e9f79825",
+      "title": "Письма",
+      "sort_order": 2,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "wedding-video",
+      "parent_id": "video",
+      "slug": "wedding-video",
+      "title": "Свадебная съемка",
+      "sort_order": 2,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "section-69bc5d1e-257c-46ad-b4db-946c12831c4c",
+      "parent_id": "texts",
+      "slug": "section-69bc5d1e-257c-46ad-b4db-946c12831c4c",
+      "title": "\"Проба пера\"",
+      "sort_order": 3,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "reportage-video",
+      "parent_id": "video",
+      "slug": "reportage-video",
+      "title": "Репортаж",
+      "sort_order": 3,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "texts",
+      "parent_id": null,
+      "slug": "texts",
+      "title": "Тексты",
+      "sort_order": 3,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "arduino",
+      "parent_id": "technical",
+      "slug": "arduino",
+      "title": "Ардуино",
+      "sort_order": 4,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "technical",
+      "parent_id": null,
+      "slug": "technical",
+      "title": "Техническое творчество",
+      "sort_order": 4,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "it",
+      "parent_id": null,
+      "slug": "it",
+      "title": "IT-проекты",
+      "sort_order": 5,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "camera-equipment",
+      "parent_id": "technical",
+      "slug": "camera-equipment",
+      "title": "Кинооператорское оборудование",
+      "sort_order": 5,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "film-photo",
+      "parent_id": "photography",
+      "slug": "film-photo",
+      "title": "Пленочные проекты",
+      "sort_order": 6,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "eco",
+      "parent_id": "technical",
+      "slug": "eco",
+      "title": "Эко",
+      "sort_order": 6,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "studio-photo",
+      "parent_id": "photography",
+      "slug": "studio-photo",
+      "title": "Студийная",
+      "sort_order": 7,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "reportage-photo",
+      "parent_id": "photography",
+      "slug": "reportage-photo",
+      "title": "Репортажная",
+      "sort_order": 8,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "pedagogy",
+      "parent_id": null,
+      "slug": "pedagogy",
+      "title": "Педагогика",
+      "sort_order": 8,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "ideas",
+      "parent_id": null,
+      "slug": "ideas",
+      "title": "Идеи и концепции",
+      "sort_order": 9,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "tourism",
+      "parent_id": null,
+      "slug": "tourism",
+      "title": "Туризм",
+      "sort_order": 10,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "decorative",
+      "parent_id": null,
+      "slug": "decorative",
+      "title": "Декоративное творчество",
+      "sort_order": 11,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "garden",
+      "parent_id": null,
+      "slug": "garden",
+      "title": "Огородные дела",
+      "sort_order": 12,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "section-5e36cdbe-8c77-425f-a091-66a122c5d21a",
+      "parent_id": null,
+      "slug": "section-5e36cdbe-8c77-425f-a091-66a122c5d21a",
+      "title": "Кинопроекты",
+      "sort_order": 13,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    },
+    {
+      "id": "section-d782d01a-6b01-44fe-93c3-b9060a3f5763",
+      "parent_id": null,
+      "slug": "section-d782d01a-6b01-44fe-93c3-b9060a3f5763",
+      "title": "Нейротворчество",
+      "sort_order": 14,
+      "is_published": true,
+      "description": "Audit fixture",
+      "cover_image_path": null
+    }
+  ],
+  "navigation": {
+    "entries": [
+      {
+        "id": "photography",
+        "parentId": null
+      },
+      {
+        "id": "product-photo",
+        "parentId": "photography"
+      },
+      {
+        "id": "reportage-photo",
+        "parentId": "photography"
+      },
+      {
+        "id": "macro",
+        "parentId": "photography"
+      },
+      {
+        "id": "studio-photo",
+        "parentId": "photography"
+      },
+      {
+        "id": "film-photo",
+        "parentId": "photography"
+      },
+      {
+        "id": "video",
+        "parentId": null
+      },
+      {
+        "id": "wedding-video",
+        "parentId": "video"
+      },
+      {
+        "id": "editing",
+        "parentId": "video"
+      },
+      {
+        "id": "reportage-video",
+        "parentId": "video"
+      },
+      {
+        "id": "technical",
+        "parentId": null
+      },
+      {
+        "id": "arduino",
+        "parentId": "technical"
+      },
+      {
+        "id": "camera-equipment",
+        "parentId": "technical"
+      },
+      {
+        "id": "eco",
+        "parentId": "technical"
+      },
+      {
+        "id": "pedagogy",
+        "parentId": null
+      },
+      {
+        "id": "teaching-methods",
+        "parentId": "pedagogy"
+      },
+      {
+        "id": "teaching-projects",
+        "parentId": "pedagogy"
+      },
+      {
+        "id": "ideas",
+        "parentId": null
+      },
+      {
+        "id": "tourism",
+        "parentId": null
+      },
+      {
+        "id": "decorative",
+        "parentId": null
+      },
+      {
+        "id": "texts",
+        "parentId": null
+      },
+      {
+        "id": "it",
+        "parentId": null
+      },
+      {
+        "id": "garden",
+        "parentId": null
+      },
+      {
+        "id": "section-5e36cdbe-8c77-425f-a091-66a122c5d21a",
+        "parentId": null
+      },
+      {
+        "id": "section-401d34c6-b05a-4380-a56c-5bccf17450cf",
+        "parentId": "section-5e36cdbe-8c77-425f-a091-66a122c5d21a"
+      },
+      {
+        "id": "section-ca87c9dd-1dea-4be6-9572-ff08e9f79825",
+        "parentId": "texts"
+      },
+      {
+        "id": "section-69bc5d1e-257c-46ad-b4db-946c12831c4c",
+        "parentId": "texts"
+      },
+      {
+        "id": "section-d782d01a-6b01-44fe-93c3-b9060a3f5763",
+        "parentId": null
+      }
+    ],
+    "revision": 8
+  },
+  "projects": [
+    {
+      "id": "7f46e7e5-2bb7-4c4b-8bae-abfca91d64a6",
+      "slug": "p-7f46e7e5-2bb7-4c4b-8bae-abfca91d64a6",
+      "primary_category_id": "camera-equipment",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "camera-equipment"
+        }
+      ],
+      "title": "Audit project 1",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "key": "t-dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "d63fd66d-f528-4712-a494-b0e0401b0fd0",
+          "key": "t-d63fd66d-f528-4712-a494-b0e0401b0fd0",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        },
+        {
+          "id": "e7d46a36-fa4d-4a3f-ab43-615b49fa18fb",
+          "key": "t-e7d46a36-fa4d-4a3f-ab43-615b49fa18fb",
+          "title": "Audit tab 3",
+          "sort_order": 2
+        },
+        {
+          "id": "2e5e877e-0cec-4f6e-aae1-2eda7273a980",
+          "key": "t-2e5e877e-0cec-4f6e-aae1-2eda7273a980",
+          "title": "Audit tab 4",
+          "sort_order": 3
+        },
+        {
+          "id": "333145d1-1994-4aee-9ffe-0eff2deb0feb",
+          "key": "t-333145d1-1994-4aee-9ffe-0eff2deb0feb",
+          "title": "Audit tab 5",
+          "sort_order": 4
+        },
+        {
+          "id": "8faf35ff-ed5f-440a-aa44-c8e3d20459f4",
+          "key": "t-8faf35ff-ed5f-440a-aa44-c8e3d20459f4",
+          "title": "Audit tab 6",
+          "sort_order": 5
+        },
+        {
+          "id": "fab3c9f9-ca2e-4ec8-8426-9bdb69808598",
+          "key": "t-fab3c9f9-ca2e-4ec8-8426-9bdb69808598",
+          "title": "Audit tab 7",
+          "sort_order": 6
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "8698484a-bc03-4232-98a0-f1b14e3420e7",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 0
+        },
+        {
+          "id": "da3f7e16-e872-40b7-951c-704dc07ab9a9",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 1
+        },
+        {
+          "id": "a8b1c7ef-6851-4f80-a8b5-7bd121d4002a",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 2
+        },
+        {
+          "id": "0a4622cb-ab98-4aab-b7ad-2343225f1442",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 3
+        },
+        {
+          "id": "4c96b459-a06c-4ce7-abc2-31df82bce16b",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 4
+        },
+        {
+          "id": "430f0d42-2d09-4df0-a24b-b668dd26a838",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 5
+        },
+        {
+          "id": "9a3ba6cb-266c-4fd3-b365-78ebdea37403",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 6
+        },
+        {
+          "id": "249d4794-83de-4838-a015-7f774b3f6645",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 7
+        },
+        {
+          "id": "85ee6fad-0372-41fb-8d5e-a6e1a1a82918",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 8
+        },
+        {
+          "id": "e77f1988-0394-42e3-8a2c-93121d2746f6",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 9
+        },
+        {
+          "id": "94ec7b80-950b-4988-87a4-ce9a3ac6efd1",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 10
+        },
+        {
+          "id": "714947de-aaf3-472b-a001-0dcdf62a97b9",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 11
+        },
+        {
+          "id": "96bf0c2f-ce8d-4dfe-9726-c9e01fd3f415",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 12
+        },
+        {
+          "id": "e44b6cd8-483c-495f-9885-75165927005c",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 13
+        },
+        {
+          "id": "b56ff12e-df4a-48a5-b5aa-94df14df930c",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 14
+        },
+        {
+          "id": "454c07db-6a14-4921-a405-89e15d6600de",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 15
+        },
+        {
+          "id": "86737aaf-9263-4ede-86bf-beb0853251af",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 16
+        },
+        {
+          "id": "8abc04fb-787a-4776-bf67-e7fcedae1b31",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 17
+        },
+        {
+          "id": "37b77f6d-243e-4183-a984-eee51099a391",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 18
+        },
+        {
+          "id": "5bd99087-dd87-4e4f-92cf-25cebbcad69a",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 19
+        },
+        {
+          "id": "edcb22d1-d47c-46fc-a270-720f8fec91ed",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 20
+        },
+        {
+          "id": "a2aaa54b-badd-48c3-9541-467b28923f4b",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 21
+        },
+        {
+          "id": "1ccdad4e-3c91-46f8-96fa-d011a6d42377",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 22
+        },
+        {
+          "id": "8ac6b3fd-cb73-46d0-a395-c9839a9851ae",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 23
+        },
+        {
+          "id": "978631c2-9be8-4237-a1ce-035f685ccd09",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 24
+        },
+        {
+          "id": "99ef1d36-c8af-4cab-a48d-349be580ece2",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 25
+        },
+        {
+          "id": "1272ed57-cec2-43fb-8646-7e9a85e09ff6",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 26
+        },
+        {
+          "id": "2f521966-09c5-4a0b-9ee7-54b75b60b338",
+          "type": "TEXT",
+          "tab_id": "dbb01ac5-401c-4514-a01d-513f5ccf1bb1",
+          "sort_order": 27
+        },
+        {
+          "id": "d033f9ec-e6a5-4e5e-8ea9-289e47e28db5",
+          "type": "GALLERY",
+          "tab_id": "8faf35ff-ed5f-440a-aa44-c8e3d20459f4",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "a8695f76-59a8-4dc1-8f4f-1ad89d5e4254",
+          "kind": "image"
+        },
+        {
+          "id": "e55f37ee-0faf-44d9-b336-683205f35ff1",
+          "kind": "image"
+        },
+        {
+          "id": "94f99c58-e207-4600-9704-ca7bd75c20c5",
+          "kind": "image"
+        },
+        {
+          "id": "26f3ba4b-a23c-4aee-a924-482bd631552d",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "073630fd-0504-4cf3-aaa6-e448a3d6634c",
+      "slug": "p-073630fd-0504-4cf3-aaa6-e448a3d6634c",
+      "primary_category_id": "photography",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "photography"
+        }
+      ],
+      "title": "Audit project 2",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "e8b45f78-4cf9-460e-be60-dbb3373fbf08",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "35573a4f-781a-4542-aa22-d11842f84243",
+          "key": "t-35573a4f-781a-4542-aa22-d11842f84243",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "3d15162c-20ca-4f3a-9608-da78324e00cb",
+          "type": "GALLERY",
+          "tab_id": "35573a4f-781a-4542-aa22-d11842f84243",
+          "sort_order": 0
+        },
+        {
+          "id": "339e8c7a-663b-498e-88c4-1eff10359270",
+          "type": "GALLERY",
+          "tab_id": "35573a4f-781a-4542-aa22-d11842f84243",
+          "sort_order": 1
+        }
+      ],
+      "project_media": [
+        {
+          "id": "65274d28-687b-4baf-8857-ce4cc71afad1",
+          "kind": "image"
+        },
+        {
+          "id": "01c31fea-998a-4840-86a1-33f611a3e80e",
+          "kind": "cover"
+        },
+        {
+          "id": "1863f975-0884-47d4-862b-a0b9a271b0ec",
+          "kind": "image"
+        },
+        {
+          "id": "e58df730-a500-42d6-8426-4d24a857077a",
+          "kind": "image"
+        },
+        {
+          "id": "56c4f441-475f-41c2-a2ad-898a0eeee590",
+          "kind": "image"
+        },
+        {
+          "id": "22081441-80ec-4080-b12a-368409b91201",
+          "kind": "image"
+        },
+        {
+          "id": "951d30cf-97f6-4efe-89a3-ca53df9c5675",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "5d1d084b-0c15-4a20-bebd-cf30c20e426e",
+      "slug": "p-5d1d084b-0c15-4a20-bebd-cf30c20e426e",
+      "primary_category_id": "macro",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "macro"
+        }
+      ],
+      "title": "Audit project 3",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "4cc25bd0-412d-4982-a519-e32431c8698f",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "96813b95-4393-478f-a973-854cdad26cd6",
+          "key": "t-96813b95-4393-478f-a973-854cdad26cd6",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "cc52b93c-5b4e-45fa-8f40-8b4e18f052c8",
+          "type": "TEXT",
+          "tab_id": "4cc25bd0-412d-4982-a519-e32431c8698f",
+          "sort_order": 0
+        },
+        {
+          "id": "fe093e56-b994-4c5b-89b0-b18512086b55",
+          "type": "GALLERY",
+          "tab_id": "96813b95-4393-478f-a973-854cdad26cd6",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "36caf4d0-e13a-4af9-b699-6e8d2ca16551",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "3b341e77-b9d4-4c6e-b624-6e7c72898a1d",
+      "slug": "p-3b341e77-b9d4-4c6e-b624-6e7c72898a1d",
+      "primary_category_id": "section-a478f77a-2c38-46ce-add4-454b858413fa",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "section-a478f77a-2c38-46ce-add4-454b858413fa"
+        }
+      ],
+      "title": "Audit project 4",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "81db078b-9a84-4e1c-9aa9-cdb7f610afdd",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        }
+      ],
+      "project_blocks": [],
+      "project_media": []
+    },
+    {
+      "id": "7c5904d8-e553-4b4d-a541-04ae263ef3aa",
+      "slug": "p-7c5904d8-e553-4b4d-a541-04ae263ef3aa",
+      "primary_category_id": "film-photo",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "film-photo"
+        }
+      ],
+      "title": "Audit project 5",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "28571029-2a71-459f-bd2a-254589a98d68",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "0a285c0b-48b8-480c-89f3-5cbad9dce52c",
+          "key": "t-0a285c0b-48b8-480c-89f3-5cbad9dce52c",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "5f938285-dc72-4c29-87c8-8cb58bf32c35",
+          "type": "TEXT",
+          "tab_id": "28571029-2a71-459f-bd2a-254589a98d68",
+          "sort_order": 0
+        },
+        {
+          "id": "3bf2ef2d-e292-4f78-999e-765029ecf95b",
+          "type": "GALLERY",
+          "tab_id": "0a285c0b-48b8-480c-89f3-5cbad9dce52c",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "830b57cc-e932-4b54-8d78-7770763a5770",
+          "kind": "image"
+        },
+        {
+          "id": "57a7147a-df6d-4ea6-af25-59b4daa38a85",
+          "kind": "image"
+        },
+        {
+          "id": "d501800a-81e6-4234-8ecd-b510f17cbdc2",
+          "kind": "image"
+        },
+        {
+          "id": "8a6a2094-eff0-43df-b5db-78df49c48630",
+          "kind": "image"
+        },
+        {
+          "id": "1c516178-de9f-41d5-84e5-ab455fdc690e",
+          "kind": "image"
+        },
+        {
+          "id": "f1fa003a-de7c-48aa-ba85-53dbd6e855d3",
+          "kind": "image"
+        },
+        {
+          "id": "9de6f07a-d481-4641-90f6-73173af869e6",
+          "kind": "image"
+        },
+        {
+          "id": "18c2dd30-a830-4d98-8ddf-b18d63b46cb7",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "a02beb3f-d22c-43b8-bf51-a47261f7357f",
+      "slug": "p-a02beb3f-d22c-43b8-bf51-a47261f7357f",
+      "primary_category_id": "studio-photo",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "studio-photo"
+        }
+      ],
+      "title": "Audit project 6",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "d1cee659-43ac-41f3-87eb-660c6b578142",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "781b106e-ba11-434d-8453-6c0e75a76b91",
+          "key": "t-781b106e-ba11-434d-8453-6c0e75a76b91",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "296223c8-20c3-4886-828b-a3022a0b2a77",
+          "type": "TEXT",
+          "tab_id": "d1cee659-43ac-41f3-87eb-660c6b578142",
+          "sort_order": 0
+        },
+        {
+          "id": "71f2624e-8634-4b44-a9ce-b340090a8a58",
+          "type": "GALLERY",
+          "tab_id": "781b106e-ba11-434d-8453-6c0e75a76b91",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "555bad1c-7c67-4b92-9040-da649986c6e2",
+          "kind": "image"
+        },
+        {
+          "id": "bc171ee3-0de8-47dd-b68b-4548a2de5320",
+          "kind": "image"
+        },
+        {
+          "id": "2a7d0bb8-1e6f-4b84-88a7-aa06c12a3896",
+          "kind": "image"
+        },
+        {
+          "id": "da04a2e9-c5d9-42dd-af43-434bedd2546b",
+          "kind": "image"
+        },
+        {
+          "id": "5143f1da-a45b-4183-a80c-350bd9ab1f04",
+          "kind": "image"
+        },
+        {
+          "id": "f283127f-07ec-4fb4-9acd-e35a9c293ed2",
+          "kind": "image"
+        },
+        {
+          "id": "95b9f746-4dbc-4294-bc7c-c18f4476d771",
+          "kind": "image"
+        },
+        {
+          "id": "c169b6b0-dd51-45cf-ac84-974bfca3d32e",
+          "kind": "image"
+        },
+        {
+          "id": "c56b7b28-01f7-484f-aaef-2cc9fb709ca2",
+          "kind": "image"
+        },
+        {
+          "id": "72a174c0-e20b-411c-8e3a-b078c8d0a4e0",
+          "kind": "image"
+        },
+        {
+          "id": "238cadf8-78a5-4ec5-aea4-edf001756cd4",
+          "kind": "image"
+        },
+        {
+          "id": "96141793-0a07-4859-bb3a-5765a60f52f7",
+          "kind": "image"
+        },
+        {
+          "id": "2ac4003f-79e7-4c70-8c05-22a8dbe00beb",
+          "kind": "image"
+        },
+        {
+          "id": "b20b24b7-ad88-45a9-9d5c-d4b089774d02",
+          "kind": "image"
+        },
+        {
+          "id": "18e271c9-1f58-4d61-962a-aae89e9b4c06",
+          "kind": "image"
+        },
+        {
+          "id": "eb3d8248-661a-4a4e-83e4-2adcfdb1edfe",
+          "kind": "image"
+        },
+        {
+          "id": "48224b2a-db97-4fda-9034-29fc827d6cd5",
+          "kind": "image"
+        },
+        {
+          "id": "10377bd0-897a-4d22-9f07-740ff12d5cf2",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "b14018ae-3906-4a60-a70b-7cc5490c8412",
+      "slug": "p-b14018ae-3906-4a60-a70b-7cc5490c8412",
+      "primary_category_id": "eco",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "eco"
+        }
+      ],
+      "title": "Audit project 7",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "300f15ff-e688-4799-ab13-df7052d2ed95",
+          "key": "photos",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        },
+        {
+          "id": "b51dd1f9-9b9a-48f0-a80d-b20e1ad81aa3",
+          "key": "process",
+          "title": "Audit tab 3",
+          "sort_order": 2
+        },
+        {
+          "id": "39819ebf-419d-4132-9f1a-7770fb0f5df2",
+          "key": "docs",
+          "title": "Audit tab 4",
+          "sort_order": 3
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "9f936aa0-cb94-4081-8842-f171b29b925d",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 0
+        },
+        {
+          "id": "f74a052f-fd49-445e-9b9f-66ad7c9d4bde",
+          "type": "HEADING",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 1
+        },
+        {
+          "id": "f504fb5c-2f37-4133-a566-819661e48d49",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 2
+        },
+        {
+          "id": "9ffffa51-b8c0-4a21-a688-63fb67eb5bdd",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 3
+        },
+        {
+          "id": "53ad7f6e-b0d8-487d-abf5-ffb80ddfca6b",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 4
+        },
+        {
+          "id": "65ec30da-7845-4c86-a098-f4fca9616688",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 5
+        },
+        {
+          "id": "3f6c161f-819f-4900-925e-3d78dd5c507a",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 6
+        },
+        {
+          "id": "e3f44e6d-7107-47d2-8c4c-7471c51b142b",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 7
+        },
+        {
+          "id": "06481fa3-aab0-4e0f-8765-2a2bed0b3af5",
+          "type": "HEADING",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 8
+        },
+        {
+          "id": "c780042d-9bbb-4d92-8a13-112a37b5ff8d",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 9
+        },
+        {
+          "id": "392c6575-e670-4158-9de9-8d284336c23b",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 10
+        },
+        {
+          "id": "1c66f054-4700-428f-b4bc-256fd1d43199",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 11
+        },
+        {
+          "id": "25ac2bc2-8d94-4ec0-8797-d5325163c62f",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 12
+        },
+        {
+          "id": "48a4f30b-70c8-4ad3-9326-9d4db838ee94",
+          "type": "TEXT",
+          "tab_id": "a1ef8cfc-b4b1-478c-9fa4-ca13609e8d8f",
+          "sort_order": 13
+        },
+        {
+          "id": "2dacfbf7-8cba-43a1-8d48-1c6a091bec0c",
+          "type": "GALLERY",
+          "tab_id": "300f15ff-e688-4799-ab13-df7052d2ed95",
+          "sort_order": 0
+        },
+        {
+          "id": "6bed97b8-71a2-4c64-a79d-7ea8e5de4c6c",
+          "type": "GALLERY",
+          "tab_id": "300f15ff-e688-4799-ab13-df7052d2ed95",
+          "sort_order": 1
+        },
+        {
+          "id": "2012b24a-e325-4205-ac5a-fc82c511b2ce",
+          "type": "TEXT",
+          "tab_id": "b51dd1f9-9b9a-48f0-a80d-b20e1ad81aa3",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "d4bdf544-1624-417a-b662-5bfd70a8a0dc",
+          "kind": "image"
+        },
+        {
+          "id": "0abe3dfd-f372-4d36-a8dc-cd828b36d892",
+          "kind": "image"
+        },
+        {
+          "id": "cf7a0869-0d02-4899-8a29-d1f30ecfd24f",
+          "kind": "image"
+        },
+        {
+          "id": "a357d860-f1b3-4274-95ac-fcd20b4cc59e",
+          "kind": "image"
+        },
+        {
+          "id": "35cc6320-fd7c-416c-b7ca-0ace1eace609",
+          "kind": "image"
+        },
+        {
+          "id": "65b702ea-9e06-4d1f-a9a6-c4cc761c0e83",
+          "kind": "image"
+        },
+        {
+          "id": "48723bef-67bd-4057-aca8-92a0b2266569",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "69a082ba-1c04-4263-af55-d8ddd088e223",
+      "slug": "p-69a082ba-1c04-4263-af55-d8ddd088e223",
+      "primary_category_id": "camera-equipment",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "camera-equipment"
+        },
+        {
+          "category_id": "technical"
+        },
+        {
+          "category_id": "film-equipment"
+        }
+      ],
+      "title": "Audit project 8",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "bf44dda7-6365-468b-b09b-a93bebf48120",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "9e21e1e4-148c-486b-85fa-0af7fedfbc69",
+          "key": "history",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        },
+        {
+          "id": "67a9abbb-ab09-49cb-9a9b-0064c62a72ab",
+          "key": "stages",
+          "title": "Audit tab 3",
+          "sort_order": 2
+        },
+        {
+          "id": "f573faa4-5790-4b07-859d-ae6a1c5df444",
+          "key": "operation",
+          "title": "Audit tab 4",
+          "sort_order": 3
+        },
+        {
+          "id": "1c2f33b2-b34f-4ab5-82d8-830dc80520d9",
+          "key": "photos",
+          "title": "Audit tab 5",
+          "sort_order": 4
+        },
+        {
+          "id": "c701e571-df6d-49f2-a6e0-7a419a0af8c6",
+          "key": "result",
+          "title": "Audit tab 6",
+          "sort_order": 5
+        },
+        {
+          "id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "key": "docs",
+          "title": "Audit tab 7",
+          "sort_order": 6
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "4c05e392-d120-432c-8d64-e0d8482475a6",
+          "type": "TEXT",
+          "tab_id": "bf44dda7-6365-468b-b09b-a93bebf48120",
+          "sort_order": 0
+        },
+        {
+          "id": "af3a4df5-38d5-4298-9833-4ff5cae83d02",
+          "type": "TEXT",
+          "tab_id": "bf44dda7-6365-468b-b09b-a93bebf48120",
+          "sort_order": 1
+        },
+        {
+          "id": "c1785328-ce03-43a3-b80b-3b50a9c6e331",
+          "type": "TEXT",
+          "tab_id": "bf44dda7-6365-468b-b09b-a93bebf48120",
+          "sort_order": 2
+        },
+        {
+          "id": "e1b489c3-4a61-4994-8dfe-d9f618e5e49d",
+          "type": "TEXT",
+          "tab_id": "9e21e1e4-148c-486b-85fa-0af7fedfbc69",
+          "sort_order": 0
+        },
+        {
+          "id": "bf59a929-c93c-4bae-b394-e5f2a6a51655",
+          "type": "TEXT",
+          "tab_id": "9e21e1e4-148c-486b-85fa-0af7fedfbc69",
+          "sort_order": 1
+        },
+        {
+          "id": "efbdf13f-9ec0-4334-8075-2ed479436676",
+          "type": "TEXT",
+          "tab_id": "9e21e1e4-148c-486b-85fa-0af7fedfbc69",
+          "sort_order": 2
+        },
+        {
+          "id": "48c34ee0-2630-453b-8267-b6439ffe3d03",
+          "type": "HEADING",
+          "tab_id": "67a9abbb-ab09-49cb-9a9b-0064c62a72ab",
+          "sort_order": 0
+        },
+        {
+          "id": "3e282c73-b6a6-44c5-8485-dd95122b39d1",
+          "type": "TEXT",
+          "tab_id": "67a9abbb-ab09-49cb-9a9b-0064c62a72ab",
+          "sort_order": 1
+        },
+        {
+          "id": "a17c46de-7c59-4e09-84aa-dd96d2952ba9",
+          "type": "LIST",
+          "tab_id": "67a9abbb-ab09-49cb-9a9b-0064c62a72ab",
+          "sort_order": 2
+        },
+        {
+          "id": "1937a0d5-05a1-47ef-95f5-af3035d4a4bd",
+          "type": "TEXT",
+          "tab_id": "f573faa4-5790-4b07-859d-ae6a1c5df444",
+          "sort_order": 0
+        },
+        {
+          "id": "7ecef428-4e51-423d-8bc5-f223f13946b2",
+          "type": "TEXT",
+          "tab_id": "f573faa4-5790-4b07-859d-ae6a1c5df444",
+          "sort_order": 1
+        },
+        {
+          "id": "a6c2114b-61b2-42e5-8300-662e44b911fe",
+          "type": "GALLERY",
+          "tab_id": "1c2f33b2-b34f-4ab5-82d8-830dc80520d9",
+          "sort_order": 0
+        },
+        {
+          "id": "d70c905b-9fe5-4ed2-86fd-f2320de7ec65",
+          "type": "GALLERY",
+          "tab_id": "1c2f33b2-b34f-4ab5-82d8-830dc80520d9",
+          "sort_order": 1
+        },
+        {
+          "id": "754cb7bb-a407-4b53-bc12-60638c513f8b",
+          "type": "TEXT",
+          "tab_id": "c701e571-df6d-49f2-a6e0-7a419a0af8c6",
+          "sort_order": 0
+        },
+        {
+          "id": "9de080ab-f2cb-49ee-b90d-af679a1f4e4c",
+          "type": "TEXT",
+          "tab_id": "c701e571-df6d-49f2-a6e0-7a419a0af8c6",
+          "sort_order": 1
+        },
+        {
+          "id": "6f01489f-494b-4d08-8ce6-d467b5c08425",
+          "type": "TEXT",
+          "tab_id": "c701e571-df6d-49f2-a6e0-7a419a0af8c6",
+          "sort_order": 2
+        },
+        {
+          "id": "335d9928-8749-48b2-9239-5abbb6ec6072",
+          "type": "FILE",
+          "tab_id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "sort_order": 0
+        },
+        {
+          "id": "c965e1e0-4b4b-462c-ab1b-c626145154e2",
+          "type": "FILE",
+          "tab_id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "sort_order": 1
+        },
+        {
+          "id": "34ef62fc-8030-4163-baff-4c1f9c7f0a61",
+          "type": "FILE",
+          "tab_id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "sort_order": 2
+        },
+        {
+          "id": "c904e8d9-d580-4c2d-8f71-9028a9c82820",
+          "type": "FILE",
+          "tab_id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "sort_order": 3
+        },
+        {
+          "id": "c1fcb881-e012-41ab-a853-d1b575fc48cf",
+          "type": "FILE",
+          "tab_id": "5839aa19-2324-4ca7-96ac-34f93621039a",
+          "sort_order": 4
+        }
+      ],
+      "project_media": [
+        {
+          "id": "69a23ab2-6b49-4652-990b-55ca9f263463",
+          "kind": "image"
+        },
+        {
+          "id": "7774b046-fe31-4682-9cb7-234c9717a414",
+          "kind": "image"
+        },
+        {
+          "id": "be1fc2aa-6969-44e4-a72f-cce6224d6c96",
+          "kind": "image"
+        },
+        {
+          "id": "fb94e102-db4e-41eb-b8ad-623e0c68239f",
+          "kind": "image"
+        },
+        {
+          "id": "3c5aa211-5273-4358-8e90-1bd435a163db",
+          "kind": "image"
+        },
+        {
+          "id": "5232cadc-6803-4282-9050-e83a24109a35",
+          "kind": "image"
+        },
+        {
+          "id": "aba9ea65-8ef3-408c-b8bb-82f5b933baaf",
+          "kind": "image"
+        },
+        {
+          "id": "29f8df40-d025-4f95-b55e-ac47af760927",
+          "kind": "image"
+        },
+        {
+          "id": "b3a82b00-7b5f-4131-a3c5-bab305a251af",
+          "kind": "image"
+        },
+        {
+          "id": "13a9f283-7c82-47c2-893c-2cb63bbb2f9d",
+          "kind": "file"
+        },
+        {
+          "id": "9535d4ec-3997-4cfe-9929-729e05975b33",
+          "kind": "file"
+        },
+        {
+          "id": "d435c55b-8e67-4df4-8a7a-10559ddab7e8",
+          "kind": "file"
+        },
+        {
+          "id": "f086972f-91ed-4d65-b858-99386f86d4d3",
+          "kind": "file"
+        },
+        {
+          "id": "49b9b87d-ecda-4903-bfec-63115ec06d72",
+          "kind": "file"
+        }
+      ]
+    },
+    {
+      "id": "70f3ef21-2b7b-4bd5-aba4-b20ff2c4c35a",
+      "slug": "p-70f3ef21-2b7b-4bd5-aba4-b20ff2c4c35a",
+      "primary_category_id": "teaching-methods",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "teaching-methods"
+        }
+      ],
+      "title": "Audit project 9",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "12f2a22b-bf4e-4b83-9256-dbcf3ee3bdf6",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "8c0a2161-eb3c-4580-9a03-7aa446672fe1",
+          "key": "t-8c0a2161-eb3c-4580-9a03-7aa446672fe1",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "d0a69b9c-5bf8-496c-9782-ef35ed15c8fb",
+          "type": "TEXT",
+          "tab_id": "12f2a22b-bf4e-4b83-9256-dbcf3ee3bdf6",
+          "sort_order": 0
+        },
+        {
+          "id": "6bb1a481-9ce5-4e2c-aa13-140daa7f2513",
+          "type": "GALLERY",
+          "tab_id": "8c0a2161-eb3c-4580-9a03-7aa446672fe1",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "721abccd-04f3-496d-8136-ea061448711e",
+          "kind": "image"
+        },
+        {
+          "id": "7af23a68-1841-47a3-a1d8-a7d780cbf0d6",
+          "kind": "image"
+        },
+        {
+          "id": "d9cc6798-4634-4bcd-8eca-24c3efd9b85d",
+          "kind": "image"
+        },
+        {
+          "id": "6766fdfc-cea6-4632-a3a9-cb7e07ed5d65",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "355e68c2-09fd-4534-9f9f-d95844ec6900",
+      "slug": "p-355e68c2-09fd-4534-9f9f-d95844ec6900",
+      "primary_category_id": "teaching-projects",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "teaching-projects"
+        }
+      ],
+      "title": "Audit project 10",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "78601043-5350-4432-b457-d4433defd47d",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "595661af-1d84-4894-a4c0-1eb4a63eb090",
+          "key": "t-595661af-1d84-4894-a4c0-1eb4a63eb090",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "4fe938e7-c7ce-4562-b7af-0cea3c3ba0d3",
+          "type": "TEXT",
+          "tab_id": "78601043-5350-4432-b457-d4433defd47d",
+          "sort_order": 0
+        },
+        {
+          "id": "5a8cff06-46cc-4a33-a045-f64ff81a3826",
+          "type": "GALLERY",
+          "tab_id": "595661af-1d84-4894-a4c0-1eb4a63eb090",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "2ff56bb0-d587-487c-af38-a809fa8b13d2",
+          "kind": "image"
+        },
+        {
+          "id": "acd8d80a-d960-4ca6-a12e-67fd77973f96",
+          "kind": "image"
+        },
+        {
+          "id": "0fc8d1c2-855e-45b1-9571-a2013aef7a14",
+          "kind": "image"
+        },
+        {
+          "id": "eb216d70-4c9c-45d1-bb68-8d33b44414fe",
+          "kind": "image"
+        },
+        {
+          "id": "66ecd4be-343a-4d8e-aea6-6c6a3638e8d7",
+          "kind": "image"
+        }
+      ]
+    },
+    {
+      "id": "1a6f6529-ddf3-4891-88b0-bbbaf4eb34fe",
+      "slug": "p-1a6f6529-ddf3-4891-88b0-bbbaf4eb34fe",
+      "primary_category_id": "section-401d34c6-b05a-4380-a56c-5bccf17450cf",
+      "status": "published",
+      "project_categories": [
+        {
+          "category_id": "section-401d34c6-b05a-4380-a56c-5bccf17450cf"
+        }
+      ],
+      "title": "Audit project 11",
+      "description": "Audit fixture",
+      "year": 2026,
+      "revision": 1,
+      "project_tabs": [
+        {
+          "id": "9c195a6a-b279-47ce-bdae-d6d5b68fc733",
+          "key": "overview",
+          "title": "Audit tab 1",
+          "sort_order": 0
+        },
+        {
+          "id": "59343a9b-0499-4757-8a80-7029dee6dfa1",
+          "key": "t-59343a9b-0499-4757-8a80-7029dee6dfa1",
+          "title": "Audit tab 2",
+          "sort_order": 1
+        }
+      ],
+      "project_blocks": [
+        {
+          "id": "c65ce185-2505-4ed5-b767-041b9dddbe2b",
+          "type": "TEXT",
+          "tab_id": "9c195a6a-b279-47ce-bdae-d6d5b68fc733",
+          "sort_order": 0
+        },
+        {
+          "id": "b1c780d1-25b9-4e98-a302-d1103d171d61",
+          "type": "GALLERY",
+          "tab_id": "59343a9b-0499-4757-8a80-7029dee6dfa1",
+          "sort_order": 0
+        }
+      ],
+      "project_media": [
+        {
+          "id": "52daf2e5-1c00-4329-9bb5-01ae4a5287ea",
+          "kind": "image"
+        },
+        {
+          "id": "ad8cc7f8-d37f-465a-9a6e-3a8d24e8fdd8",
+          "kind": "image"
+        },
+        {
+          "id": "2d96907d-aa5d-437d-a4c1-6de914826db7",
+          "kind": "image"
+        },
+        {
+          "id": "d439b62b-51da-43f0-882a-78480019cbf0",
+          "kind": "image"
+        },
+        {
+          "id": "fe52a616-9a11-453a-8036-504f5479918d",
+          "kind": "image"
+        },
+        {
+          "id": "14e9ff02-7a8e-4645-a094-29b3ec93aae9",
+          "kind": "image"
+        },
+        {
+          "id": "b0c5ea51-26ae-4d3c-8331-0f8bec9cab1c",
+          "kind": "image"
+        },
+        {
+          "id": "1b516bb7-a99b-438d-950c-9ca0042ceb96",
+          "kind": "image"
+        },
+        {
+          "id": "2b528197-f390-45a1-ae54-d27a1c6b822c",
+          "kind": "image"
+        },
+        {
+          "id": "cc9b952d-5bb3-4ca1-b27a-3089035326c3",
+          "kind": "image"
+        },
+        {
+          "id": "9c912d0f-a33f-4f31-95b0-3a358fbc0f22",
+          "kind": "image"
+        }
+      ]
+    }
+  ]
+}
